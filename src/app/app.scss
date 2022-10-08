@@ -1,0 +1,10 @@
+// using node-style package resolution in a CSS file: 
+@import "~normalize.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+@import "~@blueprintjs/core/lib/scss/variables";
+@import "~@blueprintjs/popover2/lib/css/blueprint-popover2.css";
+@import "~@blueprintjs/table/lib/css/table.css";
+body {
+  background-color: $pt-dark-app-background-color;
+}
