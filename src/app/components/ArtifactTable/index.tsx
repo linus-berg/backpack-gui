@@ -10,13 +10,17 @@ import { GetAllModuleArtifacts } from 'api/apc';
 import React, { memo } from 'react';
 import styled from 'styled-components/macro';
 
-interface Props {}
+interface Props {
+  module: string;
+}
 
 export const ArtifactTable = memo((props: Props) => {
-  const query = useQuery(['artifact_table', 'npm'], GetAllModuleArtifacts);
-  console.log(query);
+  const query = useQuery(
+    ['artifact_table', props.module],
+    GetAllModuleArtifacts,
+  );
   if (query.isLoading) {
-    return <Spinner></Spinner>;
+    return <Spinner />;
   }
 
   const columns = [
@@ -69,7 +73,6 @@ const Center = styled.div`
 `;
 
 const Div = styled.div`
-  padding: 2rem;
-  width: 80vw;
+  width: 98vw;
   height: 80vh;
 `;
