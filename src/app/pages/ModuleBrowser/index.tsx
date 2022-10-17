@@ -29,7 +29,7 @@ export const ModuleBrowser = memo((props: Props) => {
 
   return (
     <Div>
-      <Tabs id="module-tabs">
+      <Tabs id="module-tabs" renderActiveTabPanelOnly>
         {query?.data?.data.map((artifact_module: string) => (
           <Tab
             key={artifact_module}
@@ -46,3 +46,4 @@ export const ModuleBrowser = memo((props: Props) => {
 const Div = styled.div`
   padding: 1rem;
 `;
+

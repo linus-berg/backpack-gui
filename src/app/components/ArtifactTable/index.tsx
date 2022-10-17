@@ -3,12 +3,13 @@
  * ArtifactTable
  *
  */
-import { Checkbox, Spinner } from '@blueprintjs/core';
+import { Button, Checkbox, Spinner, Tag } from '@blueprintjs/core';
 import { Column, Cell, Table2 } from '@blueprintjs/table';
-import { useQuery } from '@tanstack/react-query';
-import { GetAllModuleArtifacts } from 'api/apc';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { DeleteArtifact, GetAllModuleArtifacts } from 'api/apc';
 import React, { memo } from 'react';
 import styled from 'styled-components/macro';
+import './ArtifactTable.scss';
 
 interface Props {
   module: string;
@@ -19,6 +20,9 @@ export const ArtifactTable = memo((props: Props) => {
     ['artifact_table', props.module],
     GetAllModuleArtifacts,
   );
+
+  const mutation = useMutation(DeleteArtifact);
+
   if (query.isLoading) {
     return <Spinner />;
   }
@@ -30,9 +34,22 @@ export const ArtifactTable = memo((props: Props) => {
     {
       key: 'root',
       interactive: true,
-      render: (value: boolean) => (
+      render: (row: any, key: string) => (
         <Center>
-          <Checkbox checked={value} />
+          <Tag intent={row[key] ? 'success' : 'warning'}>
+            {row[key] ? 'root' : 'branch'}
+          </Tag>
+        </Center>
+      ),
+    },
+    {
+      key: 'action',
+      interactive: true,
+      render: row => (
+        <Center>
+          <Button intent="danger" onClick={() => mutation.mutate(row.id)} small>
+            Delete
+          </Button>
         </Center>
       ),
     },
@@ -45,8 +62,8 @@ export const ArtifactTable = memo((props: Props) => {
     const render = column.render;
     const value = data[row_idx][column.key];
     return (
-      <Cell interactive={column.interactive}>
-        {render ? render(value) : value}
+      <Cell interactive={column.interactive} className="artifact-table-cell">
+        {render ? render(data[row_idx], column.key) : value}
       </Cell>
     );
   };
@@ -55,7 +72,7 @@ export const ArtifactTable = memo((props: Props) => {
     <Div>
       <Table2
         enableColumnResizing
-        defaultRowHeight={22}
+        defaultRowHeight={30}
         numRows={query.data?.data.length}
       >
         {columns.map(column => (
@@ -66,6 +83,8 @@ export const ArtifactTable = memo((props: Props) => {
   );
 });
 const Center = styled.div`
+  height: 100%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

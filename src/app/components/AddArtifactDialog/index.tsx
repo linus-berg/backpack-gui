@@ -43,20 +43,22 @@ export const AddArtifactDialog = memo((props: Props) => {
       <Div className={Classes.DIALOG_BODY}>
         <ControlGroup vertical>
           <InputGroup
-            placeholder="Artifact Name"
+            placeholder="Artifact Name (ex. react)"
             value={name}
             onChange={evt => UpdateValue(SetName, evt)}
+            leftIcon="cube"
           />
           <InputGroup
-            placeholder="Module"
+            placeholder="Module (ex. npm)"
             value={module}
             onChange={evt => UpdateValue(SetModule, evt)}
+            leftIcon="layers"
           />
         </ControlGroup>
       </Div>
       <Div className={Classes.DIALOG_FOOTER}>
         <Div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button intent="primary" onClick={() => OnAdd()}>
+          <Button icon="cube-add" intent="primary" onClick={() => OnAdd()}>
             Add
           </Button>
         </Div>
