@@ -3,7 +3,7 @@
  * ArtifactTable
  *
  */
-import { Spinner } from '@blueprintjs/core';
+import { Checkbox, Spinner } from '@blueprintjs/core';
 import { Column, Cell, Table2 } from '@blueprintjs/table';
 import { useQuery } from '@tanstack/react-query';
 import { GetAllModuleArtifacts } from 'api/apc';
@@ -19,24 +19,54 @@ export const ArtifactTable = memo((props: Props) => {
     return <Spinner></Spinner>;
   }
 
-  const columns = ['id', 'name', 'module'];
+  const columns = [
+    { key: 'id' },
+    { key: 'name' },
+    { key: 'module' },
+    {
+      key: 'root',
+      interactive: true,
+      render: (value: boolean) => (
+        <Center>
+          <Checkbox checked={value} />
+        </Center>
+      ),
+    },
+  ];
 
   const data = query.data?.data;
 
-  const RenderBasic = (row, column) => {
-    return <Cell>{data[row][columns[column]]}</Cell>;
+  const RenderBasic = (row_idx: number, col_idx: number) => {
+    const column = columns[col_idx];
+    const render = column.render;
+    const value = data[row_idx][column.key];
+    return (
+      <Cell interactive={column.interactive}>
+        {render ? render(value) : value}
+      </Cell>
+    );
   };
 
   return (
     <Div>
-      <Table2 enableColumnResizing numRows={query.data?.data.length}>
+      <Table2
+        enableColumnResizing
+        defaultRowHeight={22}
+        numRows={query.data?.data.length}
+      >
         {columns.map(column => (
-          <Column name={column} cellRenderer={RenderBasic} />
+          <Column name={column.key} cellRenderer={RenderBasic} />
         ))}
       </Table2>
     </Div>
   );
 });
+const Center = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+`;
 
 const Div = styled.div`
   padding: 2rem;

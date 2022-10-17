@@ -18,12 +18,15 @@ import { useTranslation } from 'react-i18next';
 import './app.scss';
 import { ModuleBrowser } from './pages/ModuleBrowser';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Button, Navbar, NavbarDivider } from '@blueprintjs/core';
+import { Button, FocusStyleManager, Navbar } from '@blueprintjs/core';
+import { AddArtifactDialog } from './components/AddArtifactDialog/Loadable';
 
 const query_client = new QueryClient();
+FocusStyleManager.onlyShowFocusOnTabs();
 
 export function App() {
   const { i18n } = useTranslation();
+  const [is_open, SetOpen] = React.useState(false);
   return (
     <BrowserRouter>
       <Helmet
@@ -33,19 +36,21 @@ export function App() {
       >
         <meta name="description" content="A React Boilerplate application" />
       </Helmet>
-
       <QueryClientProvider client={query_client}>
         <Navbar>
           <Navbar.Group>
+            <Navbar.Heading>Artifact Processing Complex</Navbar.Heading>
             <Navbar.Divider />
-            <Button minimal>Input</Button>
-            <Button minimal>Browser</Button>
+            <Button intent="primary" onClick={() => SetOpen(true)}>
+              Add Artifact
+            </Button>
           </Navbar.Group>
         </Navbar>
         <Switch>
           <Route exact path="/" component={ModuleBrowser} />
           <Route component={NotFoundPage} />
         </Switch>
+        <AddArtifactDialog open={is_open} onClose={() => SetOpen(false)} />
       </QueryClientProvider>
       <GlobalStyle />
     </BrowserRouter>
