@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { Artifact } from 'types';
 
-const APC_API = 'http://localhost:4001/api';
+//const APC_API = 'http://localhost:4001/api';
+const APC_API = 'http://apc-api:80/api';
 const APC_ARTIFACTS = APC_API + '/artifact';
 
 /* Getters */
