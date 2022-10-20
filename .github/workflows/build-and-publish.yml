@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix: 
         services:
-          - name: APC.GUI
+          - name: gui
 
     name: Build Docker image and push to repositories
     # run only when code is compiling and tests are passing
