@@ -24,6 +24,7 @@ export const AddArtifactDialog = memo((props: Props) => {
   const mutation = useMutation(AddArtifact);
   const [name, SetName] = useState('');
   const [module, SetModule] = useState('');
+  const [filter, SetFilter] = useState('');
 
   const UpdateValue = (fnc, evt: React.ChangeEvent<HTMLInputElement>) => {
     fnc(evt.currentTarget.value);
@@ -33,9 +34,8 @@ export const AddArtifactDialog = memo((props: Props) => {
     if (name === '' || module === '') {
       return;
     }
-    mutation.mutate({ name: name, module: module });
+    mutation.mutate({ name: name, module: module, filter: filter });
     SetName('');
-    SetModule('');
   };
 
   return (
@@ -53,6 +53,11 @@ export const AddArtifactDialog = memo((props: Props) => {
             value={module}
             onChange={evt => UpdateValue(SetModule, evt)}
             leftIcon="layers"
+          />
+          <InputGroup
+            placeholder="Regex version filter"
+            value={filter}
+            onChange={evt => UpdateValue(SetFilter, evt)}
           />
         </ControlGroup>
       </Div>

@@ -26,5 +26,6 @@ export const AddArtifact = (artifact: Artifact) => {
   return axios.post(APC_ARTIFACTS, {
     Name: artifact.name,
     Module: artifact.module,
+    Filter: artifact.filter
   });
 };

@@ -31,6 +31,7 @@ export const ArtifactTable = memo((props: Props) => {
     { key: 'id' },
     { key: 'name' },
     { key: 'module' },
+    { key: 'filter' },
     {
       key: 'root',
       interactive: true,
