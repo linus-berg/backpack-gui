@@ -4,10 +4,11 @@
  *
  */
 import { Button, Checkbox, Spinner, Tag } from '@blueprintjs/core';
+import _ from 'lodash';
 import { Column, Cell, Table2 } from '@blueprintjs/table';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { DeleteArtifact, GetAllModuleArtifacts } from 'api/apc';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import './ArtifactTable.scss';
 
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export const ArtifactTable = memo((props: Props) => {
+  const [only_roots, SetOnlyRoots] = useState(true);
   const query = useQuery(
     ['artifact_table', props.module],
     GetAllModuleArtifacts,
@@ -57,24 +59,32 @@ export const ArtifactTable = memo((props: Props) => {
   ];
 
   const data = query.data?.data;
+  const artifacts = only_roots
+    ? _.filter(data, artifact => artifact.root)
+    : data;
 
   const RenderBasic = (row_idx: number, col_idx: number) => {
     const column = columns[col_idx];
     const render = column.render;
-    const value = data[row_idx][column.key];
+    const value = artifacts[row_idx][column.key];
     return (
       <Cell interactive={column.interactive} className="artifact-table-cell">
-        {render ? render(data[row_idx], column.key) : value}
+        {render ? render(artifacts[row_idx], column.key) : value}
       </Cell>
     );
   };
 
   return (
     <Div>
+      <Checkbox
+        label="Only roots"
+        checked={only_roots}
+        onChange={() => SetOnlyRoots(!only_roots)}
+      />
       <Table2
         enableColumnResizing
         defaultRowHeight={30}
-        numRows={query.data?.data.length}
+        numRows={artifacts.length}
       >
         {columns.map(column => (
           <Column name={column.key} cellRenderer={RenderBasic} />

@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { Artifact } from 'types';
 
-//const APC_API = 'http://localhost:4001/api';
-const APC_API = 'http://localhost:9000/api';
+const APC_API = 'http://localhost:4001/api';
+//const APC_API = 'http://localhost:9000/api';
 const APC_ARTIFACTS = APC_API + '/artifact';
 
 /* Getters */
@@ -26,6 +26,13 @@ export const AddArtifact = (artifact: Artifact) => {
   return axios.post(APC_ARTIFACTS, {
     Name: artifact.name,
     Module: artifact.module,
-    Filter: artifact.filter
+    Filter: artifact.filter,
   });
+};
+export const TrackAllArtifacts = () => {
+  return axios.post(APC_ARTIFACTS + '/track/all');
+};
+
+export const ValidateAllArtifacts = () => {
+  return axios.post(APC_ARTIFACTS + '/validate/all');
 };
