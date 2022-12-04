@@ -6,7 +6,7 @@
 
 import { lazyLoad } from 'utils/loadable';
 
-export const ModuleBrowser = lazyLoad(
+export const ProcessorBrowser = lazyLoad(
   () => import('./index'),
-  module => module.ModuleBrowser,
+  module => module.ProcessorBrowser,
 );

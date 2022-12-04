@@ -7,20 +7,20 @@ import { Button, Checkbox, Spinner, Tag } from '@blueprintjs/core';
 import _ from 'lodash';
 import { Column, Cell, Table2 } from '@blueprintjs/table';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { DeleteArtifact, GetAllModuleArtifacts } from 'api/apc';
+import { DeleteArtifact, GetAllProcessorArtifacts } from 'api/apc';
 import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import './ArtifactTable.scss';
 
 interface Props {
-  module: string;
+  processor: string;
 }
 
 export const ArtifactTable = memo((props: Props) => {
   const [only_roots, SetOnlyRoots] = useState(true);
   const query = useQuery(
-    ['artifact_table', props.module],
-    GetAllModuleArtifacts,
+    ['artifact_table', props.processor],
+    GetAllProcessorArtifacts,
   );
 
   const mutation = useMutation(DeleteArtifact);
@@ -31,8 +31,7 @@ export const ArtifactTable = memo((props: Props) => {
 
   const columns = [
     { key: 'id' },
-    { key: 'name' },
-    { key: 'module' },
+    { key: 'processor' },
     { key: 'filter' },
     {
       key: 'root',
@@ -50,7 +49,13 @@ export const ArtifactTable = memo((props: Props) => {
       interactive: true,
       render: row => (
         <Center>
-          <Button intent="danger" onClick={() => mutation.mutate(row.id)} small>
+          <Button
+            intent="danger"
+            onClick={() =>
+              mutation.mutate({ id: row.id, processor: row.processor })
+            }
+            small
+          >
             Delete
           </Button>
         </Center>
@@ -87,7 +92,11 @@ export const ArtifactTable = memo((props: Props) => {
         numRows={artifacts.length}
       >
         {columns.map(column => (
-          <Column name={column.key} cellRenderer={RenderBasic} />
+          <Column
+            key={column.key}
+            name={column.key}
+            cellRenderer={RenderBasic}
+          />
         ))}
       </Table2>
     </Div>
@@ -103,6 +112,6 @@ const Center = styled.div`
 `;
 
 const Div = styled.div`
-  width: 98vw;
+  width: 100%;
   height: 80vh;
 `;

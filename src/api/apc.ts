@@ -1,31 +1,33 @@
 import axios from 'axios';
 import { Artifact } from 'types';
 
-const APC_API = window.location.protocol + "//" + window.location.hostname + ':8004/api';
+const APC_API =
+  window.location.protocol + '//' + window.location.hostname + ':8004/api';
 //const APC_API = 'http://localhost:9000/api';
 const APC_ARTIFACTS = APC_API + '/artifact';
 
 /* Getters */
-export const GetAllModules = () => {
-  return axios.get(APC_ARTIFACTS + '/modules');
+export const GetAllProcessors = () => {
+  return axios.get(APC_ARTIFACTS + '/processors');
 };
 
-export const GetAllModuleArtifacts = ({ queryKey }) => {
-  return axios.get(APC_ARTIFACTS, { params: { module: queryKey[1] } });
+export const GetAllProcessorArtifacts = ({ queryKey }) => {
+  return axios.get(APC_ARTIFACTS, { params: { processor: queryKey[1] } });
 };
 
 /* Delete */
-const DeleteArtifactUrl = (artifact_id: number) =>
-  `${APC_ARTIFACTS}/${artifact_id}`;
-export const DeleteArtifact = (artifact_id: number) => {
-  return axios.delete(DeleteArtifactUrl(artifact_id));
+const DeleteArtifactUrl = (id: string, processor: string) =>
+  `${APC_ARTIFACTS}/${processor}/${id}`;
+
+export const DeleteArtifact = ({ id, processor }) => {
+  return axios.delete(DeleteArtifactUrl(id, processor));
 };
 
 /* Add */
 export const AddArtifact = (artifact: Artifact) => {
   return axios.post(APC_ARTIFACTS, {
     Name: artifact.name,
-    Module: artifact.module,
+    Processor: artifact.module,
     Filter: artifact.filter,
   });
 };
