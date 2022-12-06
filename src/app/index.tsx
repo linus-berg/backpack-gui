@@ -8,7 +8,7 @@
 
 import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import { Route, BrowserRouter, Routes } from 'react-router-dom';
 
 import { GlobalStyle } from 'styles/global-styles';
 
@@ -17,19 +17,15 @@ import { useTranslation } from 'react-i18next';
 import './app.scss';
 import { ProcessorBrowser } from './pages/ProcessorBrowser/Loadable';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ButtonGroup, FocusStyleManager, Navbar } from '@blueprintjs/core';
-import { ValidateAllButton } from './components/ValidateAllButton/Loadable';
-import { TrackAllButton } from './components/TrackAllButton/Loadable';
-import { Administration } from './pages/Administration';
-import { AdministrationButton } from './components/AdministrationButton';
-import { ProcessorBrowserButton } from './components/ProcessorBrowserButton';
+import { FocusStyleManager } from '@blueprintjs/core';
+import { Config } from './pages/Config';
+import { Layout } from './Layout';
 
 const query_client = new QueryClient();
 FocusStyleManager.onlyShowFocusOnTabs();
 
 export function App() {
   const { i18n } = useTranslation();
-  const [is_open, SetOpen] = React.useState(false);
   return (
     <BrowserRouter>
       <Helmet
@@ -40,27 +36,16 @@ export function App() {
         <meta name="description" content="A React Boilerplate application" />
       </Helmet>
       <QueryClientProvider client={query_client}>
-        <Navbar>
-          <Navbar.Group>
-            <Navbar.Heading>Artifact Processing Complex</Navbar.Heading>
-            <Navbar.Divider />
-            <ButtonGroup>
-              <ProcessorBrowserButton />
-              <ValidateAllButton />
-              <TrackAllButton />
-              <AdministrationButton />
-            </ButtonGroup>
-          </Navbar.Group>
-        </Navbar>
-        <Switch>
-          <Route exact path="/browser">
-            <ProcessorBrowser />
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route path="processor" element={<ProcessorBrowser />}>
+              <Route index element={<ProcessorBrowser />} />
+              <Route path=":processor" element={<ProcessorBrowser />} />
+            </Route>
+            <Route path="config" element={<Config />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
-          <Route path="/administration">
-            <Administration />
-          </Route>
-          <Route component={NotFoundPage} />
-        </Switch>
+        </Routes>
       </QueryClientProvider>
       <GlobalStyle />
     </BrowserRouter>

@@ -6,7 +6,7 @@
 
 import { lazyLoad } from 'utils/loadable';
 
-export const AdministrationButton = lazyLoad(
+export const ConfigButton = lazyLoad(
   () => import('./index'),
-  module => module.AdministrationButton,
+  module => module.ConfigButton,
 );

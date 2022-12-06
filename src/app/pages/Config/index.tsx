@@ -8,7 +8,7 @@ import styled from 'styled-components/macro';
 
 interface Props {}
 
-export const Administration = memo((props: Props) => {
+export const Config = memo((props: Props) => {
   return <Div></Div>;
 });
 

@@ -45,6 +45,18 @@ export const ArtifactTable = memo((props: Props) => {
       ),
     },
     {
+      key: 'versions',
+      render: (row: any, key: string) => (
+        <Center>{_.keys(row[key]).length}</Center>
+      ),
+    },
+    {
+      key: 'dependencies',
+      render: (row: any, key: string) => (
+        <Center>{_.keys(row[key]).length}</Center>
+      ),
+    },
+    {
       key: 'action',
       interactive: true,
       render: row => (

@@ -6,7 +6,7 @@
 
 import { lazyLoad } from 'utils/loadable';
 
-export const Administration = lazyLoad(
+export const Config = lazyLoad(
   () => import('./index'),
-  module => module.Administration,
+  module => module.Config,
 );
