@@ -12,7 +12,9 @@ export const GetAllProcessors = () => {
 };
 
 export const GetAllProcessorArtifacts = ({ queryKey }) => {
-  return axios.get(APC_ARTIFACTS, { params: { processor: queryKey[1] } });
+  return axios.get(APC_ARTIFACTS, {
+    params: { processor: queryKey[1], only_roots: false },
+  });
 };
 
 /* Delete */
@@ -26,7 +28,7 @@ export const DeleteArtifact = ({ id, processor }) => {
 /* Add */
 export const AddArtifact = (artifact: Artifact) => {
   return axios.post(APC_ARTIFACTS, {
-    Name: artifact.name,
+    Id: artifact.name,
     Processor: artifact.module,
     Filter: artifact.filter,
   });
