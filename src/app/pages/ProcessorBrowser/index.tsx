@@ -34,12 +34,12 @@ export const ProcessorBrowser = memo((props: Props) => {
         selectedTabId={params.processor}
         onChange={newTabId => nav(`/processor/${newTabId}`)}
       >
-        {query?.data?.data.map((processor: string) => (
+        {query?.data?.data.map(processor => (
           <Tab
-            key={processor}
-            id={processor}
-            title={processor}
-            panel={<ProcessorPanel processor={processor} />}
+            key={processor.id}
+            id={processor.id}
+            title={processor.id}
+            panel={<ProcessorPanel processor={processor.id} />}
           />
         ))}
       </Tabs>

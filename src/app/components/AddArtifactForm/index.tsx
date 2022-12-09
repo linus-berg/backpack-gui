@@ -27,7 +27,7 @@ export const AddArtifactForm = memo((props: Props) => {
     if (name === '') {
       return;
     }
-    mutation.mutate({ name: name, module: props.processor, filter: filter });
+    mutation.mutate({ name: name, processor: props.processor, filter: filter });
     SetName('');
   };
 

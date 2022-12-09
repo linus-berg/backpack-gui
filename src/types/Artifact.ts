@@ -1,5 +1,5 @@
 export interface Artifact {
   name: string;
-  module: string;
+  processor: string;
   filter: string;
-};
+}
