@@ -9,7 +9,7 @@ const APC_PROCESSOR = APC_API + '/processor';
 
 /* Getters */
 export const GetAllProcessors = () => {
-  return axios.get(APC_ARTIFACTS + '/processors');
+  return axios.get(APC_PROCESSOR + '/processors');
 };
 
 export const GetAllProcessorArtifacts = ({ queryKey }) => {
