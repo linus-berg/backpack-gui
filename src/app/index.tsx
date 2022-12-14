@@ -18,8 +18,8 @@ import './app.scss';
 import { ProcessorBrowser } from './pages/ProcessorBrowser/Loadable';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { FocusStyleManager } from '@blueprintjs/core';
-import { Config } from './pages/Config';
 import { Layout } from './Layout';
+import { ProcessorConfig } from './pages/ProcessorConfig/Loadable';
 
 const query_client = new QueryClient();
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -38,11 +38,14 @@ export function App() {
       <QueryClientProvider client={query_client}>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route path="processor" element={<ProcessorBrowser />}>
+            <Route path="processor">
               <Route index element={<ProcessorBrowser />} />
               <Route path=":processor" element={<ProcessorBrowser />} />
             </Route>
-            <Route path="config" element={<Config />} />
+            <Route path="config">
+              <Route index element={<ProcessorConfig />} />
+              <Route path=":processor" element={<ProcessorConfig />} />
+            </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

@@ -6,7 +6,7 @@
 
 import { lazyLoad } from 'utils/loadable';
 
-export const Config = lazyLoad(
+export const ProcessorConfig = lazyLoad(
   () => import('./index'),
-  module => module.Config,
+  module => module.ProcessorConfig,
 );
