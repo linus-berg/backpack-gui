@@ -11,15 +11,16 @@ import { DeleteArtifact, GetAllProcessorArtifacts } from 'api/apc';
 import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import './ArtifactTable.scss';
+import { Processor } from '../../../types/Processor';
 
 interface Props {
-  processor: string;
+  processor: Processor;
 }
 
 export const ArtifactTable = memo((props: Props) => {
   const [only_roots, SetOnlyRoots] = useState(true);
   const query = useQuery(
-    ['artifact_table', props.processor],
+    ['artifact_table', props.processor.id],
     GetAllProcessorArtifacts,
   );
 

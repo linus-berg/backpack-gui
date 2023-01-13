@@ -39,7 +39,7 @@ export const ProcessorBrowser = memo((props: Props) => {
             key={processor.id}
             id={processor.id}
             title={processor.id}
-            panel={<ProcessorPanel processor={processor.id} />}
+            panel={<ProcessorPanel processor={processor} />}
           />
         ))}
       </Tabs>

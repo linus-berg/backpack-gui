@@ -6,14 +6,15 @@ import {
   InputGroup,
   H6,
 } from '@blueprintjs/core';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { AddArtifact } from 'api/apc';
 import React, { memo, ReactEventHandler, useState } from 'react';
 import styled from 'styled-components/macro';
 import { AuxInput } from './AuxInput';
 import { AuxField } from 'types/AuxField';
+import { Processor } from '../../../types/Processor';
 interface Props {
-  processor: string;
+  processor: Processor;
 }
 export const AddArtifactForm = memo((props: Props) => {
   const mutation = useMutation(AddArtifact);
@@ -28,17 +29,16 @@ export const AddArtifactForm = memo((props: Props) => {
     if (name === '') {
       return;
     }
-    mutation.mutate({ name: name, processor: props.processor, filter: filter });
+    mutation.mutate({
+      name: name,
+      processor: props.processor.id,
+      filter: filter,
+    });
     SetName('');
   };
 
-  const aux: AuxField[] = [
-    {
-      id: 'group',
-      type: 'string',
-      placeholder: 'Group',
-    },
-  ];
+  const aux: AuxField[] = JSON.parse(props.processor.config);
+
   return (
     <Div>
       <ControlGroup vertical>
@@ -48,7 +48,11 @@ export const AddArtifactForm = memo((props: Props) => {
           onChange={evt => UpdateValue(SetName, evt)}
           leftIcon="cube"
         />
-        <InputGroup placeholder="Processor" value={props.processor} disabled />
+        <InputGroup
+          placeholder="Processor"
+          value={props.processor.id}
+          disabled
+        />
         <InputGroup
           placeholder="Regex version filter"
           value={filter}

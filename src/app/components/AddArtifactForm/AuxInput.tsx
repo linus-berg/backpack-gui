@@ -11,8 +11,10 @@ interface Props {
 
 export const AuxInput = memo((props: Props) => {
   const config = props.config;
+  console.log(config);
 
-  const CreateField = (field: AuxField) => {
+  const CreateField = (field: AuxField, key: string) => {
+    console.log(field, key);
     const OnChange = (value: any) => {
       if (props.onChange) {
         props.onChange(field, value);
@@ -20,12 +22,7 @@ export const AuxInput = memo((props: Props) => {
     };
     if (field.type.toLowerCase() == 'string') {
       return (
-        <StringInput
-          field={field}
-          key={field.id}
-          onChange={OnChange}
-          value=""
-        />
+        <StringInput field={field} key={key} onChange={OnChange} value="" />
       );
     }
     return null;

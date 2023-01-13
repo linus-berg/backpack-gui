@@ -2,9 +2,10 @@ import React, { memo } from 'react';
 import styled from 'styled-components/macro';
 import { ArtifactTable } from 'app/components/ArtifactTable';
 import { AddArtifactForm } from 'app/components/AddArtifactForm';
+import { Processor } from '../../../types/Processor';
 
 interface Props {
-  processor: string;
+  processor: Processor;
 }
 
 export const ProcessorPanel = memo((props: Props) => {
