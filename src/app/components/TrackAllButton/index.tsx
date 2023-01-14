@@ -5,13 +5,14 @@
  */
 import { Button } from '@blueprintjs/core';
 import { useMutation } from '@tanstack/react-query';
-import { TrackAllArtifacts } from 'api/apc';
+import { useApcApi } from 'api/apc';
 import React, { memo } from 'react';
 
 interface Props {}
 
 export const TrackAllButton = memo((props: Props) => {
-  const mutation = useMutation(TrackAllArtifacts);
+  const apc = useApcApi();
+  const mutation = useMutation(apc.TrackAllArtifacts);
   return (
     <Button
       intent="success"

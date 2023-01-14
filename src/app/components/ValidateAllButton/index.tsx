@@ -5,13 +5,14 @@
  */
 import { Button } from '@blueprintjs/core';
 import { useMutation } from '@tanstack/react-query';
-import { ValidateAllArtifacts } from 'api/apc';
+import { useApcApi } from 'api/apc';
 import React, { memo } from 'react';
 
 interface Props {}
 
 export const ValidateAllButton = memo((props: Props) => {
-  const mutation = useMutation(ValidateAllArtifacts);
+  const apc = useApcApi();
+  const mutation = useMutation(apc.ValidateAllArtifacts);
   return (
     <Button
       intent="warning"

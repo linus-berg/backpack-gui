@@ -7,7 +7,7 @@ import { Button, Checkbox, Spinner, Tag } from '@blueprintjs/core';
 import _ from 'lodash';
 import { Column, Cell, Table2 } from '@blueprintjs/table';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { DeleteArtifact, GetAllProcessorArtifacts } from 'api/apc';
+import { useApcApi } from 'api/apc';
 import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import './ArtifactTable.scss';
@@ -18,13 +18,14 @@ interface Props {
 }
 
 export const ArtifactTable = memo((props: Props) => {
+  const apc = useApcApi();
   const [only_roots, SetOnlyRoots] = useState(true);
   const query = useQuery(
     ['artifact_table', props.processor.id],
-    GetAllProcessorArtifacts,
+    apc.GetAllProcessorArtifacts,
   );
 
-  const mutation = useMutation(DeleteArtifact);
+  const mutation = useMutation(apc.DeleteArtifact);
 
   if (query.isLoading) {
     return <Spinner />;

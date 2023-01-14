@@ -7,7 +7,7 @@ import {
   H6,
 } from '@blueprintjs/core';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AddArtifact } from 'api/apc';
+import { useApcApi } from 'api/apc';
 import React, { memo, ReactEventHandler, useState } from 'react';
 import styled from 'styled-components/macro';
 import { AuxInput } from './AuxInput';
@@ -17,7 +17,8 @@ interface Props {
   processor: Processor;
 }
 export const AddArtifactForm = memo((props: Props) => {
-  const mutation = useMutation(AddArtifact);
+  const apc = useApcApi();
+  const mutation = useMutation(apc.AddArtifact);
   const [name, SetName] = useState('');
   const [filter, SetFilter] = useState('');
 

@@ -6,7 +6,7 @@
 import * as React from 'react';
 import styled from 'styled-components/macro';
 import { useQuery } from '@tanstack/react-query';
-import { GetAllProcessors } from 'api/apc';
+import { useApcApi } from 'api/apc';
 import { Spinner, Tab, Tabs } from '@blueprintjs/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ProcessorEditor } from '../ProcessorEditor/Loadable';
@@ -14,7 +14,8 @@ import { ProcessorEditor } from '../ProcessorEditor/Loadable';
 interface Props {}
 
 export function ProcessorList(props: Props) {
-  const query = useQuery(['processor_list'], GetAllProcessors);
+  const apc = useApcApi();
+  const query = useQuery(['processor_list'], apc.GetAllProcessors);
   const params = useParams();
   const nav = useNavigate();
   if (query.isLoading) {

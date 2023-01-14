@@ -20,12 +20,23 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { FocusStyleManager } from '@blueprintjs/core';
 import { Layout } from './Layout';
 import { ProcessorConfig } from './pages/ProcessorConfig/Loadable';
+import { useKeycloak } from '@react-keycloak-fork/web';
 
 const query_client = new QueryClient();
 FocusStyleManager.onlyShowFocusOnTabs();
 
 export function App() {
   const { i18n } = useTranslation();
+  const { keycloak, initialized } = useKeycloak();
+
+  React.useEffect(() => {
+    if (initialized) {
+      if (!keycloak?.authenticated) {
+        keycloak.login();
+      }
+    }
+  }, [keycloak]);
+
   return (
     <BrowserRouter>
       <Helmet
