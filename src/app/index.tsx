@@ -21,6 +21,7 @@ import { FocusStyleManager } from '@blueprintjs/core';
 import { Layout } from './Layout';
 import { ProcessorConfig } from './pages/ProcessorConfig/Loadable';
 import { useKeycloak } from '@react-keycloak-fork/web';
+import { AxiosProvider } from 'api/apc';
 
 const query_client = new QueryClient();
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -29,13 +30,11 @@ export function App() {
   const { i18n } = useTranslation();
   const { keycloak, initialized } = useKeycloak();
 
-  React.useEffect(() => {
-    if (initialized) {
-      if (!keycloak?.authenticated) {
-        keycloak.login();
-      }
+  if (initialized) {
+    if (!keycloak?.authenticated) {
+      keycloak.login();
     }
-  }, [keycloak]);
+  }
 
   return (
     <BrowserRouter>
@@ -46,21 +45,23 @@ export function App() {
       >
         <meta name="description" content="A React Boilerplate application" />
       </Helmet>
-      <QueryClientProvider client={query_client}>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route path="processor">
-              <Route index element={<ProcessorBrowser />} />
-              <Route path=":processor" element={<ProcessorBrowser />} />
+      <AxiosProvider>
+        <QueryClientProvider client={query_client}>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route path="processor">
+                <Route index element={<ProcessorBrowser />} />
+                <Route path=":processor" element={<ProcessorBrowser />} />
+              </Route>
+              <Route path="config">
+                <Route index element={<ProcessorConfig />} />
+                <Route path=":processor" element={<ProcessorConfig />} />
+              </Route>
+              <Route path="*" element={<NotFoundPage />} />
             </Route>
-            <Route path="config">
-              <Route index element={<ProcessorConfig />} />
-              <Route path=":processor" element={<ProcessorConfig />} />
-            </Route>
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </QueryClientProvider>
+          </Routes>
+        </QueryClientProvider>
+      </AxiosProvider>
       <GlobalStyle />
     </BrowserRouter>
   );

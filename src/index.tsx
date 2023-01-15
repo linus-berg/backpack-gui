@@ -35,15 +35,7 @@ const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 ReactDOMClient.createRoot(MOUNT_NODE!).render(
   <Provider store={store}>
     <HelmetProvider>
-      <ReactKeycloakProvider
-        authClient={keycloak}
-        onEvent={(evt, error) => {
-          console.log(evt, error);
-        }}
-        onTokens={tokens => {
-          console.log(tokens);
-        }}
-      >
+      <ReactKeycloakProvider authClient={keycloak}>
         <React.StrictMode>
           <App />
         </React.StrictMode>
