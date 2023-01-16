@@ -1,9 +1,6 @@
 import Keycloak from 'keycloak-js';
+import { APC_API } from './api/apc';
 
-const keycloak = Keycloak({
-  url: 'http://localhost:8090',
-  realm: 'master',
-  clientId: 'apc',
-});
+const keycloak = new Keycloak(APC_API + '/status/keycloak');
 
 export default keycloak;

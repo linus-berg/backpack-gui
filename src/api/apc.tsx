@@ -5,7 +5,7 @@ import { Artifact } from 'types';
 import type { AxiosInstance } from 'axios';
 import { Spinner } from '@blueprintjs/core';
 import { AuthInterceptor } from './AuthInterceptor';
-const APC_API =
+export const APC_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
 const APC_ARTIFACTS = '/artifact';
 const APC_PROCESSOR = '/processor';
