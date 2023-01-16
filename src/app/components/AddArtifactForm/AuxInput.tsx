@@ -6,23 +6,27 @@ import { AuxField } from 'types/AuxField';
 import { StringInput } from './StringInput';
 interface Props {
   config: AuxField[];
-  onChange?: (field: AuxField, value: any) => void;
+  values: { [key: string]: string };
+  onChange?: (field: AuxField, value: string) => void;
 }
 
 export const AuxInput = memo((props: Props) => {
   const config = props.config;
-  console.log(config);
 
   const CreateField = (field: AuxField, key: string) => {
-    console.log(field, key);
-    const OnChange = (value: any) => {
+    const OnChange = (value: string) => {
       if (props.onChange) {
         props.onChange(field, value);
       }
     };
     if (field.type.toLowerCase() == 'string') {
       return (
-        <StringInput field={field} key={key} onChange={OnChange} value="" />
+        <StringInput
+          field={field}
+          key={key}
+          onChange={OnChange}
+          value={props.values[field.id]}
+        />
       );
     }
     return null;

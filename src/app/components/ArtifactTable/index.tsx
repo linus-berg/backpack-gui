@@ -12,6 +12,7 @@ import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import './ArtifactTable.scss';
 import { Processor } from '../../../types/Processor';
+import { AuxField } from 'types/AuxField';
 
 interface Props {
   processor: Processor;
@@ -30,6 +31,15 @@ export const ArtifactTable = memo((props: Props) => {
   if (query.isLoading) {
     return <Spinner />;
   }
+
+  const aux_columns = _.map(
+    JSON.parse(props.processor.config),
+    (field: AuxField) => {
+      return {
+        key: `config.${field.id}`,
+      };
+    },
+  );
 
   const columns = [
     { key: 'id' },
@@ -58,6 +68,7 @@ export const ArtifactTable = memo((props: Props) => {
         <Center>{_.keys(row[key]).length}</Center>
       ),
     },
+    ...aux_columns,
     {
       key: 'action',
       interactive: true,
@@ -77,7 +88,7 @@ export const ArtifactTable = memo((props: Props) => {
     },
   ];
 
-  const data = query.data?.data;
+  const data = _.sortBy(query.data?.data, 'id');
   const artifacts = only_roots
     ? _.filter(data, artifact => artifact.root)
     : data;
@@ -85,7 +96,7 @@ export const ArtifactTable = memo((props: Props) => {
   const RenderBasic = (row_idx: number, col_idx: number) => {
     const column = columns[col_idx];
     const render = column.render;
-    const value = artifacts[row_idx][column.key];
+    const value = _.get(artifacts[row_idx], column.key);
     return (
       <Cell interactive={column.interactive} className="artifact-table-cell">
         {render ? render(artifacts[row_idx], column.key) : value}

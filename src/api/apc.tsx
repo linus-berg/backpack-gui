@@ -13,14 +13,14 @@ const APC_PROCESSOR = '/processor';
 const DeleteArtifactUrl = (id: string, processor: string) =>
   `${APC_ARTIFACTS}/${processor}/${id}`;
 
-const ax_ctx = createContext<AxiosInstance>({} as AxiosInstance);
+const axios_ctx = createContext<AxiosInstance>({} as AxiosInstance);
 
-const ax_in = axios.create({
+const axios_instance = axios.create({
   baseURL: APC_API,
 });
 
 const interceptor = new AuthInterceptor();
-const interceptor_hdl = ax_in.interceptors.request.use(
+const interceptor_hdl = axios_instance.interceptors.request.use(
   interceptor.Intercept.bind(interceptor),
 );
 
@@ -39,14 +39,14 @@ export const AxiosProvider = props => {
   }
 
   return (
-    <ax_ctx.Provider value={ax_in}>
+    <axios_ctx.Provider value={axios_instance}>
       {keycloak?.authenticated ? props.children : <Spinner />}
-    </ax_ctx.Provider>
+    </axios_ctx.Provider>
   );
 };
 
 export const useAxios = () => {
-  return useContext(ax_ctx);
+  return useContext(axios_ctx);
 };
 
 export const useApcApi = () => {
@@ -72,6 +72,7 @@ export const useApcApi = () => {
       Id: artifact.name,
       Processor: artifact.processor,
       Filter: artifact.filter,
+      Config: artifact.config,
     });
   };
   const TrackAllArtifacts = () => {

@@ -13,17 +13,24 @@ import styled from 'styled-components/macro';
 import { AuxInput } from './AuxInput';
 import { AuxField } from 'types/AuxField';
 import { Processor } from '../../../types/Processor';
+import { Artifact } from 'types';
 interface Props {
   processor: Processor;
 }
+
 export const AddArtifactForm = memo((props: Props) => {
   const apc = useApcApi();
   const mutation = useMutation(apc.AddArtifact);
-  const [name, SetName] = useState('');
+  const [name, SetName] = useState<string>('');
   const [filter, SetFilter] = useState('');
+  const [config, SetConfig] = useState<Artifact['config']>({});
 
   const UpdateValue = (fnc, evt: React.ChangeEvent<HTMLInputElement>) => {
     fnc(evt.currentTarget.value);
+  };
+
+  const UpdateField = (field: AuxField, value: string) => {
+    SetConfig({ ...config, [field.id]: value });
   };
 
   const OnAdd = () => {
@@ -34,6 +41,7 @@ export const AddArtifactForm = memo((props: Props) => {
       name: name,
       processor: props.processor.id,
       filter: filter,
+      config: config,
     });
     SetName('');
   };
@@ -63,7 +71,7 @@ export const AddArtifactForm = memo((props: Props) => {
       <div>
         <H6>Auxiliary input</H6>
         <ControlGroup vertical>
-          <AuxInput config={aux} />
+          <AuxInput onChange={UpdateField} config={aux} values={config} />
         </ControlGroup>
       </div>
       <Button icon="cube-add" intent="primary" onClick={() => OnAdd()}>
