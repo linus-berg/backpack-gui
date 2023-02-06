@@ -22,7 +22,7 @@ export const ArtifactTable = memo((props: Props) => {
   const apc = useApcApi();
   const [only_roots, SetOnlyRoots] = useState(true);
   const query = useQuery(
-    ['artifact_table', props.processor.id],
+    ['artifact_table', props.processor.id, only_roots],
     apc.GetAllProcessorArtifacts,
   );
 

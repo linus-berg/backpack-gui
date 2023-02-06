@@ -58,7 +58,7 @@ export const useApcApi = () => {
 
   const GetAllProcessorArtifacts = ({ queryKey }) => {
     return APC.get(APC_ARTIFACTS, {
-      params: { processor: queryKey[1], only_roots: false },
+      params: { processor: queryKey[1], only_roots: queryKey[2] },
     });
   };
 
