@@ -5,6 +5,7 @@ import {
   Dialog,
   InputGroup,
   H6,
+  Card,
 } from '@blueprintjs/core';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useApcApi } from 'api/apc';
@@ -50,6 +51,11 @@ export const AddArtifactForm = memo((props: Props) => {
 
   return (
     <Div>
+      <Card>
+        <div
+          dangerouslySetInnerHTML={{ __html: props.processor.description }}
+        />
+      </Card>
       <ControlGroup vertical>
         <InputGroup
           placeholder="Artifact Name (ex. react)"
@@ -74,7 +80,12 @@ export const AddArtifactForm = memo((props: Props) => {
           <AuxInput onChange={UpdateField} config={aux} values={config} />
         </ControlGroup>
       </div>
-      <Button icon="cube-add" intent="primary" onClick={() => OnAdd()}>
+      <Button
+        icon="cube-add"
+        intent="primary"
+        onClick={() => OnAdd()}
+        disabled={name === ''}
+      >
         Add
       </Button>
     </Div>

@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f03c2a72-6a79-4508-93d7-1b6947205d68" name="Changes" comment="Fixed some processing issues.">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="f03c2a72-6a79-4508-93d7-1b6947205d68" name="Changes" comment="Updated to allow only root fetching (efficiency).">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/apc.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/apc.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/keycloak.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/keycloak.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/components/AddArtifactForm/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/AddArtifactForm/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/Processor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/Processor.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,7 +52,9 @@
       <updated>1673523027899</updated>
       <workItem from="1673523031013" duration="1720000" />
       <workItem from="1673526270528" duration="16073000" />
-      <workItem from="1673882120170" duration="810000" />
+      <workItem from="1673882120170" duration="12303000" />
+      <workItem from="1675700560267" duration="144000" />
+      <workItem from="1676548360549" duration="1144000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed some processing issues.">
       <created>1673610819659</created>
@@ -64,7 +63,21 @@
       <option name="project" value="LOCAL" />
       <updated>1673610819659</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added Keycloak URL.">
+      <created>1673882968060</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1673882968060</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Updated to allow only root fetching (efficiency).">
+      <created>1675700691083</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1675700691083</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -72,6 +85,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Fixed some processing issues." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed some processing issues." />
+    <MESSAGE value="Added Keycloak URL." />
+    <MESSAGE value="Updated to allow only root fetching (efficiency)." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated to allow only root fetching (efficiency)." />
   </component>
 </project>
