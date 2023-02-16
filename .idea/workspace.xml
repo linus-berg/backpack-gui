@@ -4,10 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f03c2a72-6a79-4508-93d7-1b6947205d68" name="Changes" comment="Updated to allow only root fetching (efficiency).">
+    <list default="true" id="f03c2a72-6a79-4508-93d7-1b6947205d68" name="Changes" comment="Updated to allow only root fetching (efficiency).&#10;&#10;Added processor descriptions.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/components/AddArtifactForm/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/AddArtifactForm/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/Processor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/Processor.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/apc.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/apc.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/components/ConfigButton/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ConfigButton/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/components/ProcessorEditor/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ProcessorEditor/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/components/TrackAllButton/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/TrackAllButton/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/components/ValidateAllButton/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ValidateAllButton/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/ProcessorConfig/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/ProcessorConfig/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +61,7 @@
       <workItem from="1673526270528" duration="16073000" />
       <workItem from="1673882120170" duration="12303000" />
       <workItem from="1675700560267" duration="144000" />
-      <workItem from="1676548360549" duration="1144000" />
+      <workItem from="1676548360549" duration="4623000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed some processing issues.">
       <created>1673610819659</created>
@@ -77,7 +84,14 @@
       <option name="project" value="LOCAL" />
       <updated>1675700691083</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Updated to allow only root fetching (efficiency).&#10;&#10;Added processor descriptions.">
+      <created>1676550006301</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1676550006301</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -87,6 +101,7 @@
     <MESSAGE value="Fixed some processing issues." />
     <MESSAGE value="Added Keycloak URL." />
     <MESSAGE value="Updated to allow only root fetching (efficiency)." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated to allow only root fetching (efficiency)." />
+    <MESSAGE value="Updated to allow only root fetching (efficiency).&#10;&#10;Added processor descriptions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated to allow only root fetching (efficiency).&#10;&#10;Added processor descriptions." />
   </component>
 </project>

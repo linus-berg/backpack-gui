@@ -29,13 +29,14 @@ export const ProcessorConfig = memo((props: Props) => {
   return (
     <Div>
       <Tabs
-        id="processor-config-tabs"
+        className="processor-config-tab"
         renderActiveTabPanelOnly
         selectedTabId={params.processor}
         onChange={newTabId => nav(`/config/${newTabId}`)}
       >
         {query?.data?.data.map(processor => (
           <Tab
+            className={'processor-config-tab'}
             key={processor.id}
             id={processor.id}
             title={processor.id}
@@ -47,4 +48,6 @@ export const ProcessorConfig = memo((props: Props) => {
   );
 });
 
-const Div = styled.div``;
+const Div = styled.div`
+  height: 100%;
+`;

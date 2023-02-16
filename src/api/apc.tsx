@@ -5,6 +5,7 @@ import { Artifact } from 'types';
 import type { AxiosInstance } from 'axios';
 import { Spinner } from '@blueprintjs/core';
 import { AuthInterceptor } from './AuthInterceptor';
+import { Processor } from '../types/Processor';
 export const APC_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
 const APC_ARTIFACTS = '/artifact';
@@ -89,8 +90,17 @@ export const useApcApi = () => {
       ProcessorId: processor_id,
     });
   };
+
+  const UpdateProcessor = (processor: Processor) => {
+    return APC.post(APC_PROCESSOR + '/update', {
+      ProcessorId: processor.id,
+      Description: processor.description,
+    });
+  };
+
   return {
     AddProcessor,
+    UpdateProcessor,
     AddArtifact,
     TrackAllArtifacts,
     DeleteArtifact,
