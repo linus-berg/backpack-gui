@@ -13,6 +13,8 @@ import styled from 'styled-components/macro';
 import './ArtifactTable.scss';
 import { Processor } from '../../../types/Processor';
 import { AuxField } from 'types/AuxField';
+import { useKeycloak } from '@react-keycloak-fork/web';
+import { Artifact } from 'types';
 
 interface Props {
   processor: Processor;
@@ -20,6 +22,8 @@ interface Props {
 
 export const ArtifactTable = memo((props: Props) => {
   const apc = useApcApi();
+  const { keycloak } = useKeycloak();
+
   const [only_roots, SetOnlyRoots] = useState(true);
   const query = useQuery(
     ['artifact_table', props.processor.id, only_roots],
@@ -36,7 +40,7 @@ export const ArtifactTable = memo((props: Props) => {
     JSON.parse(props.processor.config),
     (field: AuxField) => {
       return {
-        key: `config.${field.id}`,
+        key: `config.${field.key}`,
       };
     },
   );
@@ -76,6 +80,7 @@ export const ArtifactTable = memo((props: Props) => {
         <Center>
           <Button
             intent="danger"
+            disabled={!keycloak.hasResourceRole('Administrator')}
             onClick={() =>
               mutation.mutate({ id: row.id, processor: row.processor })
             }
@@ -90,7 +95,7 @@ export const ArtifactTable = memo((props: Props) => {
 
   const data = _.sortBy(query.data?.data, 'id');
   const artifacts = only_roots
-    ? _.filter(data, artifact => artifact.root)
+    ? _.filter(data, (artifact: Artifact) => artifact.root)
     : data;
 
   const RenderBasic = (row_idx: number, col_idx: number) => {

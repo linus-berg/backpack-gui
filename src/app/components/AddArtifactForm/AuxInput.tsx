@@ -4,8 +4,9 @@ import React, { memo, ReactEventHandler, useState } from 'react';
 import styled from 'styled-components/macro';
 import { AuxField } from 'types/AuxField';
 import { StringInput } from './StringInput';
+import { AuxDict } from 'types/AuxDict';
 interface Props {
-  config: AuxField[];
+  config: AuxDict;
   values: { [key: string]: string };
   onChange?: (field: AuxField, value: string) => void;
 }
@@ -25,7 +26,7 @@ export const AuxInput = memo((props: Props) => {
           field={field}
           key={key}
           onChange={OnChange}
-          value={props.values[field.id]}
+          value={props.values[field.key]}
         />
       );
     }

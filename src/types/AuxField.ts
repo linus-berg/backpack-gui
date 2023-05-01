@@ -1,5 +1,5 @@
 export interface AuxField {
-  id: string;
+  key: string;
   type: string;
   name: string;
   placeholder: string;

@@ -15,6 +15,7 @@ import { AuxInput } from './AuxInput';
 import { AuxField } from 'types/AuxField';
 import { Processor } from '../../../types/Processor';
 import { Artifact } from 'types';
+import { AuxDict } from 'types/AuxDict';
 interface Props {
   processor: Processor;
 }
@@ -31,7 +32,7 @@ export const AddArtifactForm = memo((props: Props) => {
   };
 
   const UpdateField = (field: AuxField, value: string) => {
-    SetConfig({ ...config, [field.id]: value });
+    SetConfig({ ...config, [field.key]: value });
   };
 
   const OnAdd = () => {
@@ -43,11 +44,13 @@ export const AddArtifactForm = memo((props: Props) => {
       processor: props.processor.id,
       filter: filter,
       config: config,
+      root: true,
     });
     SetName('');
   };
 
-  const aux: AuxField[] = JSON.parse(props.processor.config);
+  const aux: AuxDict = JSON.parse(props.processor.config);
+  console.log();
 
   return (
     <Div>

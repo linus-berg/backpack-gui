@@ -11,8 +11,8 @@ export const APC_API =
 const APC_ARTIFACTS = '/artifact';
 const APC_PROCESSOR = '/processor';
 /* Delete */
-const DeleteArtifactUrl = (id: string, processor: string) =>
-  `${APC_ARTIFACTS}/${processor}/${id}`;
+const DeleteArtifactUrl = (processor: string) =>
+  `${APC_ARTIFACTS}/${processor}/`;
 
 const axios_ctx = createContext<AxiosInstance>({} as AxiosInstance);
 
@@ -64,16 +64,20 @@ export const useApcApi = () => {
   };
 
   const DeleteArtifact = ({ id, processor }) => {
-    return APC.delete(DeleteArtifactUrl(id, processor));
+    return APC.delete(DeleteArtifactUrl(processor), {
+      data: {
+        id: id,
+      },
+    });
   };
 
   /* Add */
   const AddArtifact = (artifact: Artifact) => {
     return APC.post(APC_ARTIFACTS, {
-      Id: artifact.name,
-      Processor: artifact.processor,
-      Filter: artifact.filter,
-      Config: artifact.config,
+      id: artifact.name,
+      processor: artifact.processor,
+      filter: artifact.filter,
+      config: artifact.config,
     });
   };
   const TrackAllArtifacts = () => {
@@ -87,14 +91,14 @@ export const useApcApi = () => {
   /* Add Processor */
   const AddProcessor = (processor_id: string) => {
     return APC.post(APC_PROCESSOR, {
-      ProcessorId: processor_id,
+      processor_id: processor_id,
     });
   };
 
   const UpdateProcessor = (processor: Processor) => {
     return APC.post(APC_PROCESSOR + '/update', {
-      ProcessorId: processor.id,
-      Description: processor.description,
+      processor_id: processor.id,
+      description: processor.description,
     });
   };
 
