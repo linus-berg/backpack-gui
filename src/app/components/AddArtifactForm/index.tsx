@@ -40,11 +40,13 @@ export const AddArtifactForm = memo((props: Props) => {
       return;
     }
     mutation.mutate({
-      name: name,
+      id: name,
       processor: props.processor.id,
       filter: filter,
       config: config,
       root: true,
+      versions: {},
+      dependencies: {},
     });
     SetName('');
   };

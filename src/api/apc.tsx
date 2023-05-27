@@ -74,10 +74,12 @@ export const useApcApi = () => {
   /* Add */
   const AddArtifact = (artifact: Artifact) => {
     return APC.post(APC_ARTIFACTS, {
-      id: artifact.name,
+      id: artifact.id,
       processor: artifact.processor,
       filter: artifact.filter,
       config: artifact.config,
+      versions: {},
+      dependencies: {},
     });
   };
   const TrackAllArtifacts = () => {

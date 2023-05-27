@@ -3,7 +3,7 @@
  * ArtifactTable
  *
  */
-import { Button, Checkbox, Spinner, Tag } from '@blueprintjs/core';
+import { ButtonGroup, Button, Checkbox, Spinner, Tag } from '@blueprintjs/core';
 import _ from 'lodash';
 import { Column, Cell, Table2 } from '@blueprintjs/table';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -15,6 +15,8 @@ import { Processor } from '../../../types/Processor';
 import { AuxField } from 'types/AuxField';
 import { useKeycloak } from '@react-keycloak-fork/web';
 import { Artifact } from 'types';
+import { InspectButton } from './InspectButton';
+import { ArtifactInspector } from 'app/components/ArtifactInspector';
 
 interface Props {
   processor: Processor;
@@ -23,8 +25,8 @@ interface Props {
 export const ArtifactTable = memo((props: Props) => {
   const apc = useApcApi();
   const { keycloak } = useKeycloak();
-
   const [only_roots, SetOnlyRoots] = useState(true);
+  const [inspect, SetInspect] = useState<null | Artifact>(null);
   const query = useQuery(
     ['artifact_table', props.processor.id, only_roots],
     apc.GetAllProcessorArtifacts,
@@ -41,13 +43,14 @@ export const ArtifactTable = memo((props: Props) => {
     (field: AuxField) => {
       return {
         key: `config.${field.key}`,
+        interactive: false,
       };
     },
   );
 
   const columns = [
-    { key: 'id' },
-    { key: 'processor' },
+    { key: 'id', interactive: false },
+    { key: 'processor', interactive: false },
     { key: 'filter' },
     {
       key: 'root',
@@ -62,12 +65,14 @@ export const ArtifactTable = memo((props: Props) => {
     },
     {
       key: 'versions',
+      interactive: false,
       render: (row: any, key: string) => (
         <Center>{_.keys(row[key]).length}</Center>
       ),
     },
     {
       key: 'dependencies',
+      interactive: false,
       render: (row: any, key: string) => (
         <Center>{_.keys(row[key]).length}</Center>
       ),
@@ -76,18 +81,21 @@ export const ArtifactTable = memo((props: Props) => {
     {
       key: 'action',
       interactive: true,
-      render: row => (
+      render: (row: Artifact) => (
         <Center>
-          <Button
-            intent="danger"
-            disabled={!keycloak.hasResourceRole('Administrator')}
-            onClick={() =>
-              mutation.mutate({ id: row.id, processor: row.processor })
-            }
-            small
-          >
-            Delete
-          </Button>
+          <ButtonGroup>
+            <InspectButton artifact={row} onInspect={SetInspect} />
+            <Button
+              intent="danger"
+              disabled={!keycloak.hasResourceRole('Administrator')}
+              onClick={() =>
+                mutation.mutate({ id: row.id, processor: row.processor })
+              }
+              small
+            >
+              Delete
+            </Button>
+          </ButtonGroup>
         </Center>
       ),
     },
@@ -100,8 +108,8 @@ export const ArtifactTable = memo((props: Props) => {
 
   const RenderBasic = (row_idx: number, col_idx: number) => {
     const column = columns[col_idx];
-    const render = column.render;
     const value = _.get(artifacts[row_idx], column.key);
+    const render = 'render' in column ? column.render : undefined;
     return (
       <Cell interactive={column.interactive} className="artifact-table-cell">
         {render ? render(artifacts[row_idx], column.key) : value}
@@ -129,6 +137,7 @@ export const ArtifactTable = memo((props: Props) => {
           />
         ))}
       </Table2>
+      <ArtifactInspector onClose={() => SetInspect(null)} artifact={inspect} />
     </Div>
   );
 });
