@@ -4,16 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f03c2a72-6a79-4508-93d7-1b6947205d68" name="Changes" comment="Updated to allow only root fetching (efficiency).&#10;&#10;Added processor descriptions.">
+    <list default="true" id="f03c2a72-6a79-4508-93d7-1b6947205d68" name="Changes" comment="Added logout button and fixed displaying of added packages without updating webpage.">
+      <change afterPath="$PROJECT_DIR$/.idea/APC.GUI.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/start.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/apc.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/apc.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/app.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/components/ConfigButton/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ConfigButton/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/components/ProcessorEditor/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ProcessorEditor/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/components/TrackAllButton/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/TrackAllButton/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/components/ValidateAllButton/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ValidateAllButton/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/ProcessorConfig/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/ProcessorConfig/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/Layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/Layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/components/AddArtifactForm/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/AddArtifactForm/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/components/ArtifactTable/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ArtifactTable/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -24,31 +26,49 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="5" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2KDxbfbJncC3l7nTPzm6MdPosrx" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.stylelint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.stylelint&quot;: &quot;/home/bfde19/WebstormProjects/APC.GUI/node_modules/stylelint&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/home/bfde19/WebstormProjects/APC.GUI/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/Users/ember/Development/APC.GUI",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.stylelint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.stylelint": "/home/bfde19/WebstormProjects/APC.GUI/node_modules/stylelint",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "yarn",
+    "npm.start.executor": "Run",
+    "settings.editor.selected.configurable": "preferences.sourceCode.TypeScript",
+    "ts.external.directory.path": "/Users/ember/Development/APC.GUI/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="ReactDesignerToolWindowState">
+    <option name="myId2Visible">
+      <map>
+        <entry key="com.intellij.reactbuddy.reactComponents" value="false" />
+        <entry key="com.intellij.reactbuddy.reactInspector" value="false" />
+        <entry key="com.intellij.reactbuddy.storybook" value="false" />
+      </map>
+    </option>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -62,6 +82,8 @@
       <workItem from="1673882120170" duration="12303000" />
       <workItem from="1675700560267" duration="144000" />
       <workItem from="1676548360549" duration="4623000" />
+      <workItem from="1704998438327" duration="559000" />
+      <workItem from="1704999004889" duration="3620000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed some processing issues.">
       <created>1673610819659</created>
@@ -102,6 +124,7 @@
     <MESSAGE value="Added Keycloak URL." />
     <MESSAGE value="Updated to allow only root fetching (efficiency)." />
     <MESSAGE value="Updated to allow only root fetching (efficiency).&#10;&#10;Added processor descriptions." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated to allow only root fetching (efficiency).&#10;&#10;Added processor descriptions." />
+    <MESSAGE value="Added logout button and fixed displaying of added packages without updating webpage." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added logout button and fixed displaying of added packages without updating webpage." />
   </component>
 </project>

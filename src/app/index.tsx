@@ -22,6 +22,7 @@ import { Layout } from './Layout';
 import { ProcessorConfig } from './pages/ProcessorConfig/Loadable';
 import { useKeycloak } from '@react-keycloak-fork/web';
 import { AxiosProvider } from 'api/apc';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const query_client = new QueryClient();
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -60,6 +61,7 @@ export function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </AxiosProvider>
       <GlobalStyle />

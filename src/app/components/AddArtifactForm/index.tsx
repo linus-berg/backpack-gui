@@ -7,22 +7,32 @@ import {
   H6,
   Card,
 } from '@blueprintjs/core';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApcApi } from 'api/apc';
-import React, { memo, ReactEventHandler, useState } from 'react';
+import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { AuxInput } from './AuxInput';
 import { AuxField } from 'types/AuxField';
 import { Processor } from '../../../types/Processor';
 import { Artifact } from 'types';
 import { AuxDict } from 'types/AuxDict';
+import { AxiosResponse } from 'axios';
 interface Props {
   processor: Processor;
 }
 
 export const AddArtifactForm = memo((props: Props) => {
   const apc = useApcApi();
-  const mutation = useMutation(apc.AddArtifact);
+  const query_client = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: apc.AddArtifact,
+    onSuccess: (data: AxiosResponse<Artifact>) => {
+      const artifact: Artifact = data.data;
+      query_client.invalidateQueries({
+        queryKey: ['artifact_table', artifact.processor, true],
+      });
+    },
+  });
   const [name, SetName] = useState<string>('');
   const [filter, SetFilter] = useState('');
   const [config, SetConfig] = useState<Artifact['config']>({});
@@ -52,7 +62,6 @@ export const AddArtifactForm = memo((props: Props) => {
   };
 
   const aux: AuxDict = JSON.parse(props.processor.config);
-  console.log();
 
   return (
     <Div>
@@ -89,6 +98,7 @@ export const AddArtifactForm = memo((props: Props) => {
         icon="cube-add"
         intent="primary"
         onClick={() => OnAdd()}
+        loading={mutation.isLoading}
         disabled={name === ''}
       >
         Add

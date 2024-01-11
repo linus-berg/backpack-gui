@@ -6,7 +6,7 @@
 import { ButtonGroup, Button, Checkbox, Spinner, Tag } from '@blueprintjs/core';
 import _ from 'lodash';
 import { Column, Cell, Table2 } from '@blueprintjs/table';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApcApi } from 'api/apc';
 import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -17,6 +17,7 @@ import { useKeycloak } from '@react-keycloak-fork/web';
 import { Artifact } from 'types';
 import { InspectButton } from './InspectButton';
 import { ArtifactInspector } from 'app/components/ArtifactInspector';
+import { AxiosResponse } from 'axios';
 
 interface Props {
   processor: Processor;
@@ -25,6 +26,7 @@ interface Props {
 export const ArtifactTable = memo((props: Props) => {
   const apc = useApcApi();
   const { keycloak } = useKeycloak();
+  const query_client = useQueryClient();
   const [only_roots, SetOnlyRoots] = useState(true);
   const [inspect, SetInspect] = useState<null | Artifact>(null);
   const query = useQuery(
@@ -32,7 +34,15 @@ export const ArtifactTable = memo((props: Props) => {
     apc.GetAllProcessorArtifacts,
   );
 
-  const mutation = useMutation(apc.DeleteArtifact);
+  const mutation = useMutation({
+    mutationFn: apc.DeleteArtifact,
+    onSuccess: (data: AxiosResponse<Artifact>) => {
+      const artifact = data.data;
+      query_client.invalidateQueries({
+        queryKey: ['artifact_table', artifact.processor, true],
+      });
+    },
+  });
 
   if (query.isLoading) {
     return <Spinner />;
@@ -91,6 +101,7 @@ export const ArtifactTable = memo((props: Props) => {
               onClick={() =>
                 mutation.mutate({ id: row.id, processor: row.processor })
               }
+              loading={mutation.isLoading}
               small
             >
               Delete
