@@ -18,17 +18,51 @@ import { Artifact } from 'types';
 import { InspectButton } from './InspectButton';
 import { ArtifactInspector } from 'app/components/ArtifactInspector';
 import { AxiosResponse } from 'axios';
+import { SearchBar } from './SearchBar';
 
 interface Props {
   processor: Processor;
 }
+
+const FilterObject = (filter: string, artifact: any, deep_filter = false) => {
+  const keys = Object.keys(artifact);
+  for (let i in keys) {
+    const key = keys[i];
+    const value = artifact[key];
+    if (deep_filter && typeof value === 'object') {
+      if (FilterObject(filter, value, deep_filter)) {
+        return true;
+      }
+    } else {
+      if (('' + value).toLowerCase().includes(filter.toLowerCase())) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+const FilterArtifacts = (
+  filter: string,
+  artifacts: Artifact[],
+  deep_filter = false,
+) => {
+  if (filter === '') {
+    return artifacts;
+  }
+  return _.filter(artifacts, artifact =>
+    FilterObject(filter, artifact, deep_filter),
+  );
+};
 
 export const ArtifactTable = memo((props: Props) => {
   const apc = useApcApi();
   const { keycloak } = useKeycloak();
   const query_client = useQueryClient();
   const [only_roots, SetOnlyRoots] = useState(true);
+  const [deep_filter, SetDeepFilter] = useState(false);
   const [inspect, SetInspect] = useState<null | Artifact>(null);
+  const [search_filter, SetSearchFilter] = useState('');
   const query = useQuery(
     ['artifact_table', props.processor.id, only_roots],
     apc.GetAllProcessorArtifacts,
@@ -113,9 +147,12 @@ export const ArtifactTable = memo((props: Props) => {
   ];
 
   const data = _.sortBy(query.data?.data, 'id');
-  const artifacts = only_roots
-    ? _.filter(data, (artifact: Artifact) => artifact.root)
-    : data;
+
+  const artifacts = FilterArtifacts(
+    search_filter,
+    only_roots ? _.filter(data, (artifact: Artifact) => artifact.root) : data,
+    deep_filter,
+  );
 
   const RenderBasic = (row_idx: number, col_idx: number) => {
     const column = columns[col_idx];
@@ -135,6 +172,12 @@ export const ArtifactTable = memo((props: Props) => {
         checked={only_roots}
         onChange={() => SetOnlyRoots(!only_roots)}
       />
+      <Checkbox
+        label="Deep filtering (includes searching in dependencies)"
+        checked={deep_filter}
+        onChange={() => SetDeepFilter(!deep_filter)}
+      />
+      <SearchBar value={search_filter} onChange={SetSearchFilter}></SearchBar>
       <Table2
         enableColumnResizing
         defaultRowHeight={30}

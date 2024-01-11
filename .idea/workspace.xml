@@ -5,18 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f03c2a72-6a79-4508-93d7-1b6947205d68" name="Changes" comment="Added logout button and fixed displaying of added packages without updating webpage.">
-      <change afterPath="$PROJECT_DIR$/.idea/APC.GUI.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/start.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/components/ArtifactTable/SearchBar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/Layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/Layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/components/AddArtifactForm/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/AddArtifactForm/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/components/ArtifactTable/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ArtifactTable/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,8 +45,9 @@
     "node.js.selected.package.stylelint": "/home/bfde19/WebstormProjects/APC.GUI/node_modules/stylelint",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "yarn",
-    "npm.start.executor": "Run",
-    "settings.editor.selected.configurable": "preferences.sourceCode.TypeScript",
+    "npm.start.executor": "Debug",
+    "prettierjs.PrettierConfiguration.Package": "/Users/ember/Development/APC.GUI/node_modules/prettier",
+    "settings.editor.selected.configurable": "settings.javascript.prettier",
     "ts.external.directory.path": "/Users/ember/Development/APC.GUI/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
@@ -84,6 +76,7 @@
       <workItem from="1676548360549" duration="4623000" />
       <workItem from="1704998438327" duration="559000" />
       <workItem from="1704999004889" duration="3620000" />
+      <workItem from="1705011127740" duration="2813000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed some processing issues.">
       <created>1673610819659</created>
@@ -113,7 +106,15 @@
       <option name="project" value="LOCAL" />
       <updated>1676550006301</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added logout button and fixed displaying of added packages without updating webpage.">
+      <option name="closed" value="true" />
+      <created>1705011384985</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1705011384985</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
