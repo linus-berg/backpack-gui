@@ -25,6 +25,9 @@ interface Props {
 }
 
 const FilterObject = (filter: string, artifact: any, deep_filter = false) => {
+  if (artifact === undefined || artifact === null) {
+    return false;
+  }
   const keys = Object.keys(artifact);
   for (let i in keys) {
     const key = keys[i];
