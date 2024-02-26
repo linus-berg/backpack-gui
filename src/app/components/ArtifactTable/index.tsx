@@ -3,9 +3,9 @@
  * ArtifactTable
  *
  */
-import { ButtonGroup, Button, Checkbox, Spinner, Tag } from '@blueprintjs/core';
+import { Button, ButtonGroup, Checkbox, Spinner, Tag } from '@blueprintjs/core';
 import _ from 'lodash';
-import { Column, Cell, Table2 } from '@blueprintjs/table';
+import { Cell, Column, Table2 } from '@blueprintjs/table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApcApi } from 'api/apc';
 import React, { memo, useState } from 'react';
@@ -19,6 +19,9 @@ import { InspectButton } from './InspectButton';
 import { ArtifactInspector } from 'app/components/ArtifactInspector';
 import { AxiosResponse } from 'axios';
 import { SearchBar } from './SearchBar';
+import { TrackArtifactButton } from '../TrackArtifactButton/Loadable';
+import { ValidateArtifactButton } from '../ValidateArtifactButton/Loadable';
+import { DeleteArtifactButton } from '../DeleteArtifactButton/Loadable';
 
 interface Props {
   processor: Processor;
@@ -60,8 +63,6 @@ const FilterArtifacts = (
 
 export const ArtifactTable = memo((props: Props) => {
   const apc = useApcApi();
-  const { keycloak } = useKeycloak();
-  const query_client = useQueryClient();
   const [only_roots, SetOnlyRoots] = useState(true);
   const [deep_filter, SetDeepFilter] = useState(false);
   const [inspect, SetInspect] = useState<null | Artifact>(null);
@@ -70,16 +71,6 @@ export const ArtifactTable = memo((props: Props) => {
     ['artifact_table', props.processor.id, only_roots],
     apc.GetAllProcessorArtifacts,
   );
-
-  const mutation = useMutation({
-    mutationFn: apc.DeleteArtifact,
-    onSuccess: (data: AxiosResponse<Artifact>) => {
-      const artifact = data.data;
-      query_client.invalidateQueries({
-        queryKey: ['artifact_table', artifact.processor, true],
-      });
-    },
-  });
 
   if (query.isLoading) {
     return <Spinner />;
@@ -132,17 +123,9 @@ export const ArtifactTable = memo((props: Props) => {
         <Center>
           <ButtonGroup>
             <InspectButton artifact={row} onInspect={SetInspect} />
-            <Button
-              intent="danger"
-              disabled={!keycloak.hasResourceRole('Administrator')}
-              onClick={() =>
-                mutation.mutate({ id: row.id, processor: row.processor })
-              }
-              loading={mutation.isLoading}
-              small
-            >
-              Delete
-            </Button>
+            <TrackArtifactButton id={row.id} processor={row.processor} />
+            <ValidateArtifactButton id={row.id} processor={row.processor} />
+            <DeleteArtifactButton id={row.id} processor={row.processor} />
           </ButtonGroup>
         </Center>
       ),

@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_INJECTED_CODE" value="false" />
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f03c2a72-6a79-4508-93d7-1b6947205d68" name="Changes" comment="Added logout button and fixed displaying of added packages without updating webpage.">
-      <change afterPath="$PROJECT_DIR$/src/app/components/ArtifactTable/SearchBar.tsx" afterDir="false" />
+    <list default="true" id="f03c2a72-6a79-4508-93d7-1b6947205d68" name="Changes" comment="Added searching and deep filtering.">
+      <change afterPath="$PROJECT_DIR$/src/app/components/DeleteArtifactButton/Loadable.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/components/DeleteArtifactButton/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/components/TrackArtifactButton/Loadable.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/components/TrackArtifactButton/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/components/ValidateArtifactButton/Loadable.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/components/ValidateArtifactButton/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/apc.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/apc.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/components/ArtifactTable/InspectButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ArtifactTable/InspectButton.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/components/ArtifactTable/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/ArtifactTable/index.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,7 +47,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "/Users/ember/Development/APC.GUI",
+    "last_opened_file_path": "/Users/ember/Development/APC.GUI/src/app/components",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.stylelint": "true",
     "node.js.detected.package.tslint": "true",
@@ -47,6 +57,7 @@
     "nodejs_package_manager_path": "yarn",
     "npm.start.executor": "Debug",
     "prettierjs.PrettierConfiguration.Package": "/Users/ember/Development/APC.GUI/node_modules/prettier",
+    "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "settings.javascript.prettier",
     "ts.external.directory.path": "/Users/ember/Development/APC.GUI/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
@@ -60,6 +71,11 @@
         <entry key="com.intellij.reactbuddy.storybook" value="false" />
       </map>
     </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/app/components" />
+    </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -76,7 +92,9 @@
       <workItem from="1676548360549" duration="4623000" />
       <workItem from="1704998438327" duration="559000" />
       <workItem from="1704999004889" duration="3620000" />
-      <workItem from="1705011127740" duration="2813000" />
+      <workItem from="1705011127740" duration="2976000" />
+      <workItem from="1708195359977" duration="4119000" />
+      <workItem from="1708975704047" duration="3091000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed some processing issues.">
       <created>1673610819659</created>
@@ -114,7 +132,15 @@
       <option name="project" value="LOCAL" />
       <updated>1705011384985</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Added searching and deep filtering.">
+      <option name="closed" value="true" />
+      <created>1705013993183</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1705013993183</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -126,6 +152,7 @@
     <MESSAGE value="Updated to allow only root fetching (efficiency)." />
     <MESSAGE value="Updated to allow only root fetching (efficiency).&#10;&#10;Added processor descriptions." />
     <MESSAGE value="Added logout button and fixed displaying of added packages without updating webpage." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added logout button and fixed displaying of added packages without updating webpage." />
+    <MESSAGE value="Added searching and deep filtering." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added searching and deep filtering." />
   </component>
 </project>

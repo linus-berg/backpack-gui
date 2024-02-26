@@ -10,9 +10,6 @@ export const APC_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
 const APC_ARTIFACTS = '/artifact';
 const APC_PROCESSOR = '/processor';
-/* Delete */
-const DeleteArtifactUrl = (processor: string) =>
-  `${APC_ARTIFACTS}/${processor}/`;
 
 const axios_ctx = createContext<AxiosInstance>({} as AxiosInstance);
 
@@ -64,10 +61,25 @@ export const useApcApi = () => {
   };
 
   const DeleteArtifact = ({ id, processor }) => {
-    return APC.delete(DeleteArtifactUrl(processor), {
+    return APC.delete(APC_ARTIFACTS, {
       data: {
         id: id,
+        processor: processor,
       },
+    });
+  };
+
+  const TrackArtifact = ({ id, processor }) => {
+    return APC.post(APC_ARTIFACTS + '/track', {
+      id: id,
+      processor: processor,
+    });
+  };
+
+  const ValidateArtifact = ({ id, processor }) => {
+    return APC.post(APC_ARTIFACTS + '/validate', {
+      id: id,
+      processor: processor,
     });
   };
 
@@ -109,9 +121,11 @@ export const useApcApi = () => {
     UpdateProcessor,
     AddArtifact,
     TrackAllArtifacts,
+    TrackArtifact,
     DeleteArtifact,
     GetAllProcessors,
     GetAllProcessorArtifacts,
     ValidateAllArtifacts,
+    ValidateArtifact,
   };
 };
