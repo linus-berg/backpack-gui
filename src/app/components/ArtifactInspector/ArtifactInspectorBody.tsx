@@ -3,12 +3,14 @@
  * Inspection Drawer
  *
  */
-import { Tag } from '@blueprintjs/core';
+import { Spinner, Tag } from '@blueprintjs/core';
 import React, { memo } from 'react';
 import { Artifact } from 'types';
 import { ArtifactDependencies } from './ArtifactDependencies';
 import { ArtifactField } from './ArtifactField';
 import { ArtifactVersions } from './ArtifactVersions';
+import { useApcApi } from '../../../api/apc';
+import { useQuery } from '@tanstack/react-query';
 
 interface Props {
   artifact: Artifact | null;
@@ -23,10 +25,20 @@ const GetRootTag = (is_root: boolean) => {
 };
 
 export const ArtifactInspectorBody = memo((props: Props) => {
-  const artifact = props.artifact;
-  if (artifact === null) {
-    return null;
+  const apc = useApcApi();
+  const query = useQuery(
+    ['get-artifact', props.artifact?.processor, props.artifact?.id],
+    apc.GetArtifact,
+    {
+      enabled: props.artifact !== null,
+    },
+  );
+
+  if (query.isLoading || query.data === null || props.artifact === null) {
+    return <Spinner />;
   }
+
+  const artifact: any = query.data?.data;
   const versions = artifact.versions;
   const dependencies = artifact.dependencies;
 

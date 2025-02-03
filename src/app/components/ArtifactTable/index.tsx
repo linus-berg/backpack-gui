@@ -3,21 +3,19 @@
  * ArtifactTable
  *
  */
-import { Button, ButtonGroup, Checkbox, Spinner, Tag } from '@blueprintjs/core';
+import { ButtonGroup, Checkbox, Spinner, Tag } from '@blueprintjs/core';
 import _ from 'lodash';
 import { Cell, Column, Table2 } from '@blueprintjs/table';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useApcApi } from 'api/apc';
 import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import './ArtifactTable.scss';
 import { Processor } from '../../../types/Processor';
 import { AuxField } from 'types/AuxField';
-import { useKeycloak } from '@react-keycloak-fork/web';
 import { Artifact } from 'types';
 import { InspectButton } from './InspectButton';
 import { ArtifactInspector } from 'app/components/ArtifactInspector';
-import { AxiosResponse } from 'axios';
 import { SearchBar } from './SearchBar';
 import { TrackArtifactButton } from '../TrackArtifactButton/Loadable';
 import { ValidateArtifactButton } from '../ValidateArtifactButton/Loadable';
@@ -104,16 +102,12 @@ export const ArtifactTable = memo((props: Props) => {
     {
       key: 'versions',
       interactive: false,
-      render: (row: any, key: string) => (
-        <Center>{_.keys(row[key]).length}</Center>
-      ),
+      render: (row: any, key: string) => <Center>{row[key]}</Center>,
     },
     {
       key: 'dependencies',
       interactive: false,
-      render: (row: any, key: string) => (
-        <Center>{_.keys(row[key]).length}</Center>
-      ),
+      render: (row: any, key: string) => <Center>{row[key]}</Center>,
     },
     ...aux_columns,
     {
@@ -133,7 +127,6 @@ export const ArtifactTable = memo((props: Props) => {
   ];
 
   const data = _.sortBy(query.data?.data, 'id');
-
   const artifacts = FilterArtifacts(
     search_filter,
     only_roots ? _.filter(data, (artifact: Artifact) => artifact.root) : data,

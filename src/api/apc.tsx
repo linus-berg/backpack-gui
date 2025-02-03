@@ -9,6 +9,7 @@ import { Processor } from '../types/Processor';
 export const APC_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
 const APC_ARTIFACTS = '/artifact';
+
 const APC_PROCESSOR = '/processor';
 
 const axios_ctx = createContext<AxiosInstance>({} as AxiosInstance);
@@ -55,8 +56,14 @@ export const useApcApi = () => {
   };
 
   const GetAllProcessorArtifacts = ({ queryKey }) => {
-    return APC.get(APC_ARTIFACTS, {
+    return APC.get(APC_ARTIFACTS + '/all', {
       params: { processor: queryKey[1], only_roots: queryKey[2] },
+    });
+  };
+
+  const GetArtifact = ({ queryKey }) => {
+    return APC.get(APC_ARTIFACTS, {
+      params: { processor: queryKey[1], id: queryKey[2] },
     });
   };
 
@@ -120,6 +127,7 @@ export const useApcApi = () => {
     AddProcessor,
     UpdateProcessor,
     AddArtifact,
+    GetArtifact,
     TrackAllArtifacts,
     TrackArtifact,
     DeleteArtifact,

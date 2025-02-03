@@ -3,7 +3,7 @@
  * Inspection Drawer
  *
  */
-import { Button, Classes, Drawer } from '@blueprintjs/core';
+import { Classes, Drawer } from '@blueprintjs/core';
 import React, { memo } from 'react';
 import { Artifact } from 'types';
 import { ArtifactInspectorBody } from './ArtifactInspectorBody';
