@@ -6,14 +6,14 @@
 import { Button } from '@blueprintjs/core';
 import React, { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useKeycloak } from '@react-keycloak-fork/web';
+import { useAuth } from '../../../api/AuthProvider';
 
 interface Props {}
 
 export const ConfigButton = memo((props: Props) => {
-  const { keycloak } = useKeycloak();
+  const auth = useAuth();
   const nav = useNavigate();
-  if (!keycloak.hasResourceRole('Administrator')) {
+  if (!auth.HasRole('Administrator')) {
     return null;
   }
   return (
