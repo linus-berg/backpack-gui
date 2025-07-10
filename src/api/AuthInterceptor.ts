@@ -7,9 +7,7 @@ export class AuthInterceptor {
   }
 
   Intercept(request: AxiosRequestConfig) {
-    request.headers = {
-      Authorization: `Bearer ${this.token_}`,
-    };
+    request.withCredentials = true;
     return request;
   }
 }

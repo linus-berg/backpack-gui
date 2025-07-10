@@ -1,13 +1,14 @@
-import { useKeycloak } from '@react-keycloak-fork/web';
 import axios from 'axios';
 import React, { createContext, useContext, useEffect } from 'react';
 import { Artifact } from 'types';
 import type { AxiosInstance } from 'axios';
-import { Spinner } from '@blueprintjs/core';
 import { AuthInterceptor } from './AuthInterceptor';
 import { Processor } from '../types/Processor';
-export const APC_API =
-  window.location.protocol + '//' + window.location.hostname + ':8004/api';
+import User from '../types/User';
+
+export const APC_HOST =
+  window.location.protocol + '//' + window.location.hostname + ':8004';
+export const APC_API = APC_HOST + '/api';
 const APC_ARTIFACTS = '/artifact';
 
 const APC_PROCESSOR = '/processor';
@@ -24,22 +25,9 @@ const interceptor_hdl = axios_instance.interceptors.request.use(
 );
 
 export const AxiosProvider = props => {
-  const { keycloak, initialized } = useKeycloak();
-
-  useEffect(() => {
-    interceptor.SetToken(keycloak?.token ?? '');
-  }, [keycloak.token]);
-  keycloak.onAuthRefreshSuccess = () => {
-    interceptor.SetToken(keycloak?.token ?? '');
-  };
-
-  if (!initialized || !keycloak?.authenticated) {
-    return <Spinner />;
-  }
-
   return (
     <axios_ctx.Provider value={axios_instance}>
-      {keycloak?.authenticated ? props.children : <Spinner />}
+      {props.children}
     </axios_ctx.Provider>
   );
 };
@@ -50,6 +38,11 @@ export const useAxios = () => {
 
 export const useApcApi = () => {
   const APC = useAxios();
+  const GetMe = async () => {
+    const { data } = await APC.get<User>('/auth/me');
+    return data;
+  };
+
   /* Getters */
   const GetAllProcessors = () => {
     return APC.get(APC_PROCESSOR + '/processors');
@@ -124,6 +117,7 @@ export const useApcApi = () => {
   };
 
   return {
+    GetMe,
     AddProcessor,
     UpdateProcessor,
     AddArtifact,
