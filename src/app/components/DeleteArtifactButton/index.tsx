@@ -7,9 +7,9 @@ import { Button } from '@blueprintjs/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useApcApi } from 'api/apc';
 import React, { memo } from 'react';
+import { useKeycloak } from '@react-keycloak-fork/web';
 import { AxiosResponse } from 'axios';
 import { Artifact } from '../../../types';
-import { useAuth } from '../../../api/AuthProvider';
 
 interface Props {
   id: string;
@@ -18,7 +18,7 @@ interface Props {
 
 export const DeleteArtifactButton = memo((props: Props) => {
   const apc = useApcApi();
-  const auth = useAuth();
+  const { keycloak } = useKeycloak();
   const query_client = useQueryClient();
   const mutation = useMutation({
     mutationFn: apc.DeleteArtifact,
@@ -30,14 +30,14 @@ export const DeleteArtifactButton = memo((props: Props) => {
     },
   });
 
-  if (!auth.HasRole('Administrator')) {
+  if (!keycloak.hasResourceRole('Administrator')) {
     return null;
   }
 
   return (
     <Button
       intent="danger"
-      disabled={!auth.HasRole('Administrator')}
+      disabled={!keycloak.hasResourceRole('Administrator')}
       onClick={() => {
         if (window.confirm('Do you really want to delete ' + props.id)) {
           mutation.mutate({ id: props.id, processor: props.processor });

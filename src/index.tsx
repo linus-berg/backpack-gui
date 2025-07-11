@@ -23,8 +23,11 @@ import { HelmetProvider } from 'react-helmet-async';
 import { configureAppStore } from 'store/configureStore';
 
 import reportWebVitals from 'reportWebVitals';
+
 // Initialize languages
 import './locales/i18n';
+import { ReactKeycloakProvider } from '@react-keycloak-fork/web';
+import keycloak from 'keycloak';
 
 const store = configureAppStore();
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
@@ -32,9 +35,11 @@ const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 ReactDOMClient.createRoot(MOUNT_NODE!).render(
   <Provider store={store}>
     <HelmetProvider>
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
+      <ReactKeycloakProvider authClient={keycloak}>
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      </ReactKeycloakProvider>
     </HelmetProvider>
   </Provider>,
 );

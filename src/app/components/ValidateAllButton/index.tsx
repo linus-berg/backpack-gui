@@ -7,16 +7,16 @@ import { Button } from '@blueprintjs/core';
 import { useMutation } from '@tanstack/react-query';
 import { useApcApi } from 'api/apc';
 import React, { memo } from 'react';
-import { useAuth } from '../../../api/AuthProvider';
+import { useKeycloak } from '@react-keycloak-fork/web';
 
 interface Props {}
 
 export const ValidateAllButton = memo((props: Props) => {
-  const auth = useAuth();
+  const { keycloak } = useKeycloak();
   const apc = useApcApi();
   const mutation = useMutation(apc.ValidateAllArtifacts);
 
-  if (!auth.HasRole('Administrator')) {
+  if (!keycloak.hasResourceRole('Administrator')) {
     return null;
   }
   return (
