@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Backpack",
+  "name": "Backpack artifact suite",
   "icons": [
     {
       "src": "favicon.ico",
