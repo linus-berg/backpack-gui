@@ -40,8 +40,8 @@ export function App() {
   return (
     <BrowserRouter>
       <Helmet
-        titleTemplate="%s - APC"
-        defaultTitle="APC"
+        titleTemplate="%s - Backpack"
+        defaultTitle="Backpack"
         htmlAttributes={{ lang: i18n.language }}
       >
         <meta name="description" content="A artifact application" />

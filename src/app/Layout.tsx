@@ -21,7 +21,7 @@ export function Layout() {
     <>
       <Navbar>
         <Navbar.Group>
-          <Navbar.Heading>Artifact Processing Complex</Navbar.Heading>
+          <Navbar.Heading>Backpack</Navbar.Heading>
           <Navbar.Divider />
           <ButtonGroup>
             <ProcessorBrowserButton />
