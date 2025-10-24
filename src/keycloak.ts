@@ -1,6 +1,6 @@
 import Keycloak from 'keycloak-js';
-import { APC_API } from './api/apc';
+import { BACKPACK_API } from 'api/backpack';
 
-const keycloak = new Keycloak(APC_API + '/status/keycloak');
+const keycloak = new Keycloak(BACKPACK_API + '/status/keycloak');
 
 export default keycloak;

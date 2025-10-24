@@ -5,7 +5,7 @@
  */
 import { Button } from '@blueprintjs/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useApcApi } from 'api/apc';
+import { useBackpackApi } from 'api/backpack';
 import React, { memo } from 'react';
 import { useKeycloak } from '@react-keycloak-fork/web';
 import { AxiosResponse } from 'axios';
@@ -17,11 +17,11 @@ interface Props {
 }
 
 export const DeleteArtifactButton = memo((props: Props) => {
-  const apc = useApcApi();
+  const backpack = useBackpackApi();
   const { keycloak } = useKeycloak();
   const query_client = useQueryClient();
   const mutation = useMutation({
-    mutationFn: apc.DeleteArtifact,
+    mutationFn: backpack.DeleteArtifact,
     onSuccess: (data: AxiosResponse<Artifact>) => {
       const artifact = data.data;
       query_client.invalidateQueries({

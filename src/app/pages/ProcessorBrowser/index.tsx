@@ -5,7 +5,7 @@
  */
 import { Spinner, Tab, Tabs } from '@blueprintjs/core';
 import { useQuery } from '@tanstack/react-query';
-import { useApcApi } from 'api/apc';
+import { useBackpackApi } from 'api/backpack';
 import React, { memo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -14,8 +14,8 @@ import { ProcessorPanel } from './ProcessorPanel';
 interface Props {}
 
 export const ProcessorBrowser = memo((props: Props) => {
-  const apc = useApcApi();
-  const query = useQuery(['processor_browser'], apc.GetAllProcessors);
+  const backpack = useBackpackApi();
+  const query = useQuery(['processor_browser'], backpack.GetAllProcessors);
   const params = useParams();
   const nav = useNavigate();
 

@@ -9,7 +9,7 @@ import { Artifact } from 'types';
 import { ArtifactDependencies } from './ArtifactDependencies';
 import { ArtifactField } from './ArtifactField';
 import { ArtifactVersions } from './ArtifactVersions';
-import { useApcApi } from '../../../api/apc';
+import { useBackpackApi } from 'api/backpack';
 import { useQuery } from '@tanstack/react-query';
 
 interface Props {
@@ -25,10 +25,10 @@ const GetRootTag = (is_root: boolean) => {
 };
 
 export const ArtifactInspectorBody = memo((props: Props) => {
-  const apc = useApcApi();
+  const backpack = useBackpackApi();
   const query = useQuery(
     ['get-artifact', props.artifact?.processor, props.artifact?.id],
-    apc.GetArtifact,
+    backpack.GetArtifact,
     {
       enabled: props.artifact !== null,
     },

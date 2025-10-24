@@ -21,7 +21,7 @@ import { FocusStyleManager } from '@blueprintjs/core';
 import { Layout } from './Layout';
 import { ProcessorConfig } from './pages/ProcessorConfig/Loadable';
 import { useKeycloak } from '@react-keycloak-fork/web';
-import { AxiosProvider } from 'api/apc';
+import { AxiosProvider } from 'api/backpack';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const query_client = new QueryClient();

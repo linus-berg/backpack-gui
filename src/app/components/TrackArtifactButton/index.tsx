@@ -5,7 +5,7 @@
  */
 import { AnchorButton, Tooltip } from '@blueprintjs/core';
 import { useMutation } from '@tanstack/react-query';
-import { useApcApi } from 'api/apc';
+import { useBackpackApi } from 'api/backpack';
 import React, { memo } from 'react';
 
 interface Props {
@@ -14,8 +14,8 @@ interface Props {
 }
 
 export const TrackArtifactButton = memo((props: Props) => {
-  const apc = useApcApi();
-  const mutation = useMutation(apc.TrackArtifact);
+  const backpack = useBackpackApi();
+  const mutation = useMutation(backpack.TrackArtifact);
   const tooltip = `Check for ${props.id} updates`;
   return (
     <Tooltip content={tooltip} lazy>

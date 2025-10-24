@@ -7,7 +7,7 @@ import { ButtonGroup, Checkbox, Spinner, Tag } from '@blueprintjs/core';
 import _ from 'lodash';
 import { Cell, Column, Table2 } from '@blueprintjs/table';
 import { useQuery } from '@tanstack/react-query';
-import { useApcApi } from 'api/apc';
+import { useBackpackApi } from 'api/backpack';
 import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import './ArtifactTable.scss';
@@ -60,14 +60,14 @@ const FilterArtifacts = (
 };
 
 export const ArtifactTable = memo((props: Props) => {
-  const apc = useApcApi();
+  const backpack = useBackpackApi();
   const [only_roots, SetOnlyRoots] = useState(true);
   const [deep_filter, SetDeepFilter] = useState(false);
   const [inspect, SetInspect] = useState<null | Artifact>(null);
   const [search_filter, SetSearchFilter] = useState('');
   const query = useQuery(
     ['artifact_table', props.processor.id, only_roots],
-    apc.GetAllProcessorArtifacts,
+    backpack.GetAllProcessorArtifacts,
   );
 
   if (query.isLoading) {

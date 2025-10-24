@@ -8,7 +8,7 @@ import styled from 'styled-components/macro';
 import { Processor } from 'types/Processor';
 import Editor from '@monaco-editor/react';
 import { useMutation } from '@tanstack/react-query';
-import { useApcApi } from '../../../api/apc';
+import { useBackpackApi } from 'api/backpack';
 import { Button, Intent } from '@blueprintjs/core';
 
 interface Props {
@@ -22,8 +22,8 @@ const Div = styled.div`
 `;
 
 export const ProcessorEditor = memo((props: Props) => {
-  const apc = useApcApi();
-  const mutation = useMutation(apc.UpdateProcessor);
+  const backpack = useBackpackApi();
+  const mutation = useMutation(backpack.UpdateProcessor);
   const processor = props.processor;
   const [description, SetDescription] = useState(processor.description);
   const Save = () => {

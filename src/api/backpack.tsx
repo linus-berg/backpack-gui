@@ -6,16 +6,16 @@ import type { AxiosInstance } from 'axios';
 import { Spinner } from '@blueprintjs/core';
 import { AuthInterceptor } from './AuthInterceptor';
 import { Processor } from '../types/Processor';
-export const APC_API =
+export const BACKPACK_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
-const APC_ARTIFACTS = '/artifact';
+const BACKPACK_ARTIFACTS = '/artifact';
 
-const APC_PROCESSOR = '/processor';
+const BACKPACK_PROCESSOR = '/processor';
 
 const axios_ctx = createContext<AxiosInstance>({} as AxiosInstance);
 
 const axios_instance = axios.create({
-  baseURL: APC_API,
+  baseURL: BACKPACK_API,
 });
 
 const interceptor = new AuthInterceptor();
@@ -48,27 +48,27 @@ export const useAxios = () => {
   return useContext(axios_ctx);
 };
 
-export const useApcApi = () => {
-  const APC = useAxios();
+export const useBackpackApi = () => {
+  const backpack = useAxios();
   /* Getters */
   const GetAllProcessors = () => {
-    return APC.get(APC_PROCESSOR + '/processors');
+    return backpack.get(BACKPACK_PROCESSOR + '/processors');
   };
 
   const GetAllProcessorArtifacts = ({ queryKey }) => {
-    return APC.get(APC_ARTIFACTS + '/all', {
+    return backpack.get(BACKPACK_ARTIFACTS + '/all', {
       params: { processor: queryKey[1], only_roots: queryKey[2] },
     });
   };
 
   const GetArtifact = ({ queryKey }) => {
-    return APC.get(APC_ARTIFACTS, {
+    return backpack.get(BACKPACK_ARTIFACTS, {
       params: { processor: queryKey[1], id: queryKey[2] },
     });
   };
 
   const DeleteArtifact = ({ id, processor }) => {
-    return APC.delete(APC_ARTIFACTS, {
+    return backpack.delete(BACKPACK_ARTIFACTS, {
       data: {
         id: id,
         processor: processor,
@@ -77,14 +77,14 @@ export const useApcApi = () => {
   };
 
   const TrackArtifact = ({ id, processor }) => {
-    return APC.post(APC_ARTIFACTS + '/track', {
+    return backpack.post(BACKPACK_ARTIFACTS + '/track', {
       id: id,
       processor: processor,
     });
   };
 
   const ValidateArtifact = ({ id, processor }) => {
-    return APC.post(APC_ARTIFACTS + '/validate', {
+    return backpack.post(BACKPACK_ARTIFACTS + '/validate', {
       id: id,
       processor: processor,
     });
@@ -92,7 +92,7 @@ export const useApcApi = () => {
 
   /* Add */
   const AddArtifact = (artifact: Artifact) => {
-    return APC.post(APC_ARTIFACTS, {
+    return backpack.post(BACKPACK_ARTIFACTS, {
       id: artifact.id,
       processor: artifact.processor,
       filter: artifact.filter,
@@ -102,22 +102,22 @@ export const useApcApi = () => {
     });
   };
   const TrackAllArtifacts = () => {
-    return APC.post(APC_ARTIFACTS + '/track/all');
+    return backpack.post(BACKPACK_ARTIFACTS + '/track/all');
   };
 
   const ValidateAllArtifacts = () => {
-    return APC.post(APC_ARTIFACTS + '/validate/all');
+    return backpack.post(BACKPACK_ARTIFACTS + '/validate/all');
   };
 
   /* Add Processor */
   const AddProcessor = (processor_id: string) => {
-    return APC.post(APC_PROCESSOR, {
+    return backpack.post(BACKPACK_PROCESSOR, {
       processor_id: processor_id,
     });
   };
 
   const UpdateProcessor = (processor: Processor) => {
-    return APC.post(APC_PROCESSOR + '/update', {
+    return backpack.post(BACKPACK_PROCESSOR + '/update', {
       processor_id: processor.id,
       description: processor.description,
     });

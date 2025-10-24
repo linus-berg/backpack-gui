@@ -5,7 +5,7 @@
  */
 import { AnchorButton, Tooltip } from '@blueprintjs/core';
 import { useMutation } from '@tanstack/react-query';
-import { useApcApi } from 'api/apc';
+import { useBackpackApi } from 'api/backpack';
 import React, { memo } from 'react';
 
 interface Props {
@@ -14,8 +14,8 @@ interface Props {
 }
 
 export const ValidateArtifactButton = memo((props: Props) => {
-  const apc = useApcApi();
-  const mutation = useMutation(apc.ValidateArtifact);
+  const backpack = useBackpackApi();
+  const mutation = useMutation(backpack.ValidateArtifact);
   const tooltip = 'Verify files downloaded';
 
   return (

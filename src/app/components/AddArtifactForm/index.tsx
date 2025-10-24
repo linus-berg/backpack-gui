@@ -8,7 +8,7 @@ import {
   Card,
 } from '@blueprintjs/core';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useApcApi } from 'api/apc';
+import { useBackpackApi } from 'api/backpack';
 import React, { memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { AuxInput } from './AuxInput';
@@ -22,10 +22,10 @@ interface Props {
 }
 
 export const AddArtifactForm = memo((props: Props) => {
-  const apc = useApcApi();
+  const backpack = useBackpackApi();
   const query_client = useQueryClient();
   const mutation = useMutation({
-    mutationFn: apc.AddArtifact,
+    mutationFn: backpack.AddArtifact,
     onSuccess: (data: AxiosResponse<Artifact>) => {
       const artifact: Artifact = data.data;
       query_client.invalidateQueries({
