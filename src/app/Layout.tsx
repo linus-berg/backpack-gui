@@ -17,6 +17,7 @@ import { useKeycloak } from '@react-keycloak-fork/web';
 import { StatusPageButton } from './components/StatusPageButton/Loadable';
 import styled from 'styled-components/macro';
 import LogoImage from './logo.png';
+import { ThemeToggle } from './components/ThemeToggle';
 
 const LogoBox = styled.div`
   display: flex;
@@ -50,6 +51,7 @@ export function Layout() {
           <ConfigButton />
         </Navbar.Group>
         <Navbar.Group align={Alignment.RIGHT}>
+          <ThemeToggle />
           <Button intent={Intent.DANGER} onClick={() => kc.keycloak.logout()}>
             Logout
           </Button>

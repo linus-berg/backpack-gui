@@ -37,8 +37,8 @@ export const QueueStatusTable = memo((props: Props) => {
         </Td>
         <Td>{queue.consumers}</Td>
         <Td>{queue.messages}</Td>
-        <Td>{Math.fround(queue.avg_ingress_rate)}/s</Td>
-        <Td>{Math.fround(queue.avg_egress_rate)}/s</Td>
+        <Td>{queue.avg_ingress_rate.toFixed(2)}/s</Td>
+        <Td>{queue.avg_egress_rate.toFixed(2)}/s</Td>
       </Tr>,
     );
   }
@@ -48,27 +48,27 @@ export const QueueStatusTable = memo((props: Props) => {
       <thead>
         <tr>
           <th>
-            <Icon icon="database" intent={'none'} />
+            <Icon icon="database" color="#abb3bf" />
             <ColumnText>Queue</ColumnText>
           </th>
           <th>
-            <Icon icon="heart" />
+            <Icon icon="heart" color="#abb3bf" />
             <ColumnText>Health</ColumnText>
           </th>
           <th>
-            <Icon icon="cube" />
+            <Icon icon="cube" color="#abb3bf" />
             <ColumnText>Consumers</ColumnText>
           </th>
           <th>
-            <Icon icon="envelope" />
+            <Icon icon="envelope" color="#abb3bf" />
             <ColumnText>Messages</ColumnText>
           </th>
           <th>
-            <Icon icon="trending-up" />
+            <Icon icon="trending-up" color="#abb3bf" />
             <ColumnText>Avg. Ingress</ColumnText>
           </th>
           <th>
-            <Icon icon="trending-down" />
+            <Icon icon="trending-down" color="#abb3bf" />
             <ColumnText>Avg. Egress</ColumnText>
           </th>
         </tr>
