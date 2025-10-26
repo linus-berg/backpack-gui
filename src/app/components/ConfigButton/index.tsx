@@ -17,7 +17,7 @@ export const ConfigButton = memo((props: Props) => {
     return null;
   }
   return (
-    <Button intent="primary" icon="cog" onClick={() => nav('/config')}>
+    <Button icon="cog" onClick={() => nav('/config')} minimal>
       Config
     </Button>
   );

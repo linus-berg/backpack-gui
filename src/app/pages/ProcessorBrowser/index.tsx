@@ -39,7 +39,7 @@ export const ProcessorBrowser = memo((props: Props) => {
           <Tab
             key={processor.id}
             id={processor.id}
-            title={processor.id}
+            title={processor.id.toUpperCase()}
             panel={<ProcessorPanel processor={processor} />}
           />
         ))}
@@ -49,5 +49,6 @@ export const ProcessorBrowser = memo((props: Props) => {
 });
 
 const Div = styled.div`
-  padding: 1rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 `;

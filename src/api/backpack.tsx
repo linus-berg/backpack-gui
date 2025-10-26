@@ -6,6 +6,7 @@ import type { AxiosInstance } from 'axios';
 import { Spinner } from '@blueprintjs/core';
 import { AuthInterceptor } from './AuthInterceptor';
 import { Processor } from '../types/Processor';
+import { QueueStatus } from '../types/QueueStatus';
 export const BACKPACK_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
 const BACKPACK_ARTIFACTS = '/artifact';
@@ -53,6 +54,9 @@ export const useBackpackApi = () => {
   /* Getters */
   const GetAllProcessors = () => {
     return backpack.get(BACKPACK_PROCESSOR + '/processors');
+  };
+  const GetQueueStatus = () => {
+    return backpack.get<QueueStatus[]>('/status/queue');
   };
 
   const GetAllProcessorArtifacts = ({ queryKey }) => {
@@ -124,6 +128,7 @@ export const useBackpackApi = () => {
   };
 
   return {
+    GetQueueStatus,
     AddProcessor,
     UpdateProcessor,
     AddArtifact,

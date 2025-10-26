@@ -9,11 +9,11 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {}
 
-export const ProcessorBrowserButton = memo((props: Props) => {
+export const StatusPageButton = memo((props: Props) => {
   const nav = useNavigate();
   return (
-    <Button icon="search" onClick={() => nav('/processor/')} minimal>
-      Browser
+    <Button icon="heart" onClick={() => nav('/status/')} minimal>
+      Status
     </Button>
   );
 });

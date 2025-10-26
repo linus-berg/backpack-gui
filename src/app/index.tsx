@@ -8,7 +8,7 @@
 
 import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 
 import { GlobalStyle } from 'styles/global-styles';
 
@@ -23,6 +23,7 @@ import { ProcessorConfig } from './pages/ProcessorConfig/Loadable';
 import { useKeycloak } from '@react-keycloak-fork/web';
 import { AxiosProvider } from 'api/backpack';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { StatusPage } from './pages/StatusPage/Loadable';
 
 const query_client = new QueryClient();
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -50,6 +51,8 @@ export function App() {
         <QueryClientProvider client={query_client}>
           <Routes>
             <Route path="/" element={<Layout />}>
+              <Route index element={<Navigate to="/status" />} />
+              <Route path="status" element={<StatusPage />}></Route>
               <Route path="processor">
                 <Route index element={<ProcessorBrowser />} />
                 <Route path=":processor" element={<ProcessorBrowser />} />

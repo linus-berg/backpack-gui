@@ -1,12 +1,17 @@
 // using node-style package resolution in a CSS file: 
 @import "~normalize.css";
-@import "~@blueprintjs/core/lib/css/blueprint.css";
 @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
 @import "~@blueprintjs/core/lib/scss/variables";
 @import "~@blueprintjs/popover2/lib/css/blueprint-popover2.css";
 @import "~@blueprintjs/table/lib/css/table.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
 body {
   background-color: $pt-dark-app-background-color;
+  font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Open Sans", "Helvetica Neue", "blueprint-icons-16", sans-serif !important;
+}
+
+p, label {
+  font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Open Sans", "Helvetica Neue", "blueprint-icons-16", sans-serif !important;
 }
 
 .processor-config-tab {

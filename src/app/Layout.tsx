@@ -14,21 +14,40 @@ import { TrackAllButton } from './components/TrackAllButton/Loadable';
 import { ConfigButton } from './components/ConfigButton/Loadable';
 import { ProcessorBrowserButton } from './components/ProcessorBrowserButton';
 import { useKeycloak } from '@react-keycloak-fork/web';
+import { StatusPageButton } from './components/StatusPageButton/Loadable';
+import styled from 'styled-components/macro';
+import LogoImage from './logo.png';
 
+const LogoBox = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+const Logo = styled.img`
+  height: 32px;
+`;
+const LogoText = styled.div`
+  margin-left: 4px;
+  display: inline-block;
+`;
 export function Layout() {
   const kc = useKeycloak();
   return (
     <>
       <Navbar>
         <Navbar.Group>
-          <Navbar.Heading>Backpack</Navbar.Heading>
+          <Navbar.Heading>
+            <LogoBox>
+              <Logo src={LogoImage} />
+              <LogoText>Backpack</LogoText>
+            </LogoBox>
+          </Navbar.Heading>
           <Navbar.Divider />
-          <ButtonGroup>
-            <ProcessorBrowserButton />
-            <ValidateAllButton />
-            <TrackAllButton />
-            <ConfigButton />
-          </ButtonGroup>
+          <StatusPageButton />
+          <ProcessorBrowserButton />
+          <ValidateAllButton />
+          <TrackAllButton />
+          <ConfigButton />
         </Navbar.Group>
         <Navbar.Group align={Alignment.RIGHT}>
           <Button intent={Intent.DANGER} onClick={() => kc.keycloak.logout()}>
