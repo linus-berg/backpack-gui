@@ -24,6 +24,8 @@ export const QueueStatusTable = memo((props: Props) => {
   for (let i in query.data?.data) {
     const queue = query.data.data[i];
     const healthy = queue.consumers > 0;
+    const ingress = queue.avg_ingress_rate != null ? queue.avg_ingress_rate.toFixed(2) : 0;
+    const egress = queue.avg_egress_rate != null ? queue.avg_egress_rate.toFixed(2) : 0;
     queue_rows.push(
       <Tr>
         <Td>{queue.name}</Td>
@@ -37,8 +39,8 @@ export const QueueStatusTable = memo((props: Props) => {
         </Td>
         <Td>{queue.consumers}</Td>
         <Td>{queue.messages}</Td>
-        <Td>{queue.avg_ingress_rate.toFixed(2)}/s</Td>
-        <Td>{queue.avg_egress_rate.toFixed(2)}/s</Td>
+        <Td>{ingress}/s</Td>
+        <Td>{egress}/s</Td>
       </Tr>,
     );
   }
