@@ -6,6 +6,7 @@
 import { Spinner, Tab, Tabs } from '@blueprintjs/core';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
+import { Helmet } from 'react-helmet-async';
 import React, { memo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -28,6 +29,11 @@ export const ProcessorBrowser = memo((props: Props) => {
   }
 
   return (
+    <>
+    <Helmet>
+      <title>Processors</title>
+      <meta name="description" content="A Boilerplate application homepage" />
+    </Helmet>
     <Div>
       <Tabs
         id="processor-tabs"
@@ -45,6 +51,7 @@ export const ProcessorBrowser = memo((props: Props) => {
         ))}
       </Tabs>
     </Div>
+    </>
   );
 });
 
