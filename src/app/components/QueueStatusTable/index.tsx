@@ -67,11 +67,11 @@ export const QueueStatusTable = memo((props: Props) => {
           </th>
           <th>
             <Icon icon="trending-up" color="#abb3bf" />
-            <ColumnText>Avg. Ingress</ColumnText>
+            <ColumnText>Ingress</ColumnText>
           </th>
           <th>
             <Icon icon="trending-down" color="#abb3bf" />
-            <ColumnText>Avg. Egress</ColumnText>
+            <ColumnText>Egress</ColumnText>
           </th>
         </tr>
       </thead>
