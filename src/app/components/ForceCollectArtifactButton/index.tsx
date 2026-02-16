@@ -30,7 +30,7 @@ export const ForceCollectArtifactButton = memo((props: Props) => {
             force: true,
           })
         }
-        icon={'bring-data'}
+        icon={'repeat'}
       />
     </Tooltip>
   );
