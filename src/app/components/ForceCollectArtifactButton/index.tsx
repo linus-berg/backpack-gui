@@ -1,6 +1,6 @@
 /**
  *
- * TrackAllButton
+ * Force Collect Button
  *
  */
 import { AnchorButton, Tooltip } from '@blueprintjs/core';
@@ -13,24 +13,24 @@ interface Props {
   processor: string;
 }
 
-export const ValidateArtifactButton = memo((props: Props) => {
+export const ForceCollectArtifactButton = memo((props: Props) => {
   const backpack = useBackpackApi();
   const mutation = useMutation(backpack.ValidateArtifact);
-  const tooltip = 'Verify files downloaded';
+  const tooltip = 'Force collect';
 
   return (
     <Tooltip content={tooltip} lazy>
       <AnchorButton
-        intent="warning"
+        intent="danger"
         loading={mutation.isLoading}
         onClick={() =>
           mutation.mutate({
             id: props.id,
             processor: props.processor,
-            force: false,
+            force: true,
           })
         }
-        icon={'archive'}
+        icon={'bring-data'}
       />
     </Tooltip>
   );

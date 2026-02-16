@@ -87,10 +87,11 @@ export const useBackpackApi = () => {
     });
   };
 
-  const ValidateArtifact = ({ id, processor }) => {
+  const ValidateArtifact = ({ id, processor, force }) => {
     return backpack.post(BACKPACK_ARTIFACTS + '/validate', {
       id: id,
       processor: processor,
+      force: force,
     });
   };
 

@@ -20,6 +20,7 @@ import { SearchBar } from './SearchBar';
 import { TrackArtifactButton } from '../TrackArtifactButton/Loadable';
 import { ValidateArtifactButton } from '../ValidateArtifactButton/Loadable';
 import { DeleteArtifactButton } from '../DeleteArtifactButton/Loadable';
+import { ForceCollectArtifactButton } from '../ForceCollectArtifactButton/Loadable';
 
 interface Props {
   processor: Processor;
@@ -119,6 +120,7 @@ export const ArtifactTable = memo((props: Props) => {
             <InspectButton artifact={row} onInspect={SetInspect} />
             <TrackArtifactButton id={row.id} processor={row.processor} />
             <ValidateArtifactButton id={row.id} processor={row.processor} />
+            <ForceCollectArtifactButton id={row.id} processor={row.processor} />
             <DeleteArtifactButton id={row.id} processor={row.processor} />
           </ButtonGroup>
         </Center>
