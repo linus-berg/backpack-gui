@@ -118,15 +118,22 @@ export const ArtifactTable = memo((props: Props) => {
         <Center>
           <ButtonGroup>
             <InspectButton artifact={row} onInspect={SetInspect} />
-            <TrackArtifactButton id={row.id} processor={row.processor} />
+            {props.processor.direct_collect ? (
+              <ForceCollectArtifactButton
+                id={row.id}
+                processor={row.processor}
+              />
+            ) : (
+              <TrackArtifactButton id={row.id} processor={row.processor} />
+            )}
             <ValidateArtifactButton id={row.id} processor={row.processor} />
-            <ForceCollectArtifactButton id={row.id} processor={row.processor} />
             <DeleteArtifactButton id={row.id} processor={row.processor} />
           </ButtonGroup>
         </Center>
       ),
     },
   ];
+  console.log(props.processor);
 
   const data = _.sortBy(query.data?.data, 'id');
   const artifacts = FilterArtifacts(
