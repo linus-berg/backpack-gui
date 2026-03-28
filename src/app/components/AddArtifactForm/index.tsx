@@ -6,6 +6,8 @@ import {
   InputGroup,
   H6,
   Card,
+  Callout,
+  Intent,
 } from '@blueprintjs/core';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
@@ -17,6 +19,7 @@ import { Processor } from '../../../types/Processor';
 import { Artifact } from 'types';
 import { AuxDict } from 'types/AuxDict';
 import { AxiosResponse } from 'axios';
+
 interface Props {
   processor: Processor;
 }
@@ -65,6 +68,17 @@ export const AddArtifactForm = memo((props: Props) => {
 
   return (
     <Div>
+      {props.processor.requires_approval && (
+        <Callout
+          intent={Intent.WARNING}
+          title="Administrator Approval Required"
+          icon="shield"
+          style={{ marginBottom: '10px' }}
+        >
+          New artifacts added to this processor will be reviewed by an
+          administrator before collection starts.
+        </Callout>
+      )}
       <Card>
         <div
           dangerouslySetInnerHTML={{ __html: props.processor.description }}
