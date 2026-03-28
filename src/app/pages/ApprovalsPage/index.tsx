@@ -75,9 +75,13 @@ export const ApprovalsPage = memo(() => {
                     <td><Tag minimal>{pending.processor}</Tag></td>
                     <td style={{ fontWeight: 'bold' }}>{pending.id}</td>
                     <td>
-                      <Code intent={regexValid ? Intent.NONE : Intent.DANGER}>
+                      <Tag
+                        minimal
+                        intent={regexValid ? Intent.NONE : Intent.DANGER}
+                        style={{ fontFamily: 'monospace' }}
+                      >
                         {pending.filter || '*'}
-                      </Code>
+                      </Tag>
                       {!regexValid && (
                         <Icon
                           icon="warning-sign"
