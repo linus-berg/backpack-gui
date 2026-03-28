@@ -8,6 +8,8 @@ import { AuthInterceptor } from './AuthInterceptor';
 import { Processor } from '../types/Processor';
 import { QueueStatus } from '../types/QueueStatus';
 import { Event } from '../types/Event';
+import { Schedule } from '../types/Schedule';
+
 export const BACKPACK_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
 const BACKPACK_ARTIFACTS = '/artifact';
@@ -62,6 +64,18 @@ export const useBackpackApi = () => {
 
   const GetEvents = () => {
     return backpack.get<Event[]>('/event');
+  };
+
+  const GetSchedules = () => {
+    return backpack.get<Schedule[]>('/scheduler');
+  };
+
+  const TriggerSync = (processor: string) => {
+    return backpack.post(`/scheduler/trigger/${processor}`);
+  };
+
+  const UpdateSchedule = (schedule: Schedule) => {
+    return backpack.post('/scheduler', schedule);
   };
 
   const PurgeQueue = (queue_name: string) => {
@@ -146,6 +160,9 @@ export const useBackpackApi = () => {
   return {
     GetQueueStatus,
     GetEvents,
+    GetSchedules,
+    TriggerSync,
+    UpdateSchedule,
     PurgeQueue,
     AddProcessor,
     UpdateProcessor,

@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
 import { QueueStatusTable } from '../../components/QueueStatusTable/Loadable';
 import { EventFeed } from '../../components/EventFeed/Loadable';
+import { SchedulerPanel } from '../../components/SchedulerPanel/Loadable';
 import { H3, Icon } from '@blueprintjs/core';
 
 const PageGrid = styled.div`
@@ -36,6 +37,13 @@ export function StatusPage() {
           <EventFeed />
         </div>
       </PageGrid>
+      <div style={{ padding: '1rem', marginTop: '1rem' }}>
+        <H3>
+          <Icon icon="calendar" style={{ marginRight: '10px' }} />
+          Tracking Schedules
+        </H3>
+        <SchedulerPanel />
+      </div>
     </>
   );
 }
