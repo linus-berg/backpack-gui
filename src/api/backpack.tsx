@@ -10,6 +10,7 @@ import { QueueStatus } from '../types/QueueStatus';
 import { Event } from '../types/Event';
 import { Schedule } from '../types/Schedule';
 import { PendingArtifact } from '../types/PendingArtifact';
+import { ApiKey } from '../types/ApiKey';
 
 export const BACKPACK_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
@@ -69,6 +70,18 @@ export const useBackpackApi = () => {
 
   const GetSchedules = () => {
     return backpack.get<Schedule[]>('/scheduler');
+  };
+
+  const GetApiKeys = () => {
+    return backpack.get<ApiKey[]>('/apikey');
+  };
+
+  const CreateApiKey = (name: string) => {
+    return backpack.post('/apikey', { name: name });
+  };
+
+  const DeleteApiKey = (id: string) => {
+    return backpack.delete(`/apikey/${id}`);
   };
 
   const TriggerSync = (processor: string) => {
@@ -184,6 +197,9 @@ export const useBackpackApi = () => {
     GetQueueStatus,
     GetEvents,
     GetSchedules,
+    GetApiKeys,
+    CreateApiKey,
+    DeleteApiKey,
     TriggerSync,
     UpdateSchedule,
     PurgeQueue,

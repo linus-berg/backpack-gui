@@ -25,6 +25,7 @@ import { AxiosProvider } from 'api/backpack';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { StatusPage } from './pages/StatusPage/Loadable';
 import { ApprovalsPage } from './pages/ApprovalsPage/Loadable';
+import { ApiKeyPage } from './pages/ApiKeyPage/Loadable';
 
 const query_client = new QueryClient();
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -63,7 +64,10 @@ export function App() {
                 <Route path=":processor" element={<ProcessorConfig />} />
               </Route>
               {keycloak?.hasResourceRole('Administrator') && (
-                <Route path="approvals" element={<ApprovalsPage />} />
+                <>
+                  <Route path="approvals" element={<ApprovalsPage />} />
+                  <Route path="apikeys" element={<ApiKeyPage />} />
+                </>
               )}
               <Route path="*" element={<NotFoundPage />} />
             </Route>
