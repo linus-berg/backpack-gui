@@ -3,15 +3,8 @@
  * ArtifactTable
  *
  */
-import {
-  ButtonGroup,
-  Checkbox,
-  Spinner,
-  Tag,
-  Icon,
-  Text,
-} from '@blueprintjs/core';
-import { get, filter, map, sortBy } from 'lodash-es';
+import { Spinner, Tag } from '@blueprintjs/core';
+import { get, filter, sortBy } from 'lodash-es';
 import { Cell, Column, Table2 } from '@blueprintjs/table';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
@@ -19,15 +12,10 @@ import React, { memo, useState } from 'react';
 import styled from 'styled-components';
 import './ArtifactTable.scss';
 import { Processor } from '../../../types/Processor';
-import { AuxField } from 'types/AuxField';
 import { Artifact } from 'types';
-import { InspectButton } from './InspectButton';
 import { ArtifactInspector } from 'app/components/ArtifactInspector';
-import { SearchBar } from './SearchBar';
-import { TrackArtifactButton } from '../TrackArtifactButton/Loadable';
-import { ValidateArtifactButton } from '../ValidateArtifactButton/Loadable';
-import { DeleteArtifactButton } from '../DeleteArtifactButton/Loadable';
-import { ForceCollectArtifactButton } from '../ForceCollectArtifactButton/Loadable';
+import { ArtifactTableFilterBar } from './components/ArtifactTableFilterBar';
+import { ArtifactTableActions } from './components/ArtifactTableActions';
 
 interface Props {
   processor: Processor;
@@ -89,17 +77,6 @@ export const ArtifactTable = memo((props: Props) => {
     deep_filter,
   );
 
-  const aux_columns = map(
-    JSON.parse(props.processor.config),
-    (field: AuxField) => {
-      return {
-        key: `config.${field.key}`,
-        name: field.name,
-        interactive: false,
-      };
-    },
-  );
-
   const columns = [
     { key: 'id', name: 'ID', interactive: false },
     { key: 'filter', name: 'Filter' },
@@ -139,26 +116,17 @@ export const ArtifactTable = memo((props: Props) => {
         </Center>
       ),
     },
-    ...aux_columns,
     {
       key: 'action',
       name: 'Actions',
       interactive: true,
       render: (row: Artifact) => (
         <Center>
-          <ButtonGroup minimal>
-            <InspectButton artifact={row} onInspect={SetInspect} />
-            {props.processor.direct_collect ? (
-              <ForceCollectArtifactButton
-                id={row.id}
-                processor={row.processor}
-              />
-            ) : (
-              <TrackArtifactButton id={row.id} processor={row.processor} />
-            )}
-            <ValidateArtifactButton id={row.id} processor={row.processor} />
-            <DeleteArtifactButton id={row.id} processor={row.processor} />
-          </ButtonGroup>
+          <ArtifactTableActions
+            artifact={row}
+            processor={props.processor}
+            onInspect={SetInspect}
+          />
         </Center>
       ),
     },
@@ -177,31 +145,15 @@ export const ArtifactTable = memo((props: Props) => {
 
   return (
     <Div>
-      <TableHeader>
-        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Icon icon="database" color="#abb3bf" />
-            <Text>
-              <b>{artifacts.length}</b> Artifacts
-            </Text>
-          </div>
-          <Checkbox
-            label="Roots Only"
-            checked={only_roots}
-            onChange={() => SetOnlyRoots(!only_roots)}
-            style={{ marginBottom: 0 }}
-          />
-          <Checkbox
-            label="Deep Search"
-            checked={deep_filter}
-            onChange={() => SetDeepFilter(!deep_filter)}
-            style={{ marginBottom: 0 }}
-          />
-        </div>
-        <div style={{ width: '300px' }}>
-          <SearchBar value={search_filter} onChange={SetSearchFilter} />
-        </div>
-      </TableHeader>
+      <ArtifactTableFilterBar
+        artifactCount={artifacts.length}
+        onlyRoots={only_roots}
+        onOnlyRootsChange={SetOnlyRoots}
+        deepFilter={deep_filter}
+        onDeepFilterChange={SetDeepFilter}
+        searchFilter={search_filter}
+        onSearchFilterChange={SetSearchFilter}
+      />
 
       <TableWrapper>
         <Table2
@@ -229,15 +181,6 @@ const Div = styled.div`
   height: 75vh;
   display: flex;
   flex-direction: column;
-`;
-
-const TableHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--table-border);
-  margin-bottom: 8px;
 `;
 
 const TableWrapper = styled.div`
