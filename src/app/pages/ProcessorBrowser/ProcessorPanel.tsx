@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ArtifactTable } from 'app/components/ArtifactTable';
 import { AddArtifactForm } from 'app/components/AddArtifactForm';
 import { Processor } from '../../../types/Processor';
-import { Button, Intent } from '@blueprintjs/core';
+import { Button, Intent, Callout } from '@blueprintjs/core';
 import { BulkAddDialog } from 'app/components/BulkAddDialog';
 
 interface Props {
@@ -12,13 +12,27 @@ interface Props {
 
 export const ProcessorPanel = memo((props: Props) => {
   const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
-  console.log(props.processor);
+
   return (
     <Div>
       <TableDiv>
         <ArtifactTable processor={props.processor} />
       </TableDiv>
       <FormDiv>
+        {props.processor.is_external && (
+          <Callout
+            intent={Intent.WARNING}
+            title="External Management"
+            icon="warning-sign"
+            style={{ marginBottom: '1.5rem' }}
+          >
+            <div style={{ fontSize: '0.85em' }}>
+              Backpack acts as a <b>metadata registry</b> for this ecosystem. 
+              The collection, synchronization, and storage of these artifacts 
+               are managed by an external system.
+            </div>
+          </Callout>
+        )}
         <AddArtifactForm processor={props.processor} />
         {props.processor.multi_add && (
           <Button

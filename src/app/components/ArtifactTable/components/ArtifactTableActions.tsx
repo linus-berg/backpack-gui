@@ -18,15 +18,25 @@ export const ArtifactTableActions = ({ artifact, processor, onInspect }: Props) 
   return (
     <ButtonGroup minimal>
       <InspectButton artifact={artifact} onInspect={onInspect} />
-      {processor.direct_collect ? (
-        <ForceCollectArtifactButton
-          id={artifact.id}
-          processor={artifact.processor}
-        />
-      ) : (
-        <TrackArtifactButton id={artifact.id} processor={artifact.processor} />
+      {!processor.is_external && (
+        <>
+          {processor.direct_collect ? (
+            <ForceCollectArtifactButton
+              id={artifact.id}
+              processor={artifact.processor}
+            />
+          ) : (
+            <TrackArtifactButton
+              id={artifact.id}
+              processor={artifact.processor}
+            />
+          )}
+          <ValidateArtifactButton
+            id={artifact.id}
+            processor={artifact.processor}
+          />
+        </>
       )}
-      <ValidateArtifactButton id={artifact.id} processor={artifact.processor} />
       <DeleteArtifactButton id={artifact.id} processor={artifact.processor} />
     </ButtonGroup>
   );

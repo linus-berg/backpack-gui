@@ -98,9 +98,13 @@ export const ArtifactTable = memo((props: Props) => {
       interactive: false,
       render: (row: any, key: string) => (
         <Center>
-          <Tag round minimal>
-            {row[key]}
-          </Tag>
+          {props.processor.is_external || props.processor.direct_collect ? (
+            <Tag minimal>N/A</Tag>
+          ) : (
+            <Tag round minimal>
+              {row[key]}
+            </Tag>
+          )}
         </Center>
       ),
     },
@@ -110,9 +114,13 @@ export const ArtifactTable = memo((props: Props) => {
       interactive: false,
       render: (row: any, key: string) => (
         <Center>
-          <Tag round minimal>
-            {row[key]}
-          </Tag>
+          {props.processor.is_external || props.processor.direct_collect ? (
+            <Tag minimal>N/A</Tag>
+          ) : (
+            <Tag round minimal>
+              {row[key]}
+            </Tag>
+          )}
         </Center>
       ),
     },
