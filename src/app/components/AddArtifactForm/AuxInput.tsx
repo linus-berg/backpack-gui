@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { map } from 'lodash';
 import { useMutation } from '@tanstack/react-query';
 import React, { memo, ReactEventHandler, useState } from 'react';
 import styled from 'styled-components';
@@ -32,7 +32,7 @@ export const AuxInput = memo((props: Props) => {
     }
     return null;
   };
-  return <Div>{_.map(config, CreateField)}</Div>;
+  return <Div>{map(config, CreateField)}</Div>;
 });
 
 const Div = styled.div``;
