@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
-import { Spinner, HTMLTable, Button, Intent, Icon } from '@blueprintjs/core';
+import { Spinner, HTMLTable, Button, Intent } from '@blueprintjs/core';
 import { useKeycloak } from '@react-keycloak-fork/web';
 import { ScrollTableContainer } from '../ScrollTableContainer';
 
