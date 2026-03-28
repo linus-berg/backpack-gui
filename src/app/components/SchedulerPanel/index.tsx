@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import { Spinner, HTMLTable, Button, Intent, Icon } from '@blueprintjs/core';
-import styled from 'styled-components';
 import { useKeycloak } from '@react-keycloak-fork/web';
 import { ScrollTableContainer } from '../ScrollTableContainer';
 
@@ -36,6 +35,7 @@ export const SchedulerPanel = memo((props: Props) => {
             <th>Processor</th>
             <th>Schedule (Cron)</th>
             <th>Last Run</th>
+            <th>Next Run (Est.)</th>
             {isAdmin && <th>Actions</th>}
           </tr>
         </thead>
@@ -50,6 +50,11 @@ export const SchedulerPanel = memo((props: Props) => {
                 {schedule.last_run
                   ? new Date(schedule.last_run).toLocaleString()
                   : 'Never'}
+              </td>
+              <td style={{ color: '#0F9960' }}>
+                {schedule.next_run
+                  ? new Date(schedule.next_run).toLocaleString()
+                  : 'Invalid Cron'}
               </td>
               {isAdmin && (
                 <td>
