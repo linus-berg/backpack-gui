@@ -76,8 +76,8 @@ export const useBackpackApi = () => {
     return backpack.get<ApiKey[]>('/apikey');
   };
 
-  const CreateApiKey = (name: string) => {
-    return backpack.post('/apikey', { name: name });
+  const CreateApiKey = ({ name, is_admin }) => {
+    return backpack.post('/apikey', { name: name, is_admin: is_admin });
   };
 
   const DeleteApiKey = (id: string) => {

@@ -15,7 +15,7 @@ import {
   Callout,
   Code,
   Tag,
-  ButtonGroup,
+  Checkbox,
 } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { Helmet } from 'react-helmet-async';
@@ -31,6 +31,7 @@ export const ApiKeyPage = memo(() => {
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
+  const [newIsAdmin, setNewIsAdmin] = useState(false);
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery(['api_keys'], backpack.GetApiKeys);
@@ -38,8 +39,9 @@ export const ApiKeyPage = memo(() => {
   const createMutation = useMutation(backpack.CreateApiKey, {
     onSuccess: (res) => {
       queryClient.invalidateQueries(['api_keys']);
-      setGeneratedKey(res.data.key);
+      setGeneratedKey((res.data as any).key);
       setNewKeyName('');
+      setNewIsAdmin(false);
     },
   });
 
@@ -81,6 +83,7 @@ export const ApiKeyPage = memo(() => {
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Scope</th>
                 <th>Key Preview</th>
                 <th>Created By</th>
                 <th>Created At</th>
@@ -91,6 +94,11 @@ export const ApiKeyPage = memo(() => {
               {data?.data.map(key => (
                 <tr key={key.id}>
                   <td style={{ fontWeight: 'bold' }}>{key.name}</td>
+                  <td>
+                    <Tag minimal intent={key.is_admin ? Intent.DANGER : Intent.NONE}>
+                      {key.is_admin ? 'Administrator' : 'User'}
+                    </Tag>
+                  </td>
                   <td>
                     <code>{key.key_preview}</code>
                   </td>
@@ -110,7 +118,7 @@ export const ApiKeyPage = memo(() => {
               ))}
               {data?.data.length === 0 && (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#abb3bf' }}>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: '#abb3bf' }}>
                     No API keys found.
                   </td>
                 </tr>
@@ -137,19 +145,33 @@ export const ApiKeyPage = memo(() => {
                 </div>
               </Callout>
             ) : (
-              <FormGroup
-                label="Key Name"
-                labelFor="key-name"
-                labelInfo="(required)"
-                helperText="Give this key a descriptive name (e.g. Jenkins Build Server)"
-              >
-                <InputGroup
-                  id="key-name"
-                  placeholder="Enter key name..."
-                  value={newKeyName}
-                  onChange={e => setNewKeyName(e.target.value)}
+              <>
+                <FormGroup
+                  label="Key Name"
+                  labelFor="key-name"
+                  labelInfo="(required)"
+                  helperText="Give this key a descriptive name (e.g. Jenkins Build Server)"
+                >
+                  <InputGroup
+                    id="key-name"
+                    placeholder="Enter key name..."
+                    value={newKeyName}
+                    onChange={e => setNewKeyName(e.target.value)}
+                  />
+                </FormGroup>
+                <Checkbox
+                  label="Administrator Key"
+                  checked={newIsAdmin}
+                  onChange={() => setNewIsAdmin(!newIsAdmin)}
                 />
-              </FormGroup>
+                {newIsAdmin && (
+                  <Callout intent={Intent.DANGER} style={{ marginTop: '1rem' }} icon="warning-sign">
+                    <div style={{ fontSize: '0.85em' }}>
+                      Administrator keys have full access to all API endpoints, including deleting artifacts and managing processors.
+                    </div>
+                  </Callout>
+                )}
+              </>
             )}
           </div>
           <div className={Classes.DIALOG_FOOTER}>
@@ -161,7 +183,7 @@ export const ApiKeyPage = memo(() => {
                   <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
                   <Button
                     intent={Intent.PRIMARY}
-                    onClick={() => createMutation.mutate(newKeyName)}
+                    onClick={() => createMutation.mutate({ name: newKeyName, is_admin: newIsAdmin })}
                     loading={createMutation.isLoading}
                     disabled={!newKeyName}
                   >
