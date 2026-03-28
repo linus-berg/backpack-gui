@@ -1,6 +1,5 @@
 import { map } from 'lodash';
-import { useMutation } from '@tanstack/react-query';
-import React, { memo, ReactEventHandler, useState } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import { AuxField } from 'types/AuxField';
 import { StringInput } from './StringInput';
