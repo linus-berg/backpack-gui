@@ -50,4 +50,5 @@ export const ProcessorConfig = memo((props: Props) => {
 
 const Div = styled.div`
   height: 100%;
+  padding: 1rem;
 `;

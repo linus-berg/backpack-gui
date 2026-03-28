@@ -87,6 +87,7 @@ export const ProcessorEditor = memo((props: Props) => {
             display: 'flex',
             flexDirection: 'column',
             height: '20rem',
+            width: '100%',
           }}
         >
           <H3>Configuration (JSON)</H3>
