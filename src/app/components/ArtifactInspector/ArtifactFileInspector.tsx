@@ -4,7 +4,7 @@
  *
  */
 import React, { memo } from 'react';
-import { map } from 'lodash';
+import { map } from 'lodash-es';
 import { Classes, Dialog, HTMLTable } from '@blueprintjs/core';
 import { ArtifactVersion } from 'types/ArtifactVersion';
 import { ArtifactFile } from 'types/ArtifactFile';

@@ -4,7 +4,7 @@
  *
  */
 import { ButtonGroup, Checkbox, Spinner, Tag } from '@blueprintjs/core';
-import { get, filter, map, sortBy } from 'lodash';
+import { get, filter, map, sortBy } from 'lodash-es';
 import { Cell, Column, Table2 } from '@blueprintjs/table';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';

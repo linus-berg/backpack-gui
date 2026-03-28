@@ -1,4 +1,4 @@
-import { map } from 'lodash';
+import { map } from 'lodash-es';
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import { AuxField } from 'types/AuxField';
@@ -13,7 +13,8 @@ interface Props {
 export const AuxInput = memo((props: Props) => {
   const config = props.config;
 
-  const CreateField = (field: AuxField, key: string) => {
+  const CreateField = (key: string) => {
+    const field = config[key];
     const OnChange = (value: string) => {
       if (props.onChange) {
         props.onChange(field, value);
@@ -31,6 +32,7 @@ export const AuxInput = memo((props: Props) => {
     }
     return null;
   };
+
   return <Div>{map(config, CreateField)}</Div>;
 });
 

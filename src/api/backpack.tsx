@@ -133,11 +133,17 @@ export const useBackpackApi = () => {
       direct_collect: processor.direct_collect,
     });
   };
+
+  const DeleteProcessor = (processor_id: string) => {
+    return backpack.delete(BACKPACK_PROCESSOR + '/' + processor_id);
+  };
+
   return {
     GetQueueStatus,
     PurgeQueue,
     AddProcessor,
     UpdateProcessor,
+    DeleteProcessor,
     AddArtifact,
     GetArtifact,
     TrackAllArtifacts,

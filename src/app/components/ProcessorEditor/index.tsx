@@ -9,7 +9,8 @@ import { Processor } from 'types/Processor';
 import Editor from '@monaco-editor/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
-import { Button, Checkbox, H3, Intent } from '@blueprintjs/core';
+import { Alert, Button, Checkbox, H3, Intent } from '@blueprintjs/core';
+import { useKeycloak } from '@react-keycloak-fork/web';
 
 interface Props {
   processor: Processor;
@@ -24,11 +25,21 @@ const Div = styled.div`
 export const ProcessorEditor = memo((props: Props) => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
+  const { keycloak } = useKeycloak();
+  const isAdmin = keycloak.hasResourceRole('Administrator');
+
   const mutation = useMutation(backpack.UpdateProcessor, {
     onSuccess: () => {
       queryClient.invalidateQueries(['processor_list']);
     },
   });
+
+  const deleteMutation = useMutation(backpack.DeleteProcessor, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['processor_list']);
+    },
+  });
+
   const processor = props.processor;
 
   const formatJson = (jsonStr: string) => {
@@ -42,6 +53,7 @@ export const ProcessorEditor = memo((props: Props) => {
   const [description, SetDescription] = useState(processor.description);
   const [config, SetConfig] = useState(formatJson(processor.config));
   const [direct_collect, SetDirectCollect] = useState(processor.direct_collect);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const Save = () => {
     mutation.mutate({
@@ -63,7 +75,30 @@ export const ProcessorEditor = memo((props: Props) => {
         >
           Save
         </Button>
+        {isAdmin && (
+          <Button
+            onClick={() => setShowDeleteAlert(true)}
+            loading={deleteMutation.isLoading}
+            intent={Intent.DANGER}
+          >
+            Delete
+          </Button>
+        )}
       </div>
+      <Alert
+        cancelButtonText="Cancel"
+        confirmButtonText="Delete"
+        icon="trash"
+        intent={Intent.DANGER}
+        isOpen={showDeleteAlert}
+        onCancel={() => setShowDeleteAlert(false)}
+        onConfirm={() => deleteMutation.mutate(processor.id)}
+      >
+        <p>
+          Are you sure you want to delete the processor <b>{processor.id}</b>?
+          This action cannot be undone.
+        </p>
+      </Alert>
       <Checkbox
         label="Direct Collect"
         checked={direct_collect}

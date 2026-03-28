@@ -5,7 +5,7 @@
  */
 import React, { memo, useState } from 'react';
 import { Artifact } from 'types';
-import { map } from 'lodash';
+import { map } from 'lodash-es';
 import { Button, HTMLTable, IconName, Intent, Tag } from '@blueprintjs/core';
 import { ArtifactVersion } from 'types/ArtifactVersion';
 import { ArtifactFileInspector } from './ArtifactFileInspector';
