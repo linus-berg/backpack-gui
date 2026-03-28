@@ -8,6 +8,7 @@ import {
   Callout,
   H6,
   Code,
+  Tag,
 } from '@blueprintjs/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
@@ -41,6 +42,7 @@ export const BulkAddDialog = memo(({ processor, isOpen, onClose }: Props) => {
   const queryClient = useQueryClient();
   const [text, setText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState({ current: 0, total: 0 });
 
   const mutation = useMutation(backpack.AddArtifact, {
     onSuccess: () => {
@@ -49,12 +51,18 @@ export const BulkAddDialog = memo(({ processor, isOpen, onClose }: Props) => {
   });
 
   const handleAdd = async () => {
-    setIsProcessing(true);
     const lines = text.split('\n').filter(line => line.trim() !== '');
+    setIsProcessing(true);
+    setProgress({ current: 0, total: lines.length });
     
+    let count = 0;
     for (const line of lines) {
       const parts = line.split(';');
-      if (parts.length < 1 || !parts[0].trim()) continue;
+      if (parts.length < 1 || !parts[0].trim()) {
+        count++;
+        setProgress({ current: count, total: lines.length });
+        continue;
+      }
 
       const id = parts[0].trim();
       const filter = parts.length > 1 ? parts[1].trim() : '';
@@ -82,6 +90,8 @@ export const BulkAddDialog = memo(({ processor, isOpen, onClose }: Props) => {
       } catch (e) {
         console.error(`Failed to add ${id}`, e);
       }
+      count++;
+      setProgress({ current: count, total: lines.length });
     }
 
     setIsProcessing(false);
@@ -98,7 +108,14 @@ export const BulkAddDialog = memo(({ processor, isOpen, onClose }: Props) => {
     >
       <Layout>
         <InputArea>
-          <H6>Artifact List (One per row)</H6>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+            <H6 style={{ margin: 0 }}>Artifact List (One per row)</H6>
+            {isProcessing && (
+              <Tag intent={Intent.PRIMARY} minimal>
+                Adding: {progress.current} / {progress.total}
+              </Tag>
+            )}
+          </div>
           <TextArea
             fill
             growVertically
