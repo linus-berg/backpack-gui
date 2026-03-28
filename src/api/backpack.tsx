@@ -125,6 +125,8 @@ export const useBackpackApi = () => {
     return backpack.post(BACKPACK_PROCESSOR + '/update', {
       processor_id: processor.id,
       description: processor.description,
+      config: processor.config,
+      direct_collect: processor.direct_collect,
     });
   };
 
