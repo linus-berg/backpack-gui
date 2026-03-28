@@ -18,6 +18,7 @@ interface Props {
 export const SearchBar = memo((props: Props) => {
   return (
     <InputGroup
+      placeholder="Search for artifact..."
       value={props.value}
       onChange={evt => props.onChange(evt.currentTarget.value)}
     />

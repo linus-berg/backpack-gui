@@ -3,7 +3,14 @@
  * ArtifactTable
  *
  */
-import { ButtonGroup, Checkbox, Spinner, Tag } from '@blueprintjs/core';
+import {
+  ButtonGroup,
+  Checkbox,
+  Spinner,
+  Tag,
+  Icon,
+  Text,
+} from '@blueprintjs/core';
 import { get, filter, map, sortBy } from 'lodash-es';
 import { Cell, Column, Table2 } from '@blueprintjs/table';
 import { useQuery } from '@tanstack/react-query';
@@ -75,26 +82,34 @@ export const ArtifactTable = memo((props: Props) => {
     return <Spinner />;
   }
 
+  const data = sortBy(query.data?.data, 'id');
+  const artifacts = FilterArtifacts(
+    search_filter,
+    only_roots ? filter(data, (artifact: Artifact) => artifact.root) : data,
+    deep_filter,
+  );
+
   const aux_columns = map(
     JSON.parse(props.processor.config),
     (field: AuxField) => {
       return {
         key: `config.${field.key}`,
+        name: field.name,
         interactive: false,
       };
     },
   );
 
   const columns = [
-    { key: 'id', interactive: false },
-    { key: 'processor', interactive: false },
-    { key: 'filter' },
+    { key: 'id', name: 'ID', interactive: false },
+    { key: 'filter', name: 'Filter' },
     {
       key: 'root',
+      name: 'Type',
       interactive: true,
       render: (row: any, key: string) => (
         <Center>
-          <Tag intent={row[key] ? 'success' : 'warning'}>
+          <Tag minimal intent={row[key] ? 'success' : 'warning'}>
             {row[key] ? 'root' : 'branch'}
           </Tag>
         </Center>
@@ -102,21 +117,36 @@ export const ArtifactTable = memo((props: Props) => {
     },
     {
       key: 'versions',
+      name: 'Versions',
       interactive: false,
-      render: (row: any, key: string) => <Center>{row[key]}</Center>,
+      render: (row: any, key: string) => (
+        <Center>
+          <Tag round minimal>
+            {row[key]}
+          </Tag>
+        </Center>
+      ),
     },
     {
       key: 'dependencies',
+      name: 'Deps',
       interactive: false,
-      render: (row: any, key: string) => <Center>{row[key]}</Center>,
+      render: (row: any, key: string) => (
+        <Center>
+          <Tag round minimal>
+            {row[key]}
+          </Tag>
+        </Center>
+      ),
     },
     ...aux_columns,
     {
       key: 'action',
+      name: 'Actions',
       interactive: true,
       render: (row: Artifact) => (
         <Center>
-          <ButtonGroup>
+          <ButtonGroup minimal>
             <InspectButton artifact={row} onInspect={SetInspect} />
             {props.processor.direct_collect ? (
               <ForceCollectArtifactButton
@@ -134,13 +164,6 @@ export const ArtifactTable = memo((props: Props) => {
     },
   ];
 
-  const data = sortBy(query.data?.data, 'id');
-  const artifacts = FilterArtifacts(
-    search_filter,
-    only_roots ? filter(data, (artifact: Artifact) => artifact.root) : data,
-    deep_filter,
-  );
-
   const RenderBasic = (row_idx: number, col_idx: number) => {
     const column = columns[col_idx];
     const value = get(artifacts[row_idx], column.key);
@@ -154,36 +177,78 @@ export const ArtifactTable = memo((props: Props) => {
 
   return (
     <Div>
-      <div style={{ display: 'flex', gap: '1rem' }}>
-        <Checkbox
-          label="Only roots"
-          checked={only_roots}
-          onChange={() => SetOnlyRoots(!only_roots)}
-        />
-        <Checkbox
-          label="Deep filtering"
-          checked={deep_filter}
-          onChange={() => SetDeepFilter(!deep_filter)}
-        />
-      </div>
-      <SearchBar value={search_filter} onChange={SetSearchFilter}></SearchBar>
-      <Table2
-        enableColumnResizing
-        defaultRowHeight={30}
-        numRows={artifacts.length}
-      >
-        {columns.map(column => (
-          <Column
-            key={column.key}
-            name={column.key}
-            cellRenderer={RenderBasic}
+      <TableHeader>
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Icon icon="database" color="#abb3bf" />
+            <Text>
+              <b>{artifacts.length}</b> Artifacts
+            </Text>
+          </div>
+          <Checkbox
+            label="Roots Only"
+            checked={only_roots}
+            onChange={() => SetOnlyRoots(!only_roots)}
+            style={{ marginBottom: 0 }}
           />
-        ))}
-      </Table2>
+          <Checkbox
+            label="Deep Search"
+            checked={deep_filter}
+            onChange={() => SetDeepFilter(!deep_filter)}
+            style={{ marginBottom: 0 }}
+          />
+        </div>
+        <div style={{ width: '300px' }}>
+          <SearchBar value={search_filter} onChange={SetSearchFilter} />
+        </div>
+      </TableHeader>
+
+      <TableWrapper>
+        <Table2
+          enableColumnResizing
+          defaultRowHeight={32}
+          numRows={artifacts.length}
+        >
+          {columns.map(column => (
+            <Column
+              key={column.key}
+              name={column.name}
+              cellRenderer={RenderBasic}
+            />
+          ))}
+        </Table2>
+      </TableWrapper>
+
       <ArtifactInspector onClose={() => SetInspect(null)} artifact={inspect} />
     </Div>
   );
 });
+
+const Div = styled.div`
+  width: 100%;
+  height: 75vh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const TableHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #d8e1e8;
+  margin-bottom: 8px;
+
+  .bp4-dark & {
+    border-bottom-color: #394b59;
+  }
+`;
+
+const TableWrapper = styled.div`
+  flex: 1;
+  min-height: 0;
+`;
+
 const Center = styled.div`
   height: 100%;
   width: 100%;
@@ -191,9 +256,4 @@ const Center = styled.div`
   justify-content: center;
   align-items: center;
   padding: 4px;
-`;
-
-const Div = styled.div`
-  width: 100%;
-  height: 65vh;
 `;
