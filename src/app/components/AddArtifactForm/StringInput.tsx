@@ -7,7 +7,7 @@ import {
 } from '@blueprintjs/core';
 import { useMutation } from '@tanstack/react-query';
 import React, { memo, ReactEventHandler, useState } from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { AuxField } from 'types/AuxField';
 
 interface Props {

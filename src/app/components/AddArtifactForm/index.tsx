@@ -10,7 +10,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import React, { memo, useState } from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { AuxInput } from './AuxInput';
 import { AuxField } from 'types/AuxField';
 import { Processor } from '../../../types/Processor';

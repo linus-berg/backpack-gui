@@ -4,7 +4,7 @@
  *
  */
 import React, { memo, useState } from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { Processor } from 'types/Processor';
 import Editor from '@monaco-editor/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';

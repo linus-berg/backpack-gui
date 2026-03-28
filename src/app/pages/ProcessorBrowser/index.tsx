@@ -9,7 +9,7 @@ import { useBackpackApi } from 'api/backpack';
 import { Helmet } from 'react-helmet-async';
 import React, { memo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { ProcessorPanel } from './ProcessorPanel';
 
 interface Props {}

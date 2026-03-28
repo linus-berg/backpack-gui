@@ -15,7 +15,7 @@ import { ConfigButton } from './components/ConfigButton/Loadable';
 import { ProcessorBrowserButton } from './components/ProcessorBrowserButton';
 import { useKeycloak } from '@react-keycloak-fork/web';
 import { StatusPageButton } from './components/StatusPageButton/Loadable';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import LogoImage from './logo.png';
 import { ThemeToggle } from './components/ThemeToggle';
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { QueueStatusTable } from '../../components/QueueStatusTable/Loadable';
 
 const PageGrid = styled.div`

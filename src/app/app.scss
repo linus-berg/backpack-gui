@@ -1,10 +1,10 @@
 // using node-style package resolution in a CSS file: 
-@import "~normalize.css";
-@import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
-@import "~@blueprintjs/core/lib/scss/variables";
-@import "~@blueprintjs/popover2/lib/css/blueprint-popover2.css";
-@import "~@blueprintjs/table/lib/css/table.css";
-@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "normalize.css";
+@import "@blueprintjs/icons/lib/css/blueprint-icons.css";
+@import "@blueprintjs/core/lib/scss/variables";
+@import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
+@import "@blueprintjs/table/lib/css/table.css";
+@import "@blueprintjs/core/lib/css/blueprint.css";
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 @font-face {

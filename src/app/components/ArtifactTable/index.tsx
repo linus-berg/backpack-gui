@@ -9,7 +9,7 @@ import { Cell, Column, Table2 } from '@blueprintjs/table';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import React, { memo, useState } from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import './ArtifactTable.scss';
 import { Processor } from '../../../types/Processor';
 import { AuxField } from 'types/AuxField';

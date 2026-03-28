@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { ArtifactTable } from 'app/components/ArtifactTable';
 import { AddArtifactForm } from 'app/components/AddArtifactForm';
 import { Processor } from '../../../types/Processor';

@@ -4,7 +4,7 @@
  *
  */
 import React, { memo } from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import { Spinner, Tab, Tabs } from '@blueprintjs/core';

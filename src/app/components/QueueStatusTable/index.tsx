@@ -2,7 +2,7 @@ import { Spinner, HTMLTable, Icon } from '@blueprintjs/core';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import React, { memo } from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 interface Props {}
 
 const ColumnText = styled.span`
