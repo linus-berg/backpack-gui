@@ -10,6 +10,13 @@ interface Props {}
 const ColumnText = styled.span`
   margin-left: 4px;
 `;
+
+const ScrollDiv = styled.div`
+  max-height: 500px;
+  overflow-y: auto;
+  border: 1px solid #394b59;
+`;
+
 const Tr = styled.tr``;
 const Td = styled.td`
   vertical-align: middle !important;
@@ -19,7 +26,7 @@ export const QueueStatusTable = memo((props: Props) => {
   const backpack = useBackpackApi();
   const { keycloak } = useKeycloak();
   const queryClient = useQueryClient();
-  const isAdmin = keycloak.hasResourceRole('Administrator');
+  const isAdmin = keycloak.hasRealmRole('Administrator');
 
   const query = useQuery(['queue_status'], backpack.GetQueueStatus, {
     refetchInterval: 5000,
@@ -60,8 +67,9 @@ export const QueueStatusTable = memo((props: Props) => {
         {isAdmin && (
           <Td>
             <Button
+              minimal
               small
-              intent={Intent.WARNING}
+              intent={Intent.DANGER}
               icon="trash"
               loading={
                 purgeMutation.isLoading &&
@@ -78,42 +86,37 @@ export const QueueStatusTable = memo((props: Props) => {
   }
 
   return (
-    <HTMLTable striped condensed>
-      <thead>
-        <tr>
-          <th>
-            <Icon icon="database" color="#abb3bf" />
-            <ColumnText>Queue</ColumnText>
-          </th>
-          <th>
-            <Icon icon="heart" color="#abb3bf" />
-            <ColumnText>Health</ColumnText>
-          </th>
-          <th>
-            <Icon icon="cube" color="#abb3bf" />
-            <ColumnText>Consumers</ColumnText>
-          </th>
-          <th>
-            <Icon icon="envelope" color="#abb3bf" />
-            <ColumnText>Messages</ColumnText>
-          </th>
-          <th>
-            <Icon icon="trending-up" color="#abb3bf" />
-            <ColumnText>Ingress</ColumnText>
-          </th>
-          <th>
-            <Icon icon="trending-down" color="#abb3bf" />
-            <ColumnText>Egress</ColumnText>
-          </th>
-          {isAdmin && (
+    <ScrollDiv>
+      <HTMLTable striped condensed style={{ width: '100%' }}>
+        <thead>
+          <tr>
             <th>
-              <Icon icon="cog" color="#abb3bf" />
-              <ColumnText>Actions</ColumnText>
+              <ColumnText>Queue</ColumnText>
             </th>
-          )}
-        </tr>
-      </thead>
-      <tbody>{queue_rows}</tbody>
-    </HTMLTable>
+            <th>
+              <ColumnText>Health</ColumnText>
+            </th>
+            <th>
+              <ColumnText>Consumers</ColumnText>
+            </th>
+            <th>
+              <ColumnText>Messages</ColumnText>
+            </th>
+            <th>
+              <ColumnText>Ingress</ColumnText>
+            </th>
+            <th>
+              <ColumnText>Egress</ColumnText>
+            </th>
+            {isAdmin && (
+              <th>
+                <ColumnText>Actions</ColumnText>
+              </th>
+            )}
+          </tr>
+        </thead>
+        <tbody>{queue_rows}</tbody>
+      </HTMLTable>
+    </ScrollDiv>
   );
 });

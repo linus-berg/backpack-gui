@@ -8,10 +8,9 @@ import { EventSeverity } from 'types/Event';
 interface Props {}
 
 const ScrollDiv = styled.div`
-  max-height: 400px;
+  max-height: 500px;
   overflow-y: auto;
   border: 1px solid #394b59;
-  border-radius: 3px;
 `;
 
 const SeverityToIntent = (severity: EventSeverity): Intent => {
@@ -76,7 +75,12 @@ export const EventFeed = memo((props: Props) => {
                   {event.source}
                 </Tag>
               </td>
-              <td style={{ fontWeight: event.severity === EventSeverity.ERROR ? 'bold' : 'normal' }}>
+              <td
+                style={{
+                  fontWeight:
+                    event.severity === EventSeverity.ERROR ? 'bold' : 'normal',
+                }}
+              >
                 {event.message}
               </td>
               <td>
