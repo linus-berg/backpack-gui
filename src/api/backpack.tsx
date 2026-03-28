@@ -7,6 +7,7 @@ import { Spinner } from '@blueprintjs/core';
 import { AuthInterceptor } from './AuthInterceptor';
 import { Processor } from '../types/Processor';
 import { QueueStatus } from '../types/QueueStatus';
+import { Event } from '../types/Event';
 export const BACKPACK_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
 const BACKPACK_ARTIFACTS = '/artifact';
@@ -57,6 +58,10 @@ export const useBackpackApi = () => {
   };
   const GetQueueStatus = () => {
     return backpack.get<QueueStatus[]>('/status/queue');
+  };
+
+  const GetEvents = () => {
+    return backpack.get<Event[]>('/event');
   };
 
   const PurgeQueue = (queue_name: string) => {
@@ -140,6 +145,7 @@ export const useBackpackApi = () => {
 
   return {
     GetQueueStatus,
+    GetEvents,
     PurgeQueue,
     AddProcessor,
     UpdateProcessor,
