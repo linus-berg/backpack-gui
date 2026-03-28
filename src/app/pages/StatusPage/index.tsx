@@ -7,11 +7,28 @@ import { SchedulerPanel } from '../../components/SchedulerPanel/Loadable';
 import { H3, Icon } from '@blueprintjs/core';
 
 const PageGrid = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 1rem;
   padding: 1rem;
-  align-items: flex-start;
+  height: calc(100vh - 50px);
+  box-sizing: border-box;
+`;
+
+const GridItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+`;
+
+const Title = styled(H3)`
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 `;
 
 export function StatusPage() {
@@ -22,28 +39,29 @@ export function StatusPage() {
         <meta name="description" content="Backpack system status and events" />
       </Helmet>
       <PageGrid>
-        <div style={{ flex: 1 }}>
-          <H3>
+        <GridItem style={{ gridColumn: 'span 2', gridRow: 'span 2' }}>
+          <Title>
             <Icon icon="pulse" style={{ marginRight: '10px' }} />
             Queue Status
-          </H3>
+          </Title>
           <QueueStatusTable />
-        </div>
-        <div style={{ flex: 1 }}>
-          <H3>
+        </GridItem>
+
+        <GridItem style={{ gridColumn: 'span 2', gridRow: 'span 2' }}>
+          <Title>
+            <Icon icon="calendar" style={{ marginRight: '10px' }} />
+            Tracking Schedules
+          </Title>
+          <SchedulerPanel />
+        </GridItem>
+        <GridItem style={{ gridColumn: 'span 4', gridRow: 'span 2' }}>
+          <Title>
             <Icon icon="history" style={{ marginRight: '10px' }} />
             System Events
-          </H3>
+          </Title>
           <EventFeed />
-        </div>
+        </GridItem>
       </PageGrid>
-      <div style={{ padding: '1rem', marginTop: '1rem' }}>
-        <H3>
-          <Icon icon="calendar" style={{ marginRight: '10px' }} />
-          Tracking Schedules
-        </H3>
-        <SchedulerPanel />
-      </div>
     </>
   );
 }

@@ -12,9 +12,10 @@ const ColumnText = styled.span`
 `;
 
 const ScrollDiv = styled.div`
-  max-height: 500px;
+  flex: 1;
   overflow-y: auto;
   border: 1px solid #394b59;
+  border-radius: 3px;
 `;
 
 const Tr = styled.tr``;
