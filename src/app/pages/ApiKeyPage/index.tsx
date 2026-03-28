@@ -92,7 +92,7 @@ export const ApiKeyPage = memo(() => {
                 <tr key={key.id}>
                   <td style={{ fontWeight: 'bold' }}>{key.name}</td>
                   <td>
-                    <code>{key.key.substring(0, 4)}...{key.key.substring(key.key.length - 4)}</code>
+                    <code>{key.key_preview}</code>
                   </td>
                   <td>{key.created_by}</td>
                   <td>{new Date(key.created_at).toLocaleString()}</td>
