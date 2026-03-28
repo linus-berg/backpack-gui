@@ -1,13 +1,19 @@
 import React, { memo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
-import { Spinner, HTMLTable, Button, Intent, Icon, H3, Tag, ButtonGroup, Code } from '@blueprintjs/core';
+import { Spinner, HTMLTable, Button, Intent, Icon, H3, Tag, ButtonGroup } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { Helmet } from 'react-helmet-async';
 import { ScrollTableContainer } from 'app/components/ScrollTableContainer';
 
 const PageDiv = styled.div`
   padding: 1rem;
+`;
+
+const Title = styled(H3)`
+  display: flex;
+  align-items: center;
+  margin-top: 0;
 `;
 
 export const ApprovalsPage = memo(() => {
@@ -50,10 +56,10 @@ export const ApprovalsPage = memo(() => {
         <title>Approvals</title>
       </Helmet>
       <PageDiv>
-        <H3>
+        <Title>
           <Icon icon="confirm" style={{ marginRight: '10px' }} />
           Pending Approvals
-        </H3>
+        </Title>
         <ScrollTableContainer style={{ height: '70vh' }}>
           <HTMLTable striped condensed style={{ width: '100%' }}>
             <thead>

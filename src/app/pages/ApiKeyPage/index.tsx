@@ -25,6 +25,12 @@ const PageDiv = styled.div`
   padding: 1rem;
 `;
 
+const Title = styled(H3)`
+  display: flex;
+  align-items: center;
+  margin: 0;
+`;
+
 export const ApiKeyPage = memo(() => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
@@ -62,10 +68,10 @@ export const ApiKeyPage = memo(() => {
       </Helmet>
       <PageDiv>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <H3 style={{ margin: 0 }}>
+          <Title>
             <Icon icon="key" style={{ marginRight: '10px' }} />
             API Key Management
-          </H3>
+          </Title>
           <Button
             icon="plus"
             intent={Intent.PRIMARY}
