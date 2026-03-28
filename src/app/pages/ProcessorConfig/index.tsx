@@ -38,6 +38,7 @@ export const ProcessorConfig = memo((props: Props) => {
   const [newProcessorId, setNewProcessorId] = useState('');
   const [newRequiresApproval, setNewRequiresApproval] = useState(false);
   const [newMultiAdd, setNewMultiAdd] = useState(false);
+  const [newIsExternal, setNewIsExternal] = useState(false);
 
   const addMutation = useMutation(backpack.AddProcessor, {
     onSuccess: () => {
@@ -46,6 +47,7 @@ export const ProcessorConfig = memo((props: Props) => {
       setNewProcessorId('');
       setNewRequiresApproval(false);
       setNewMultiAdd(false);
+      setNewIsExternal(false);
     },
   });
 
@@ -125,6 +127,11 @@ export const ProcessorConfig = memo((props: Props) => {
             checked={newMultiAdd}
             onChange={() => setNewMultiAdd(!newMultiAdd)}
           />
+          <Checkbox
+            label="External Handling"
+            checked={newIsExternal}
+            onChange={() => setNewIsExternal(!newIsExternal)}
+          />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
@@ -136,6 +143,7 @@ export const ProcessorConfig = memo((props: Props) => {
                   processor_id: newProcessorId,
                   requires_approval: newRequiresApproval,
                   multi_add: newMultiAdd,
+                  is_external: newIsExternal,
                 })
               }
               loading={addMutation.isLoading}

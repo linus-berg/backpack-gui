@@ -9,6 +9,8 @@ interface Props {
   onRequiresApprovalChange: (value: boolean) => void;
   multiAdd: boolean;
   onMultiAddChange: (value: boolean) => void;
+  isExternal: boolean;
+  onIsExternalChange: (value: boolean) => void;
 }
 
 const HelpIcon = styled(Icon)`
@@ -24,9 +26,11 @@ export const ProcessorEditorSettings = ({
   onRequiresApprovalChange,
   multiAdd,
   onMultiAddChange,
+  isExternal,
+  onIsExternalChange,
 }: Props) => {
   return (
-    <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+    <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', flexWrap: 'wrap' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <Checkbox
           label="Direct Collect"
@@ -57,6 +61,17 @@ export const ProcessorEditorSettings = ({
           style={{ marginBottom: 0, marginTop: '1rem' }}
         />
         <Tooltip content="Enables the 'Bulk Add' button in the processor panel for adding multiple artifacts via text input." position="top">
+          <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
+        </Tooltip>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Checkbox
+          label="External Handling"
+          checked={isExternal}
+          onChange={() => onIsExternalChange(!isExternal)}
+          style={{ marginBottom: 0, marginTop: '1rem' }}
+        />
+        <Tooltip content="If enabled, Backpack only tracks the artifact IDs. No background collection or processing will be performed." position="top">
           <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
         </Tooltip>
       </div>

@@ -56,6 +56,7 @@ export const ProcessorEditor = memo((props: Props) => {
   const [direct_collect, SetDirectCollect] = useState(processor.direct_collect);
   const [requires_approval, SetRequiresApproval] = useState(processor.requires_approval);
   const [multi_add, SetMultiAdd] = useState(processor.multi_add);
+  const [is_external, SetIsExternal] = useState(processor.is_external);
 
   const Save = () => {
     mutation.mutate({
@@ -65,6 +66,7 @@ export const ProcessorEditor = memo((props: Props) => {
       direct_collect,
       requires_approval,
       multi_add,
+      is_external,
     });
   };
 
@@ -86,6 +88,8 @@ export const ProcessorEditor = memo((props: Props) => {
         onRequiresApprovalChange={SetRequiresApproval}
         multiAdd={multi_add}
         onMultiAddChange={SetMultiAdd}
+        isExternal={is_external}
+        onIsExternalChange={SetIsExternal}
       />
 
       <ProcessorEditorFields

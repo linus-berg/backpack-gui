@@ -5,4 +5,5 @@ export interface Processor {
   direct_collect: boolean;
   requires_approval: boolean;
   multi_add: boolean;
+  is_external: boolean;
 }
