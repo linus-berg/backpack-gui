@@ -157,10 +157,11 @@ export const useBackpackApi = () => {
   };
 
   /* Add Processor */
-  const AddProcessor = ({ processor_id, requires_approval }) => {
+  const AddProcessor = ({ processor_id, requires_approval, multi_add }) => {
     return backpack.post(BACKPACK_PROCESSOR, {
       processor_id: processor_id,
       requires_approval: requires_approval,
+      multi_add: multi_add,
     });
   };
 
@@ -171,6 +172,7 @@ export const useBackpackApi = () => {
       config: processor.config,
       direct_collect: processor.direct_collect,
       requires_approval: processor.requires_approval,
+      multi_add: processor.multi_add,
     });
   };
 

@@ -29,7 +29,7 @@ export const ProcessorConfig = memo((props: Props) => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
   const { keycloak } = useKeycloak();
-  const isAdmin = keycloak.hasRealmRole('Administrator');
+  const isAdmin = keycloak.hasResourceRole('Administrator');
   const query = useQuery(['processor_list'], backpack.GetAllProcessors);
   const params = useParams();
   const nav = useNavigate();
@@ -37,6 +37,7 @@ export const ProcessorConfig = memo((props: Props) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newProcessorId, setNewProcessorId] = useState('');
   const [newRequiresApproval, setNewRequiresApproval] = useState(false);
+  const [newMultiAdd, setNewMultiAdd] = useState(false);
 
   const addMutation = useMutation(backpack.AddProcessor, {
     onSuccess: () => {
@@ -44,6 +45,7 @@ export const ProcessorConfig = memo((props: Props) => {
       setIsDialogOpen(false);
       setNewProcessorId('');
       setNewRequiresApproval(false);
+      setNewMultiAdd(false);
     },
   });
 
@@ -118,6 +120,11 @@ export const ProcessorConfig = memo((props: Props) => {
             checked={newRequiresApproval}
             onChange={() => setNewRequiresApproval(!newRequiresApproval)}
           />
+          <Checkbox
+            label="Enable Bulk Add"
+            checked={newMultiAdd}
+            onChange={() => setNewMultiAdd(!newMultiAdd)}
+          />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
@@ -128,6 +135,7 @@ export const ProcessorConfig = memo((props: Props) => {
                 addMutation.mutate({
                   processor_id: newProcessorId,
                   requires_approval: newRequiresApproval,
+                  multi_add: newMultiAdd,
                 })
               }
               loading={addMutation.isLoading}

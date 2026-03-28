@@ -21,7 +21,7 @@ export const QueueStatusTable = memo((props: Props) => {
   const backpack = useBackpackApi();
   const { keycloak } = useKeycloak();
   const queryClient = useQueryClient();
-  const isAdmin = keycloak.hasRealmRole('Administrator');
+  const isAdmin = keycloak.hasResourceRole('Administrator');
 
   const query = useQuery(['queue_status'], backpack.GetQueueStatus, {
     refetchInterval: 5000,

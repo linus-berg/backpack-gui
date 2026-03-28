@@ -53,9 +53,8 @@ export const ProcessorEditor = memo((props: Props) => {
   const [description, SetDescription] = useState(processor.description);
   const [config, SetConfig] = useState(formatJson(processor.config));
   const [direct_collect, SetDirectCollect] = useState(processor.direct_collect);
-  const [requires_approval, SetRequiresApproval] = useState(
-    processor.requires_approval,
-  );
+  const [requires_approval, SetRequiresApproval] = useState(processor.requires_approval);
+  const [multi_add, SetMultiAdd] = useState(processor.multi_add);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const Save = () => {
@@ -65,6 +64,7 @@ export const ProcessorEditor = memo((props: Props) => {
       config,
       direct_collect,
       requires_approval,
+      multi_add,
     });
   };
 
@@ -114,6 +114,12 @@ export const ProcessorEditor = memo((props: Props) => {
           label="Requires Approval"
           checked={requires_approval}
           onChange={() => SetRequiresApproval(!requires_approval)}
+          style={{ marginTop: '1rem' }}
+        />
+        <Checkbox
+          label="Enable Bulk Add"
+          checked={multi_add}
+          onChange={() => SetMultiAdd(!multi_add)}
           style={{ marginTop: '1rem' }}
         />
       </div>

@@ -1,14 +1,18 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import styled from 'styled-components';
 import { ArtifactTable } from 'app/components/ArtifactTable';
 import { AddArtifactForm } from 'app/components/AddArtifactForm';
 import { Processor } from '../../../types/Processor';
+import { Button, Intent } from '@blueprintjs/core';
+import { BulkAddDialog } from 'app/components/BulkAddDialog';
 
 interface Props {
   processor: Processor;
 }
 
 export const ProcessorPanel = memo((props: Props) => {
+  const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
+  console.log(props.processor);
   return (
     <Div>
       <TableDiv>
@@ -16,7 +20,22 @@ export const ProcessorPanel = memo((props: Props) => {
       </TableDiv>
       <FormDiv>
         <AddArtifactForm processor={props.processor} />
+        {props.processor.multi_add && (
+          <Button
+            fill
+            intent={Intent.NONE}
+            style={{ marginTop: '1rem' }}
+            onClick={() => setIsBulkAddOpen(true)}
+          >
+            Bulk Add Artifacts
+          </Button>
+        )}
       </FormDiv>
+      <BulkAddDialog
+        processor={props.processor}
+        isOpen={isBulkAddOpen}
+        onClose={() => setIsBulkAddOpen(false)}
+      />
     </Div>
   );
 });
