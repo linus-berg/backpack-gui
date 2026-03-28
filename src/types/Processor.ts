@@ -3,4 +3,5 @@ export interface Processor {
   config: string;
   description: string;
   direct_collect: boolean;
+  requires_approval: boolean;
 }

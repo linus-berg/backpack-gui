@@ -10,6 +10,7 @@ import { useBackpackApi } from 'api/backpack';
 import {
   Button,
   Classes,
+  Checkbox,
   Dialog,
   FormGroup,
   InputGroup,
@@ -28,19 +29,21 @@ export const ProcessorConfig = memo((props: Props) => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
   const { keycloak } = useKeycloak();
-  const isAdmin = keycloak.hasResourceRole('Administrator');
+  const isAdmin = keycloak.hasRealmRole('Administrator');
   const query = useQuery(['processor_list'], backpack.GetAllProcessors);
   const params = useParams();
   const nav = useNavigate();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newProcessorId, setNewProcessorId] = useState('');
+  const [newRequiresApproval, setNewRequiresApproval] = useState(false);
 
   const addMutation = useMutation(backpack.AddProcessor, {
     onSuccess: () => {
       queryClient.invalidateQueries(['processor_list']);
       setIsDialogOpen(false);
       setNewProcessorId('');
+      setNewRequiresApproval(false);
     },
   });
 
@@ -110,13 +113,23 @@ export const ProcessorConfig = memo((props: Props) => {
               onChange={e => setNewProcessorId(e.target.value)}
             />
           </FormGroup>
+          <Checkbox
+            label="Requires Approval for new artifacts"
+            checked={newRequiresApproval}
+            onChange={() => setNewRequiresApproval(!newRequiresApproval)}
+          />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
             <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
             <Button
               intent={Intent.PRIMARY}
-              onClick={() => addMutation.mutate(newProcessorId)}
+              onClick={() =>
+                addMutation.mutate({
+                  processor_id: newProcessorId,
+                  requires_approval: newRequiresApproval,
+                })
+              }
               loading={addMutation.isLoading}
               disabled={!newProcessorId}
             >

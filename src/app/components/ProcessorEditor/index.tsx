@@ -53,6 +53,9 @@ export const ProcessorEditor = memo((props: Props) => {
   const [description, SetDescription] = useState(processor.description);
   const [config, SetConfig] = useState(formatJson(processor.config));
   const [direct_collect, SetDirectCollect] = useState(processor.direct_collect);
+  const [requires_approval, SetRequiresApproval] = useState(
+    processor.requires_approval,
+  );
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const Save = () => {
@@ -61,6 +64,7 @@ export const ProcessorEditor = memo((props: Props) => {
       description,
       config,
       direct_collect,
+      requires_approval,
     });
   };
 
@@ -99,12 +103,20 @@ export const ProcessorEditor = memo((props: Props) => {
           This action cannot be undone.
         </p>
       </Alert>
-      <Checkbox
-        label="Direct Collect"
-        checked={direct_collect}
-        onChange={() => SetDirectCollect(!direct_collect)}
-        style={{ marginTop: '1rem' }}
-      />
+      <div style={{ display: 'flex', gap: '2rem' }}>
+        <Checkbox
+          label="Direct Collect"
+          checked={direct_collect}
+          onChange={() => SetDirectCollect(!direct_collect)}
+          style={{ marginTop: '1rem' }}
+        />
+        <Checkbox
+          label="Requires Approval"
+          checked={requires_approval}
+          onChange={() => SetRequiresApproval(!requires_approval)}
+          style={{ marginTop: '1rem' }}
+        />
+      </div>
       <div style={{ display: 'flex', gap: '1rem', flex: 1, marginTop: '1rem' }}>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <H3>Description</H3>

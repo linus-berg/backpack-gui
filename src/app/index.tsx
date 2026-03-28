@@ -24,6 +24,7 @@ import { useKeycloak } from '@react-keycloak-fork/web';
 import { AxiosProvider } from 'api/backpack';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { StatusPage } from './pages/StatusPage/Loadable';
+import { ApprovalsPage } from './pages/ApprovalsPage/Loadable';
 
 const query_client = new QueryClient();
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -61,6 +62,9 @@ export function App() {
                 <Route index element={<ProcessorConfig />} />
                 <Route path=":processor" element={<ProcessorConfig />} />
               </Route>
+              {keycloak?.hasResourceRole('Administrator') && (
+                <Route path="approvals" element={<ApprovalsPage />} />
+              )}
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>

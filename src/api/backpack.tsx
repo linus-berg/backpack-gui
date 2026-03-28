@@ -9,6 +9,7 @@ import { Processor } from '../types/Processor';
 import { QueueStatus } from '../types/QueueStatus';
 import { Event } from '../types/Event';
 import { Schedule } from '../types/Schedule';
+import { PendingArtifact } from '../types/PendingArtifact';
 
 export const BACKPACK_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
@@ -118,6 +119,24 @@ export const useBackpackApi = () => {
     });
   };
 
+  const GetPendingArtifacts = () => {
+    return backpack.get<PendingArtifact[]>(BACKPACK_ARTIFACTS + '/pending');
+  };
+
+  const ApproveArtifact = ({ id, processor }) => {
+    return backpack.post(BACKPACK_ARTIFACTS + '/approve', {
+      id: id,
+      processor: processor,
+    });
+  };
+
+  const RejectArtifact = ({ id, processor }) => {
+    return backpack.post(BACKPACK_ARTIFACTS + '/reject', {
+      id: id,
+      processor: processor,
+    });
+  };
+
   /* Add */
   const AddArtifact = (artifact: Artifact) => {
     return backpack.post(BACKPACK_ARTIFACTS, {
@@ -138,9 +157,10 @@ export const useBackpackApi = () => {
   };
 
   /* Add Processor */
-  const AddProcessor = (processor_id: string) => {
+  const AddProcessor = ({ processor_id, requires_approval }) => {
     return backpack.post(BACKPACK_PROCESSOR, {
       processor_id: processor_id,
+      requires_approval: requires_approval,
     });
   };
 
@@ -150,6 +170,7 @@ export const useBackpackApi = () => {
       description: processor.description,
       config: processor.config,
       direct_collect: processor.direct_collect,
+      requires_approval: processor.requires_approval,
     });
   };
 
@@ -176,5 +197,8 @@ export const useBackpackApi = () => {
     GetAllProcessorArtifacts,
     ValidateAllArtifacts,
     ValidateArtifact,
+    GetPendingArtifacts,
+    ApproveArtifact,
+    RejectArtifact,
   };
 };

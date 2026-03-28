@@ -133,7 +133,6 @@ export const ArtifactTable = memo((props: Props) => {
       ),
     },
   ];
-  console.log(props.processor);
 
   const data = sortBy(query.data?.data, 'id');
   const artifacts = FilterArtifacts(
@@ -155,16 +154,18 @@ export const ArtifactTable = memo((props: Props) => {
 
   return (
     <Div>
-      <Checkbox
-        label="Only roots"
-        checked={only_roots}
-        onChange={() => SetOnlyRoots(!only_roots)}
-      />
-      <Checkbox
-        label="Deep filtering (includes searching in dependencies)"
-        checked={deep_filter}
-        onChange={() => SetDeepFilter(!deep_filter)}
-      />
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <Checkbox
+          label="Only roots"
+          checked={only_roots}
+          onChange={() => SetOnlyRoots(!only_roots)}
+        />
+        <Checkbox
+          label="Deep filtering"
+          checked={deep_filter}
+          onChange={() => SetDeepFilter(!deep_filter)}
+        />
+      </div>
       <SearchBar value={search_filter} onChange={SetSearchFilter}></SearchBar>
       <Table2
         enableColumnResizing

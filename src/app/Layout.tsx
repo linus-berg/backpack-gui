@@ -15,6 +15,7 @@ import { ConfigButton } from './components/ConfigButton/Loadable';
 import { ProcessorBrowserButton } from './components/ProcessorBrowserButton';
 import { useKeycloak } from '@react-keycloak-fork/web';
 import { StatusPageButton } from './components/StatusPageButton/Loadable';
+import { ApprovalsButton } from './components/ApprovalsButton';
 import styled from 'styled-components';
 import LogoImage from './logo.png';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -45,6 +46,7 @@ export function Layout() {
           </Navbar.Heading>
           <Navbar.Divider />
           <StatusPageButton />
+          <ApprovalsButton />
           <ProcessorBrowserButton />
           <ValidateAllButton />
           <TrackAllButton />
