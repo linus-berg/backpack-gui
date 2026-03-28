@@ -13,8 +13,7 @@ interface Props {
 export const AuxInput = memo((props: Props) => {
   const config = props.config;
 
-  const CreateField = (key: string) => {
-    const field = config[key];
+  const CreateField = (field: AuxField, key: string) => {
     const OnChange = (value: string) => {
       if (props.onChange) {
         props.onChange(field, value);
