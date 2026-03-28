@@ -4,15 +4,9 @@ import { useBackpackApi } from 'api/backpack';
 import { Spinner, HTMLTable, Icon, Intent, Tag } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { EventSeverity } from 'types/Event';
+import { ScrollTableContainer } from '../ScrollTableContainer';
 
 interface Props {}
-
-const ScrollDiv = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  border: 1px solid #394b59;
-  border-radius: 3px;
-`;
 
 const SeverityToIntent = (severity: EventSeverity): Intent => {
   switch (severity) {
@@ -51,7 +45,7 @@ export const EventFeed = memo((props: Props) => {
   }
 
   return (
-    <ScrollDiv>
+    <ScrollTableContainer>
       <HTMLTable striped condensed style={{ width: '100%' }}>
         <thead>
           <tr>
@@ -92,6 +86,6 @@ export const EventFeed = memo((props: Props) => {
           ))}
         </tbody>
       </HTMLTable>
-    </ScrollDiv>
+    </ScrollTableContainer>
   );
 });

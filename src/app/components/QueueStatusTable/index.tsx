@@ -4,18 +4,12 @@ import { useBackpackApi } from 'api/backpack';
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import { useKeycloak } from '@react-keycloak-fork/web';
+import { ScrollTableContainer } from '../ScrollTableContainer';
 
 interface Props {}
 
 const ColumnText = styled.span`
   margin-left: 4px;
-`;
-
-const ScrollDiv = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  border: 1px solid #394b59;
-  border-radius: 3px;
 `;
 
 const Tr = styled.tr``;
@@ -87,7 +81,7 @@ export const QueueStatusTable = memo((props: Props) => {
   }
 
   return (
-    <ScrollDiv>
+    <ScrollTableContainer>
       <HTMLTable striped condensed style={{ width: '100%' }}>
         <thead>
           <tr>
@@ -118,6 +112,6 @@ export const QueueStatusTable = memo((props: Props) => {
         </thead>
         <tbody>{queue_rows}</tbody>
       </HTMLTable>
-    </ScrollDiv>
+    </ScrollTableContainer>
   );
 });

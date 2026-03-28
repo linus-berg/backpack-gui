@@ -4,15 +4,9 @@ import { useBackpackApi } from 'api/backpack';
 import { Spinner, HTMLTable, Button, Intent, Icon } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { useKeycloak } from '@react-keycloak-fork/web';
+import { ScrollTableContainer } from '../ScrollTableContainer';
 
 interface Props {}
-
-const ScrollDiv = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  border: 1px solid #394b59;
-  border-radius: 3px;
-`;
 
 export const SchedulerPanel = memo((props: Props) => {
   const backpack = useBackpackApi();
@@ -35,7 +29,7 @@ export const SchedulerPanel = memo((props: Props) => {
   }
 
   return (
-    <ScrollDiv>
+    <ScrollTableContainer>
       <HTMLTable striped condensed style={{ width: '100%' }}>
         <thead>
           <tr>
@@ -57,8 +51,8 @@ export const SchedulerPanel = memo((props: Props) => {
                   ? new Date(schedule.last_run).toLocaleString()
                   : 'Never'}
               </td>
-              <td>
-                {isAdmin && (
+              {isAdmin && (
+                <td>
                   <Button
                     small
                     minimal
@@ -72,12 +66,12 @@ export const SchedulerPanel = memo((props: Props) => {
                   >
                     Sync Now
                   </Button>
-                )}
-              </td>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </HTMLTable>
-    </ScrollDiv>
+    </ScrollTableContainer>
   );
 });
