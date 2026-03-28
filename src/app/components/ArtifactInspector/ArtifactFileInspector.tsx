@@ -4,7 +4,7 @@
  *
  */
 import React, { memo } from 'react';
-import _ from 'lodash';
+import { map } from 'lodash';
 import { Classes, Dialog, HTMLTable } from '@blueprintjs/core';
 import { ArtifactVersion } from 'types/ArtifactVersion';
 import { ArtifactFile } from 'types/ArtifactFile';
@@ -52,7 +52,7 @@ export const ArtifactFileInspector = memo((props: Props) => {
               <th>Folder</th>
             </tr>
           </thead>
-          <tbody>{_.map(files, MapRow)}</tbody>
+          <tbody>{map(files, MapRow)}</tbody>
         </HTMLTable>
       </div>
     </Dialog>

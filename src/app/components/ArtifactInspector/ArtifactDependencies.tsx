@@ -5,7 +5,7 @@
  */
 import React, { memo } from 'react';
 import { Artifact } from 'types';
-import _ from 'lodash';
+import { map } from 'lodash';
 import { HTMLTable } from '@blueprintjs/core';
 import { ArtifactDependency } from 'types/ArtifactDependency';
 
@@ -38,7 +38,7 @@ export const ArtifactDependencies = memo((props: Props) => {
             <th>Processor</th>
           </tr>
         </thead>
-        <tbody>{_.map(dependencies, MapRow)}</tbody>
+        <tbody>{map(dependencies, MapRow)}</tbody>
       </HTMLTable>
     </div>
   );

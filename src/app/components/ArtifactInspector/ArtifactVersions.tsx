@@ -5,7 +5,7 @@
  */
 import React, { memo, useState } from 'react';
 import { Artifact } from 'types';
-import _ from 'lodash';
+import { map } from 'lodash';
 import { Button, HTMLTable, IconName, Intent, Tag } from '@blueprintjs/core';
 import { ArtifactVersion } from 'types/ArtifactVersion';
 import { ArtifactFileInspector } from './ArtifactFileInspector';
@@ -67,7 +67,7 @@ export const ArtifactVersions = memo((props: Props) => {
             <th>Files</th>
           </tr>
         </thead>
-        <tbody>{_.map(versions, MapRow)}</tbody>
+        <tbody>{map(versions, MapRow)}</tbody>
       </HTMLTable>
       <ArtifactFileInspector version={v} onClose={() => SetVersion(null)} />
     </div>

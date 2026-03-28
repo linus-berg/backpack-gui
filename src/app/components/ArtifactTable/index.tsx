@@ -4,7 +4,7 @@
  *
  */
 import { ButtonGroup, Checkbox, Spinner, Tag } from '@blueprintjs/core';
-import _ from 'lodash';
+import { get, filter, map, sortBy } from 'lodash';
 import { Cell, Column, Table2 } from '@blueprintjs/table';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
@@ -48,15 +48,15 @@ const FilterObject = (filter: string, artifact: any, deep_filter = false) => {
 };
 
 const FilterArtifacts = (
-  filter: string,
+  filter_str: string,
   artifacts: Artifact[],
   deep_filter = false,
 ) => {
-  if (filter === '') {
+  if (filter_str === '') {
     return artifacts;
   }
-  return _.filter(artifacts, artifact =>
-    FilterObject(filter, artifact, deep_filter),
+  return filter(artifacts, artifact =>
+    FilterObject(filter_str, artifact, deep_filter),
   );
 };
 
@@ -75,7 +75,7 @@ export const ArtifactTable = memo((props: Props) => {
     return <Spinner />;
   }
 
-  const aux_columns = _.map(
+  const aux_columns = map(
     JSON.parse(props.processor.config),
     (field: AuxField) => {
       return {
@@ -135,16 +135,16 @@ export const ArtifactTable = memo((props: Props) => {
   ];
   console.log(props.processor);
 
-  const data = _.sortBy(query.data?.data, 'id');
+  const data = sortBy(query.data?.data, 'id');
   const artifacts = FilterArtifacts(
     search_filter,
-    only_roots ? _.filter(data, (artifact: Artifact) => artifact.root) : data,
+    only_roots ? filter(data, (artifact: Artifact) => artifact.root) : data,
     deep_filter,
   );
 
   const RenderBasic = (row_idx: number, col_idx: number) => {
     const column = columns[col_idx];
-    const value = _.get(artifacts[row_idx], column.key);
+    const value = get(artifacts[row_idx], column.key);
     const render = 'render' in column ? column.render : undefined;
     return (
       <Cell interactive={column.interactive} className="artifact-table-cell">
