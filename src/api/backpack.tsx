@@ -59,6 +59,10 @@ export const useBackpackApi = () => {
     return backpack.get<QueueStatus[]>('/status/queue');
   };
 
+  const PurgeQueue = (queue_name: string) => {
+    return backpack.delete(`/status/queue/${queue_name}`);
+  };
+
   const GetAllProcessorArtifacts = ({ queryKey }) => {
     return backpack.get(BACKPACK_ARTIFACTS + '/all', {
       params: { processor: queryKey[1], only_roots: queryKey[2] },
@@ -129,9 +133,9 @@ export const useBackpackApi = () => {
       direct_collect: processor.direct_collect,
     });
   };
-
   return {
     GetQueueStatus,
+    PurgeQueue,
     AddProcessor,
     UpdateProcessor,
     AddArtifact,

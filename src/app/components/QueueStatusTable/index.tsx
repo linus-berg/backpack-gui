@@ -1,20 +1,34 @@
-import { Spinner, HTMLTable, Icon } from '@blueprintjs/core';
-import { useQuery } from '@tanstack/react-query';
+import { Spinner, HTMLTable, Icon, Button, Intent } from '@blueprintjs/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import React, { memo } from 'react';
 import styled from 'styled-components';
+import { useKeycloak } from '@react-keycloak-fork/web';
+
 interface Props {}
 
 const ColumnText = styled.span`
   margin-left: 4px;
 `;
 const Tr = styled.tr``;
-const Td = styled.td``;
+const Td = styled.td`
+  vertical-align: middle !important;
+`;
 
 export const QueueStatusTable = memo((props: Props) => {
   const backpack = useBackpackApi();
+  const { keycloak } = useKeycloak();
+  const queryClient = useQueryClient();
+  const isAdmin = keycloak.hasResourceRole('Administrator');
+
   const query = useQuery(['queue_status'], backpack.GetQueueStatus, {
     refetchInterval: 5000,
+  });
+
+  const purgeMutation = useMutation(backpack.PurgeQueue, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['queue_status']);
+    },
   });
 
   if (query.isLoading || query.data === null || query.data === undefined) {
@@ -24,10 +38,12 @@ export const QueueStatusTable = memo((props: Props) => {
   for (let i in query.data?.data) {
     const queue = query.data.data[i];
     const healthy = queue.consumers > 0;
-    const ingress = queue.avg_ingress_rate != null ? queue.avg_ingress_rate.toFixed(2) : 0;
-    const egress = queue.avg_egress_rate != null ? queue.avg_egress_rate.toFixed(2) : 0;
+    const ingress =
+      queue.avg_ingress_rate != null ? queue.avg_ingress_rate.toFixed(2) : 0;
+    const egress =
+      queue.avg_egress_rate != null ? queue.avg_egress_rate.toFixed(2) : 0;
     queue_rows.push(
-      <Tr>
+      <Tr key={queue.name}>
         <Td>{queue.name}</Td>
         <Td>
           {
@@ -41,6 +57,22 @@ export const QueueStatusTable = memo((props: Props) => {
         <Td>{queue.messages}</Td>
         <Td>{ingress}/s</Td>
         <Td>{egress}/s</Td>
+        {isAdmin && (
+          <Td>
+            <Button
+              small
+              intent={Intent.WARNING}
+              icon="trash"
+              loading={
+                purgeMutation.isLoading &&
+                purgeMutation.variables === queue.name
+              }
+              onClick={() => purgeMutation.mutate(queue.name)}
+            >
+              Purge
+            </Button>
+          </Td>
+        )}
       </Tr>,
     );
   }
@@ -73,6 +105,12 @@ export const QueueStatusTable = memo((props: Props) => {
             <Icon icon="trending-down" color="#abb3bf" />
             <ColumnText>Egress</ColumnText>
           </th>
+          {isAdmin && (
+            <th>
+              <Icon icon="cog" color="#abb3bf" />
+              <ColumnText>Actions</ColumnText>
+            </th>
+          )}
         </tr>
       </thead>
       <tbody>{queue_rows}</tbody>
