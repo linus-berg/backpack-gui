@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
-import { Spinner, HTMLTable, Button, Intent, Icon, H3, Tag, ButtonGroup } from '@blueprintjs/core';
+import { Spinner, HTMLTable, Button, Intent, Icon, H3, Tag, ButtonGroup, Code } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { Helmet } from 'react-helmet-async';
 import { ScrollTableContainer } from 'app/components/ScrollTableContainer';
@@ -30,6 +30,16 @@ export const ApprovalsPage = memo(() => {
     }
   });
 
+  const isValidRegex = (pattern: string) => {
+    if (!pattern || pattern === '*') return true;
+    try {
+      new RegExp(pattern);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
   if (isLoading) {
     return <Spinner />;
   }
@@ -50,45 +60,70 @@ export const ApprovalsPage = memo(() => {
               <tr>
                 <th>Processor</th>
                 <th>Artifact ID</th>
+                <th>Filter (Regex)</th>
+                <th>Configuration</th>
                 <th>Requested By</th>
                 <th>Timestamp</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {data?.data?.map(pending => (
-                <tr key={`${pending.processor}/${pending.id}`}>
-                  <td><Tag minimal>{pending.processor}</Tag></td>
-                  <td style={{ fontWeight: 'bold' }}>{pending.id}</td>
-                  <td>{pending.requested_by}</td>
-                  <td>{new Date(pending.timestamp).toLocaleString()}</td>
-                  <td>
-                    <ButtonGroup>
-                      <Button
-                        small
-                        intent={Intent.SUCCESS}
-                        icon="tick"
-                        loading={approveMutation.isLoading && (approveMutation.variables as any)?.id === pending.id}
-                        onClick={() => approveMutation.mutate({ id: pending.id, processor: pending.processor })}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        small
-                        intent={Intent.DANGER}
-                        icon="cross"
-                        loading={rejectMutation.isLoading && (rejectMutation.variables as any)?.id === pending.id}
-                        onClick={() => rejectMutation.mutate({ id: pending.id, processor: pending.processor })}
-                      >
-                        Reject
-                      </Button>
-                    </ButtonGroup>
-                  </td>
-                </tr>
-              ))}
+              {data?.data?.map(pending => {
+                const regexValid = isValidRegex(pending.filter);
+                return (
+                  <tr key={`${pending.processor}/${pending.id}`}>
+                    <td><Tag minimal>{pending.processor}</Tag></td>
+                    <td style={{ fontWeight: 'bold' }}>{pending.id}</td>
+                    <td>
+                      <Code intent={regexValid ? Intent.NONE : Intent.DANGER}>
+                        {pending.filter || '*'}
+                      </Code>
+                      {!regexValid && (
+                        <Icon
+                          icon="warning-sign"
+                          intent={Intent.DANGER}
+                          style={{ marginLeft: '5px' }}
+                          title="Invalid Regular Expression"
+                        />
+                      )}
+                    </td>
+                    <td>
+                      {Object.entries(pending.config || {}).map(([key, value]) => (
+                        <div key={key} style={{ fontSize: '0.85em' }}>
+                          <span style={{ color: '#abb3bf' }}>{key}:</span> {value}
+                        </div>
+                      ))}
+                    </td>
+                    <td>{pending.requested_by}</td>
+                    <td>{new Date(pending.timestamp).toLocaleString()}</td>
+                    <td>
+                      <ButtonGroup>
+                        <Button
+                          small
+                          intent={Intent.SUCCESS}
+                          icon="tick"
+                          loading={approveMutation.isLoading && (approveMutation.variables as any)?.id === pending.id}
+                          onClick={() => approveMutation.mutate({ id: pending.id, processor: pending.processor })}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          small
+                          intent={Intent.DANGER}
+                          icon="cross"
+                          loading={rejectMutation.isLoading && (rejectMutation.variables as any)?.id === pending.id}
+                          onClick={() => rejectMutation.mutate({ id: pending.id, processor: pending.processor })}
+                        >
+                          Reject
+                        </Button>
+                      </ButtonGroup>
+                    </td>
+                  </tr>
+                );
+              })}
               {(!data?.data || data.data.length === 0) && (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#abb3bf' }}>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#abb3bf' }}>
                     No pending approvals found.
                   </td>
                 </tr>
