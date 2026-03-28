@@ -35,3 +35,15 @@ p, label {
 .processor-config-tab {
   height: 100%;
 }
+
+:root {
+  --table-header-bg: #{$light-gray5};
+  --table-header-shadow: #{$light-gray3};
+  --table-border: #{$light-gray2};
+}
+
+.bp4-dark {
+  --table-header-bg: #{$dark-gray3};
+  --table-header-shadow: #{$dark-gray2};
+  --table-border: #{$dark-gray1};
+}

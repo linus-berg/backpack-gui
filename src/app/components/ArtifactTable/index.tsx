@@ -236,12 +236,8 @@ const TableHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #d8e1e8;
+  border-bottom: 1px solid var(--table-border);
   margin-bottom: 8px;
-
-  .bp4-dark & {
-    border-bottom-color: #394b59;
-  }
 `;
 
 const TableWrapper = styled.div`
