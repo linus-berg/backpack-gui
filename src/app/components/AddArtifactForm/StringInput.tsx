@@ -1,12 +1,7 @@
 import {
-  Button,
-  Classes,
-  ControlGroup,
-  Dialog,
   InputGroup,
 } from '@blueprintjs/core';
-import { useMutation } from '@tanstack/react-query';
-import React, { memo, ReactEventHandler, useState } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import { AuxField } from 'types/AuxField';
 
@@ -16,14 +11,25 @@ interface Props {
   onChange: (value: string) => void;
 }
 
+const FormRow = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+`;
+
 export const StringInput = memo((props: Props) => {
   const OnChange = evt => props.onChange(evt.currentTarget.value);
   const field = props.field;
   return (
-    <InputGroup
-      value={props.value}
-      onChange={OnChange}
-      placeholder={field.placeholder}
-    />
+    <FormRow>
+      <InputGroup
+        fill
+        value={props.value}
+        onChange={OnChange}
+        placeholder={field.placeholder}
+      />
+      {/* Placeholder for help icon to maintain alignment */}
+      <div style={{ width: '14px', marginLeft: '8px' }} />
+    </FormRow>
   );
 });

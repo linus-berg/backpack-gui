@@ -1,13 +1,13 @@
 import {
   Button,
-  Classes,
-  ControlGroup,
-  Dialog,
   InputGroup,
   H6,
   Card,
   Callout,
   Intent,
+  Tooltip,
+  Position,
+  Icon,
 } from '@blueprintjs/core';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
@@ -75,8 +75,10 @@ export const AddArtifactForm = memo((props: Props) => {
           icon="shield"
           style={{ marginBottom: '10px' }}
         >
-          New artifacts added to this processor will be reviewed by an
-          administrator before collection starts.
+          <div style={{ fontSize: '0.85em' }}>
+            New artifacts added to this processor will be reviewed by an
+            administrator before collection starts.
+          </div>
         </Callout>
       )}
       <Card>
@@ -84,29 +86,52 @@ export const AddArtifactForm = memo((props: Props) => {
           dangerouslySetInnerHTML={{ __html: props.processor.description }}
         />
       </Card>
-      <ControlGroup vertical>
+
+      <FormRow>
         <InputGroup
+          fill
           placeholder="Artifact Name (ex. react)"
           value={name}
           onChange={evt => UpdateValue(SetName, evt)}
           leftIcon="cube"
         />
+        <Tooltip
+          content="The unique identifier for the package (e.g., 'lodash' or 'ubuntu')"
+          position={Position.RIGHT}
+        >
+          <HelpIcon icon="help" size={14} />
+        </Tooltip>
+      </FormRow>
+
+      <FormRow>
         <InputGroup
+          fill
           placeholder="Processor"
           value={props.processor.id}
           disabled
         />
+        <div style={{ width: '14px', marginLeft: '8px' }} />
+      </FormRow>
+
+      <FormRow>
         <InputGroup
+          fill
           placeholder="Regex version filter"
           value={filter}
           onChange={evt => UpdateValue(SetFilter, evt)}
+          leftIcon="filter"
         />
-      </ControlGroup>
-      <div>
-        <H6>Auxiliary input</H6>
-        <ControlGroup vertical>
-          <AuxInput onChange={UpdateField} config={aux} values={config} />
-        </ControlGroup>
+        <Tooltip
+          content="Optional: A regular expression to filter which versions should be mirrored (e.g., '^18\..*')"
+          position={Position.RIGHT}
+        >
+          <HelpIcon icon="help" size={14} />
+        </Tooltip>
+      </FormRow>
+
+      <div style={{ marginTop: '8px' }}>
+        <H6>Auxiliary Configuration</H6>
+        <AuxInput onChange={UpdateField} config={aux} values={config} />
       </div>
       <Button
         icon="cube-add"
@@ -114,8 +139,9 @@ export const AddArtifactForm = memo((props: Props) => {
         onClick={() => OnAdd()}
         loading={mutation.isLoading}
         disabled={name === ''}
+        style={{ marginTop: '8px' }}
       >
-        Add
+        Add Artifact
       </Button>
     </Div>
   );
@@ -124,5 +150,18 @@ export const AddArtifactForm = memo((props: Props) => {
 const Div = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+`;
+
+const FormRow = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+`;
+
+const HelpIcon = styled(Icon)`
+  margin-left: 8px;
+  color: #abb3bf;
+  cursor: help;
+  flex-shrink: 0;
 `;

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { AuxField } from 'types/AuxField';
 import { StringInput } from './StringInput';
 import { AuxDict } from 'types/AuxDict';
+
 interface Props {
   config: AuxDict;
   values: { [key: string]: string };
@@ -32,7 +33,15 @@ export const AuxInput = memo((props: Props) => {
     return null;
   };
 
-  return <Div>{map(config, CreateField)}</Div>;
+  return (
+    <Div>
+      {map(config, CreateField)}
+    </Div>
+  );
 });
 
-const Div = styled.div``;
+const Div = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
