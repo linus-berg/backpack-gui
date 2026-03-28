@@ -4,7 +4,7 @@
  *
  */
 import { Spinner, Tag } from '@blueprintjs/core';
-import { get, filter, sortBy } from 'lodash-es';
+import { get, filter, map, sortBy } from 'lodash-es';
 import { Cell, Column, Table2 } from '@blueprintjs/table';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
@@ -16,6 +16,7 @@ import { Artifact } from 'types';
 import { ArtifactInspector } from 'app/components/ArtifactInspector';
 import { ArtifactTableFilterBar } from './components/ArtifactTableFilterBar';
 import { ArtifactTableActions } from './components/ArtifactTableActions';
+import { AuxField } from 'types/AuxField';
 
 interface Props {
   processor: Processor;
@@ -77,6 +78,17 @@ export const ArtifactTable = memo((props: Props) => {
     deep_filter,
   );
 
+  const aux_columns = map(
+    JSON.parse(props.processor.config),
+    (field: AuxField) => {
+      return {
+        key: `config.${field.key}`,
+        name: `config.${field.key}`,
+        interactive: false,
+      };
+    },
+  );
+
   const columns = [
     { key: 'id', name: 'ID', interactive: false },
     { key: 'filter', name: 'Filter' },
@@ -124,6 +136,7 @@ export const ArtifactTable = memo((props: Props) => {
         </Center>
       ),
     },
+    ...aux_columns,
     {
       key: 'action',
       name: 'Actions',
@@ -186,7 +199,7 @@ export const ArtifactTable = memo((props: Props) => {
 
 const Div = styled.div`
   width: 100%;
-  height: 75vh;
+  height: 80vh;
   display: flex;
   flex-direction: column;
 `;

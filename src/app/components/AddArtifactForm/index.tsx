@@ -9,6 +9,8 @@ import {
   Position,
   Icon,
 } from '@blueprintjs/core';
+
+import { Popover2 } from '@blueprintjs/popover2';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import React, { memo, useState } from 'react';
@@ -68,18 +70,45 @@ export const AddArtifactForm = memo((props: Props) => {
 
   return (
     <Div>
-      {props.processor.requires_approval && (
-        <Callout
-          intent={Intent.WARNING}
-          title="Administrator Approval Required"
-          icon="shield"
-          style={{ marginBottom: '10px' }}
+      {props.processor.is_external && (
+        <Popover2
+          position={Position.LEFT}
+          content={
+            <div style={{ padding: '1rem', maxWidth: '300px' }}>
+              Backpack acts as a <b>metadata registry</b> for this ecosystem.
+              The collection, synchronization, and storage of these artifacts
+              are managed by an external system.
+            </div>
+          }
         >
-          <div style={{ fontSize: '0.85em' }}>
-            New artifacts added to this processor will be reviewed by an
-            administrator before collection starts.
-          </div>
-        </Callout>
+          <Callout
+            intent={Intent.WARNING}
+            title="External Management"
+            icon="warning-sign"
+            style={{
+              width: '100%',
+              cursor: 'pointer',
+            }}
+          />
+        </Popover2>
+      )}
+      {props.processor.requires_approval && (
+        <Popover2
+          position={Position.LEFT}
+          content={
+            <div style={{ padding: '1rem', maxWidth: '300px' }}>
+              New artifacts added to this processor will be reviewed by an
+              administrator before collection starts.
+            </div>
+          }
+        >
+          <Callout
+            intent={Intent.WARNING}
+            title="Approval Required"
+            icon="shield"
+            style={{ marginBottom: '10px', cursor: 'pointer' }}
+          />
+        </Popover2>
       )}
       <Card>
         <div

@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { ArtifactTable } from 'app/components/ArtifactTable';
 import { AddArtifactForm } from 'app/components/AddArtifactForm';
 import { Processor } from '../../../types/Processor';
-import { Button, Intent, Callout } from '@blueprintjs/core';
+import { Button, Intent, Callout, Position } from '@blueprintjs/core';
+import { Popover2 } from '@blueprintjs/popover2';
 import { BulkAddDialog } from 'app/components/BulkAddDialog';
 
 interface Props {
@@ -19,20 +20,6 @@ export const ProcessorPanel = memo((props: Props) => {
         <ArtifactTable processor={props.processor} />
       </TableDiv>
       <FormDiv>
-        {props.processor.is_external && (
-          <Callout
-            intent={Intent.WARNING}
-            title="External Management"
-            icon="warning-sign"
-            style={{ marginBottom: '1.5rem' }}
-          >
-            <div style={{ fontSize: '0.85em' }}>
-              Backpack acts as a <b>metadata registry</b> for this ecosystem. 
-              The collection, synchronization, and storage of these artifacts 
-               are managed by an external system.
-            </div>
-          </Callout>
-        )}
         <AddArtifactForm processor={props.processor} />
         {props.processor.multi_add && (
           <Button
@@ -67,5 +54,4 @@ const TableDiv = styled.div`
 
 const FormDiv = styled.div`
   padding-left: 2rem;
-  padding-top: 2rem;
 `;
