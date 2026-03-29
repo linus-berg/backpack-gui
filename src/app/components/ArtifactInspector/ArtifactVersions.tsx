@@ -6,69 +6,89 @@
 import React, { memo, useState } from 'react';
 import { Artifact } from 'types';
 import { map } from 'lodash-es';
-import { Button, HTMLTable, IconName, Intent, Tag } from '@blueprintjs/core';
+import { Button, HTMLTable, IconName, Intent, Tag, Tooltip, Icon } from '@blueprintjs/core';
 import { ArtifactVersion } from 'types/ArtifactVersion';
 import { ArtifactFileInspector } from './ArtifactFileInspector';
+import styled from 'styled-components';
 
 interface Props {
   artifact: Artifact;
 }
 
-const GetMatchTag = (
+const ScrollContainer = styled.div`
+  max-height: 50vh;
+  overflow-y: auto;
+  border: 1px solid var(--table-border);
+  border-radius: 3px;
+  margin-top: 10px;
+`;
+
+const GetMatchIcon = (
   filter: string,
   regex: RegExp,
-  version: ArtifactVersion,
+  version: string,
 ) => {
-  let icon: IconName = 'tick';
-  let intent: Intent = 'success';
-  if (filter !== '' && filter !== null) {
-    if (!regex.test(version.version)) {
-      icon = 'cross';
-      intent = 'danger';
-    }
+  if (!filter || filter === '*') {
+    return <Icon icon="tick-circle" intent={Intent.SUCCESS} />;
   }
-  return <Tag intent={intent} icon={icon} />;
+  
+  const isMatch = regex.test(version);
+  return (
+    <Tooltip content={isMatch ? "Matches Filter" : "Filtered Out"} position="left">
+      <Icon 
+        icon={isMatch ? 'tick-circle' : 'disable'} 
+        intent={isMatch ? Intent.SUCCESS : Intent.NONE} 
+      />
+    </Tooltip>
+  );
 };
+
 export const ArtifactVersions = memo((props: Props) => {
   const versions = props.artifact.versions;
-  const regex = new RegExp(props.artifact.filter);
+  const regex = new RegExp(props.artifact.filter || '.*');
   const [v, SetVersion] = useState<ArtifactVersion | null>(null);
 
-  const MapRow = (version: ArtifactVersion) => {
-    const OnClickFiles = () => {
-      SetVersion(version);
-    };
-    const files = Object.keys(version.files).length;
-    return (
-      <tr>
-        <td>{version.version}</td>
-        <td>{GetMatchTag(props.artifact.filter, regex, version)}</td>
-        <td>
-          <Button icon={'folder-open'} intent="primary" onClick={OnClickFiles}>
-            {files}
-          </Button>
-        </td>
-      </tr>
-    );
-  };
   return (
-    <div className="artifact-table-wrapper">
-      <HTMLTable
-        className="artifact-table"
-        condensed
-        striped
-        bordered
-        interactive
-      >
-        <thead>
-          <tr>
-            <th>Version</th>
-            <th>Match (filter)</th>
-            <th>Files</th>
-          </tr>
-        </thead>
-        <tbody>{map(versions, MapRow)}</tbody>
-      </HTMLTable>
+    <div>
+      <ScrollContainer>
+        <HTMLTable
+          condensed
+          striped
+          style={{ width: '100%' }}
+        >
+          <thead>
+            <tr>
+              <th style={{ width: '40px' }}></th>
+              <th>Version</th>
+              <th>Status</th>
+              <th style={{ textAlign: 'right' }}>Files</th>
+            </tr>
+          </thead>
+          <tbody>
+            {map(versions, (version: ArtifactVersion) => (
+              <tr key={version.version}>
+                <td>{GetMatchIcon(props.artifact.filter, regex, version.version)}</td>
+                <td style={{ fontWeight: 600 }}>{version.version}</td>
+                <td>
+                  <Tag minimal intent={version.collected ? Intent.SUCCESS : Intent.WARNING}>
+                    {version.collected ? 'mirrored' : 'pending'}
+                  </Tag>
+                </td>
+                <td style={{ textAlign: 'right' }}>
+                  <Button 
+                    small
+                    minimal
+                    icon={'folder-open'} 
+                    intent={Intent.PRIMARY} 
+                    onClick={() => SetVersion(version)}
+                    text={Object.keys(version.files || {}).length}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </HTMLTable>
+      </ScrollContainer>
       <ArtifactFileInspector version={v} onClose={() => SetVersion(null)} />
     </div>
   );

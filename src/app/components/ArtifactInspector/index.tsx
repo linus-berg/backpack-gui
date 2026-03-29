@@ -3,7 +3,7 @@
  * Inspection Drawer
  *
  */
-import { Classes, Drawer } from '@blueprintjs/core';
+import { Classes, Drawer, Position } from '@blueprintjs/core';
 import React, { memo } from 'react';
 import { Artifact } from 'types';
 import { ArtifactInspectorBody } from './ArtifactInspectorBody';
@@ -17,14 +17,21 @@ interface Props {
 export const ArtifactInspector = memo((props: Props) => {
   return (
     <Drawer
-      title={props.artifact?.id}
+      title={
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ color: '#5c7080' }}>Inspection:</span>
+          <span style={{ fontWeight: 600 }}>{props.artifact?.id}</span>
+        </div>
+      }
+      icon="info-sign"
       onClose={props.onClose}
       isOpen={props.artifact !== null}
+      position={Position.RIGHT}
+      size="60%"
     >
       <div className={Classes.DRAWER_BODY}>
         <ArtifactInspectorBody artifact={props.artifact} />
       </div>
-      <div className={Classes.DRAWER_FOOTER}></div>
     </Drawer>
   );
 });
