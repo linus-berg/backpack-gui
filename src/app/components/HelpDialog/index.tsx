@@ -77,7 +77,7 @@ export const HelpDialog = ({ isOpen, onClose }: Props) => {
 
             <HelpSection>
               <ActionHeader>
-                <Icon icon="cube-add" intent={Intent.SUCCESS} />
+                <Icon icon="cube-add" intent={Intent.PRIMARY} />
                 <H6 style={{ margin: 0 }}>Add Artifact</H6>
               </ActionHeader>
               <p>
@@ -98,7 +98,7 @@ export const HelpDialog = ({ isOpen, onClose }: Props) => {
 
             <HelpSection>
               <ActionHeader>
-                <Icon icon="refresh" intent={Intent.PRIMARY} />
+                <Icon icon="refresh" intent={Intent.SUCCESS} />
                 <H6 style={{ margin: 0 }}>Request Update (Re-track)</H6>
               </ActionHeader>
               <p>
@@ -110,7 +110,7 @@ export const HelpDialog = ({ isOpen, onClose }: Props) => {
 
             <HelpSection>
               <ActionHeader>
-                <Icon icon="confirm" intent={Intent.PRIMARY} />
+                <Icon icon="confirm" intent={Intent.WARNING} />
                 <H6 style={{ margin: 0 }}>Validate Artifact</H6>
               </ActionHeader>
               <p>
@@ -123,8 +123,10 @@ export const HelpDialog = ({ isOpen, onClose }: Props) => {
 
             <HelpSection>
               <ActionHeader>
-                <Icon icon="manual" intent={Intent.SUCCESS} />
-                <H6 style={{ margin: 0 }}>Manual Collection</H6>
+                <Icon icon="refresh" intent={Intent.DANGER} />
+                <H6 style={{ margin: 0 }}>
+                  Force Collection (only available on <i>direct</i> processors)
+                </H6>
               </ActionHeader>
               <p>
                 Triggers an immediate download attempt for specific versions
