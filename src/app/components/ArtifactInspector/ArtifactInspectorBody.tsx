@@ -3,7 +3,17 @@
  * Inspection Drawer
  *
  */
-import { Spinner, Tag, Tabs, Tab, H5, Card, Elevation, Icon, Intent } from '@blueprintjs/core';
+import {
+  Spinner,
+  Tag,
+  Tabs,
+  Tab,
+  H5,
+  Card,
+  Elevation,
+  Icon,
+  Intent,
+} from '@blueprintjs/core';
 import React, { memo, useState } from 'react';
 import { Artifact } from 'types';
 import { ArtifactDependencies } from './ArtifactDependencies';
@@ -67,7 +77,7 @@ export const ArtifactInspectorBody = memo((props: Props) => {
 
   const artifact: Artifact = query.data.data;
   const versionCount = Object.keys(artifact.versions || {}).length;
-  const depCount = artifact.dependencies?.length || 0;
+  const depCount = Object.keys(artifact.dependencies).length || 0;
 
   return (
     <div style={{ padding: '20px' }}>
@@ -85,21 +95,32 @@ export const ArtifactInspectorBody = memo((props: Props) => {
           <StatLabel>Dependencies</StatLabel>
         </StatCard>
         <StatCard elevation={Elevation.ZERO}>
-          <Icon 
-            icon={artifact.root ? 'tick-circle' : 'git-branch'} 
-            size={24} 
+          <Icon
+            icon={artifact.root ? 'tick-circle' : 'git-branch'}
+            size={24}
             intent={artifact.root ? Intent.SUCCESS : Intent.WARNING}
             style={{ marginBottom: '8px' }}
           />
-          <StatLabel>{artifact.root ? 'Root Artifact' : 'Dependency'}</StatLabel>
+          <StatLabel>
+            {artifact.root ? 'Root Artifact' : 'Dependency'}
+          </StatLabel>
         </StatCard>
       </MetadataRow>
 
-      <Card elevation={Elevation.ZERO} style={{ marginBottom: '20px', padding: '15px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '10px' }}>
+      <Card
+        elevation={Elevation.ZERO}
+        style={{ marginBottom: '20px', padding: '15px' }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '120px 1fr',
+            gap: '10px',
+          }}
+        >
           <StatLabel style={{ alignSelf: 'center' }}>Filter:</StatLabel>
           <code>{artifact.filter || '*'}</code>
-          
+
           <StatLabel style={{ alignSelf: 'center' }}>Config:</StatLabel>
           <pre style={{ margin: 0, fontSize: '0.85em' }}>
             {JSON.stringify(artifact.config, null, 2)}
@@ -117,7 +138,7 @@ export const ArtifactInspectorBody = memo((props: Props) => {
           id="versions"
           title={
             <span>
-              <Icon icon="versions" style={{ marginRight: '8px' }} />
+              <Icon icon="variable" style={{ marginRight: '8px' }} />
               Versions
             </span>
           }

@@ -19,7 +19,7 @@ export const ArtifactInspector = memo((props: Props) => {
     <Drawer
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ color: '#5c7080' }}>Inspection:</span>
+          <span>Inspection:</span>
           <span style={{ fontWeight: 600 }}>{props.artifact?.id}</span>
         </div>
       }

@@ -6,7 +6,15 @@
 import React, { memo, useState } from 'react';
 import { Artifact } from 'types';
 import { map } from 'lodash-es';
-import { Button, HTMLTable, IconName, Intent, Tag, Tooltip, Icon } from '@blueprintjs/core';
+import {
+  Button,
+  HTMLTable,
+  IconName,
+  Intent,
+  Tag,
+  Tooltip,
+  Icon,
+} from '@blueprintjs/core';
 import { ArtifactVersion } from 'types/ArtifactVersion';
 import { ArtifactFileInspector } from './ArtifactFileInspector';
 import styled from 'styled-components';
@@ -23,21 +31,20 @@ const ScrollContainer = styled.div`
   margin-top: 10px;
 `;
 
-const GetMatchIcon = (
-  filter: string,
-  regex: RegExp,
-  version: string,
-) => {
+const GetMatchIcon = (filter: string, regex: RegExp, version: string) => {
   if (!filter || filter === '*') {
     return <Icon icon="tick-circle" intent={Intent.SUCCESS} />;
   }
-  
+
   const isMatch = regex.test(version);
   return (
-    <Tooltip content={isMatch ? "Matches Filter" : "Filtered Out"} position="left">
-      <Icon 
-        icon={isMatch ? 'tick-circle' : 'disable'} 
-        intent={isMatch ? Intent.SUCCESS : Intent.NONE} 
+    <Tooltip
+      content={isMatch ? 'Matches Filter' : 'Filtered Out'}
+      position="left"
+    >
+      <Icon
+        icon={isMatch ? 'tick-circle' : 'disable'}
+        intent={isMatch ? Intent.SUCCESS : Intent.NONE}
       />
     </Tooltip>
   );
@@ -51,35 +58,27 @@ export const ArtifactVersions = memo((props: Props) => {
   return (
     <div>
       <ScrollContainer>
-        <HTMLTable
-          condensed
-          striped
-          style={{ width: '100%' }}
-        >
+        <HTMLTable condensed striped style={{ width: '100%' }}>
           <thead>
             <tr>
               <th style={{ width: '40px' }}></th>
               <th>Version</th>
-              <th>Status</th>
               <th style={{ textAlign: 'right' }}>Files</th>
             </tr>
           </thead>
           <tbody>
             {map(versions, (version: ArtifactVersion) => (
               <tr key={version.version}>
-                <td>{GetMatchIcon(props.artifact.filter, regex, version.version)}</td>
-                <td style={{ fontWeight: 600 }}>{version.version}</td>
                 <td>
-                  <Tag minimal intent={version.collected ? Intent.SUCCESS : Intent.WARNING}>
-                    {version.collected ? 'mirrored' : 'pending'}
-                  </Tag>
+                  {GetMatchIcon(props.artifact.filter, regex, version.version)}
                 </td>
+                <td style={{ fontWeight: 600 }}>{version.version}</td>
                 <td style={{ textAlign: 'right' }}>
-                  <Button 
+                  <Button
                     small
                     minimal
-                    icon={'folder-open'} 
-                    intent={Intent.PRIMARY} 
+                    icon={'folder-open'}
+                    intent={Intent.PRIMARY}
                     onClick={() => SetVersion(version)}
                     text={Object.keys(version.files || {}).length}
                   />
