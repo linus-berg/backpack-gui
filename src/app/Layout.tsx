@@ -21,6 +21,7 @@ import { useAuth } from 'react-oidc-context';
 import { StatusPageButton } from './components/StatusPageButton/Loadable';
 import { ApprovalsButton } from './components/ApprovalsButton';
 import { ApiKeyButton } from './components/ApiKeyButton';
+import { HomeButton } from './components/HomeButton';
 import styled from 'styled-components';
 import LogoImage from './logo.png';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -86,6 +87,7 @@ export function Layout() {
           </Navbar.Heading>
           <Navbar.Divider />
           <NavContainer>
+            <HomeButton />
             <StatusPageButton />
             <ProcessorBrowserButton />
 

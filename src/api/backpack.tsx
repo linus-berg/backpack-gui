@@ -86,6 +86,18 @@ export const useBackpackApi = () => {
     return backpack.delete(`/apikey/${id}`);
   };
 
+  const GetNewsPosts = () => {
+    return backpack.get<NewsPost[]>('/news');
+  };
+
+  const CreateNewsPost = (post: Partial<NewsPost>) => {
+    return backpack.post('/news', post);
+  };
+
+  const DeleteNewsPost = (id: string) => {
+    return backpack.delete(`/news/${id}`);
+  };
+
   const TriggerSync = (processor: string) => {
     return backpack.post(`/scheduler/trigger/${processor}`);
   };
@@ -211,6 +223,9 @@ export const useBackpackApi = () => {
     GetApiKeys,
     CreateApiKey,
     DeleteApiKey,
+    GetNewsPosts,
+    CreateNewsPost,
+    DeleteNewsPost,
     TriggerSync,
     UpdateSchedule,
     PurgeQueue,

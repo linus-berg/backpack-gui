@@ -27,6 +27,7 @@ import { StatusPage } from './pages/StatusPage/Loadable';
 import { ApprovalsPage } from './pages/ApprovalsPage/Loadable';
 import { ApiKeyPage } from './pages/ApiKeyPage/Loadable';
 import { UserProvider, useUser } from './context/UserContext';
+import { LandingPage } from './pages/LandingPage';
 
 const query_client = new QueryClient();
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -38,7 +39,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<Navigate to="/status" />} />
+        <Route index element={<LandingPage />} />
         <Route path="status" element={<StatusPage />}></Route>
         <Route path="processor">
           <Route index element={<ProcessorBrowser />} />
