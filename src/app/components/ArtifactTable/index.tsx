@@ -12,11 +12,12 @@ import React, { memo, useState } from 'react';
 import styled from 'styled-components';
 import './ArtifactTable.scss';
 import { Processor } from '../../../types/Processor';
+import { AuxField } from 'types/AuxField';
 import { Artifact } from 'types';
 import { ArtifactInspector } from 'app/components/ArtifactInspector';
 import { ArtifactTableFilterBar } from './components/ArtifactTableFilterBar';
 import { ArtifactTableActions } from './components/ArtifactTableActions';
-import { AuxField } from 'types/AuxField';
+import { useUser } from 'app/context/UserContext';
 
 interface Props {
   processor: Processor;
@@ -58,6 +59,9 @@ const FilterArtifacts = (
 
 export const ArtifactTable = memo((props: Props) => {
   const backpack = useBackpackApi();
+  const { hasRole } = useUser();
+  const isAdmin = hasRole('Administrator');
+
   const [only_roots, SetOnlyRoots] = useState(true);
   const [deep_filter, SetDeepFilter] = useState(false);
   const [inspect, SetInspect] = useState<null | Artifact>(null);
@@ -83,7 +87,7 @@ export const ArtifactTable = memo((props: Props) => {
     (field: AuxField) => {
       return {
         key: `config.${field.key}`,
-        name: `config.${field.key}`,
+        name: field.name,
         interactive: false,
       };
     },
@@ -181,6 +185,11 @@ export const ArtifactTable = memo((props: Props) => {
           enableColumnResizing
           defaultRowHeight={32}
           numRows={artifacts.length}
+          columnHeaderCellRenderer={idx => (
+            <div style={{ padding: '8px', fontWeight: 600, color: '#5c7080' }}>
+              {columns[idx].name}
+            </div>
+          )}
         >
           {columns.map(column => (
             <Column
@@ -199,7 +208,7 @@ export const ArtifactTable = memo((props: Props) => {
 
 const Div = styled.div`
   width: 100%;
-  height: 80vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 `;

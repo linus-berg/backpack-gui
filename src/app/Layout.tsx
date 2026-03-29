@@ -16,13 +16,14 @@ import { ValidateAllButton } from './components/ValidateAllButton/Loadable';
 import { TrackAllButton } from './components/TrackAllButton/Loadable';
 import { ConfigButton } from './components/ConfigButton/Loadable';
 import { ProcessorBrowserButton } from './components/ProcessorBrowserButton';
-import { useKeycloak } from '@react-keycloak-fork/web';
+import { useAuth } from 'react-oidc-context';
 import { StatusPageButton } from './components/StatusPageButton/Loadable';
 import { ApprovalsButton } from './components/ApprovalsButton';
 import { ApiKeyButton } from './components/ApiKeyButton';
 import styled from 'styled-components';
 import LogoImage from './logo.png';
 import { ThemeToggle } from './components/ThemeToggle';
+import { useUser } from './context/UserContext';
 
 const LogoBox = styled.div`
   display: flex;
@@ -53,8 +54,9 @@ const NavContainer = styled.div`
 `;
 
 export function Layout() {
-  const { keycloak } = useKeycloak();
-  const isAdmin = keycloak.hasResourceRole('Administrator');
+  const auth = useAuth();
+  const { hasRole } = useUser();
+  const isAdmin = hasRole('Administrator');
 
   const MaintenanceMenu = (
     <Menu>
@@ -104,7 +106,7 @@ export function Layout() {
             icon="log-out"
             minimal
             intent={Intent.DANGER}
-            onClick={() => keycloak.logout()}
+            onClick={() => auth.signoutRedirect()}
             text="Sign Out"
           />
         </Navbar.Group>

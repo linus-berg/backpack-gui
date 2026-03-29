@@ -7,16 +7,15 @@ import { Button } from '@blueprintjs/core';
 import { useMutation } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import React, { memo } from 'react';
-import { useKeycloak } from '@react-keycloak-fork/web';
+import { useUser } from '../../context/UserContext';
 
 interface Props {}
 
 export const ValidateAllButton = memo((props: Props) => {
-  const { keycloak } = useKeycloak();
   const backpack = useBackpackApi();
+  const { hasRole } = useUser();
   const mutation = useMutation(backpack.ValidateAllArtifacts);
-
-  if (!keycloak.hasResourceRole('Administrator')) {
+  if (!hasRole('Administrator')) {
     return null;
   }
   return (

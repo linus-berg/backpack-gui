@@ -21,15 +21,15 @@ import {
 } from '@blueprintjs/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ProcessorEditor } from 'app/components/ProcessorEditor/Loadable';
-import { useKeycloak } from '@react-keycloak-fork/web';
+import { useUser } from '../../context/UserContext';
 
 interface Props {}
 
 export const ProcessorConfig = memo((props: Props) => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
-  const { keycloak } = useKeycloak();
-  const isAdmin = keycloak.hasResourceRole('Administrator');
+  const { hasRole } = useUser();
+  const isAdmin = hasRole('Administrator');
   const query = useQuery(['processor_list'], backpack.GetAllProcessors);
   const params = useParams();
   const nav = useNavigate();

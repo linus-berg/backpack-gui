@@ -1,4 +1,4 @@
-import { useKeycloak } from '@react-keycloak-fork/web';
+import { useAuth } from 'react-oidc-context';
 import axios from 'axios';
 import React, { createContext, useContext, useEffect } from 'react';
 import { Artifact } from 'types';
@@ -11,6 +11,7 @@ import { Event } from '../types/Event';
 import { Schedule } from '../types/Schedule';
 import { PendingArtifact } from '../types/PendingArtifact';
 import { ApiKey } from '../types/ApiKey';
+import { User } from '../types/User';
 
 export const BACKPACK_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
@@ -30,22 +31,19 @@ const interceptor_hdl = axios_instance.interceptors.request.use(
 );
 
 export const AxiosProvider = props => {
-  const { keycloak, initialized } = useKeycloak();
+  const auth = useAuth();
 
   useEffect(() => {
-    interceptor.SetToken(keycloak?.token ?? '');
-  }, [keycloak.token]);
-  keycloak.onAuthRefreshSuccess = () => {
-    interceptor.SetToken(keycloak?.token ?? '');
-  };
+    interceptor.SetToken(auth.user?.access_token ?? '');
+  }, [auth.user?.access_token]);
 
-  if (!initialized || !keycloak?.authenticated) {
+  if (auth.isLoading || !auth.isAuthenticated) {
     return <Spinner />;
   }
 
   return (
     <axios_ctx.Provider value={axios_instance}>
-      {keycloak?.authenticated ? props.children : <Spinner />}
+      {auth.isAuthenticated ? props.children : <Spinner />}
     </axios_ctx.Provider>
   );
 };
@@ -62,6 +60,10 @@ export const useBackpackApi = () => {
   };
   const GetQueueStatus = () => {
     return backpack.get<QueueStatus[]>('/status/queue');
+  };
+
+  const GetUserInfo = () => {
+    return backpack.get<User>('/auth/me');
   };
 
   const GetEvents = () => {
@@ -197,6 +199,7 @@ export const useBackpackApi = () => {
 
   return {
     GetQueueStatus,
+    GetUserInfo,
     GetEvents,
     GetSchedules,
     GetApiKeys,

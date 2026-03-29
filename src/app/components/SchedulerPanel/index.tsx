@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import { Spinner, HTMLTable, Button, Intent } from '@blueprintjs/core';
-import { useKeycloak } from '@react-keycloak-fork/web';
+import { useUser } from '../../context/UserContext';
 import { ScrollTableContainer } from '../ScrollTableContainer';
 
 interface Props {}
@@ -10,8 +10,8 @@ interface Props {}
 export const SchedulerPanel = memo((props: Props) => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
-  const { keycloak } = useKeycloak();
-  const isAdmin = keycloak.hasResourceRole('Administrator');
+  const { hasRole } = useUser();
+  const isAdmin = hasRole('Administrator');
 
   const { data, isLoading } = useQuery(['schedules'], backpack.GetSchedules, {
     refetchInterval: 10000,

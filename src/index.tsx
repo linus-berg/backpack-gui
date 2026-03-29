@@ -26,8 +26,7 @@ import reportWebVitals from 'reportWebVitals';
 
 // Initialize languages
 import './locales/i18n';
-import { ReactKeycloakProvider } from '@react-keycloak-fork/web';
-import keycloak from 'keycloak';
+import { OidcWrapper } from './app/components/OidcWrapper';
 
 const store = configureAppStore();
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
@@ -35,11 +34,11 @@ const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 ReactDOMClient.createRoot(MOUNT_NODE!).render(
   <Provider store={store}>
     <HelmetProvider>
-      <ReactKeycloakProvider authClient={keycloak}>
+      <OidcWrapper>
         <React.StrictMode>
           <App />
         </React.StrictMode>
-      </ReactKeycloakProvider>
+      </OidcWrapper>
     </HelmetProvider>
   </Provider>,
 );

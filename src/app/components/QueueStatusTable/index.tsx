@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import React, { memo } from 'react';
 import styled from 'styled-components';
-import { useKeycloak } from '@react-keycloak-fork/web';
+import { useUser } from '../../context/UserContext';
 import { ScrollTableContainer } from '../ScrollTableContainer';
 
 interface Props {}
@@ -19,9 +19,9 @@ const Td = styled.td`
 
 export const QueueStatusTable = memo((props: Props) => {
   const backpack = useBackpackApi();
-  const { keycloak } = useKeycloak();
+  const { hasRole } = useUser();
   const queryClient = useQueryClient();
-  const isAdmin = keycloak.hasResourceRole('Administrator');
+  const isAdmin = hasRole('Administrator');
 
   const query = useQuery(['queue_status'], backpack.GetQueueStatus, {
     refetchInterval: 5000,

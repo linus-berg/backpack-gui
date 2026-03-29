@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { Processor } from 'types/Processor';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
-import { useKeycloak } from '@react-keycloak-fork/web';
+import { useUser } from '../../context/UserContext';
 import { ProcessorEditorHeader } from './components/ProcessorEditorHeader';
 import { ProcessorEditorSettings } from './components/ProcessorEditorSettings';
 import { ProcessorEditorFields } from './components/ProcessorEditorFields';
@@ -26,8 +26,8 @@ const Div = styled.div`
 export const ProcessorEditor = memo((props: Props) => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
-  const { keycloak } = useKeycloak();
-  const isAdmin = keycloak.hasResourceRole('Administrator');
+  const { hasRole } = useUser();
+  const isAdmin = hasRole('Administrator');
 
   const mutation = useMutation(backpack.UpdateProcessor, {
     onSuccess: () => {

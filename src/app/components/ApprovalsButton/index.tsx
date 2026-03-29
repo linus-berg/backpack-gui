@@ -1,12 +1,12 @@
 import React from 'react';
 import { Button, Intent } from '@blueprintjs/core';
 import { useNavigate } from 'react-router-dom';
-import { useKeycloak } from '@react-keycloak-fork/web';
+import { useUser } from '../../context/UserContext';
 
 export const ApprovalsButton = () => {
-  const { keycloak } = useKeycloak();
+  const { hasRole } = useUser();
   const navigate = useNavigate();
-  const isAdmin = keycloak.hasResourceRole('Administrator');
+  const isAdmin = hasRole('Administrator');
 
   if (!isAdmin) {
     return null;
