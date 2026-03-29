@@ -12,6 +12,7 @@ import { Schedule } from '../types/Schedule';
 import { PendingArtifact } from '../types/PendingArtifact';
 import { ApiKey } from '../types/ApiKey';
 import { User } from '../types/User';
+import { NewsPost } from '../types/NewsPost';
 
 export const BACKPACK_API =
   window.location.protocol + '//' + window.location.hostname + ':8004/api';
@@ -190,7 +191,12 @@ export const useBackpackApi = () => {
   };
 
   /* Add Processor */
-  const AddProcessor = ({ processor_id, requires_approval, multi_add, is_external }) => {
+  const AddProcessor = ({
+    processor_id,
+    requires_approval,
+    multi_add,
+    is_external,
+  }) => {
     return backpack.post(BACKPACK_PROCESSOR, {
       processor_id: processor_id,
       requires_approval: requires_approval,
