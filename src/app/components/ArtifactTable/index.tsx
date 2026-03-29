@@ -126,7 +126,7 @@ export const ArtifactTable = memo((props: Props) => {
     },
     {
       key: 'dependencies',
-      name: 'Deps',
+      name: 'Dependencies',
       interactive: false,
       render: (row: any, key: string) => (
         <Center>
