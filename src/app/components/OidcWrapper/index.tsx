@@ -20,6 +20,8 @@ export const OidcWrapper = ({ children }: { children: React.ReactNode }) => {
           client_id: oidcData.client_id,
           redirect_uri: window.location.origin + '/',
           scope: 'openid profile roles',
+          automaticSilentRenew: true,
+          accessTokenExpiringNotificationTimeInSeconds: 30,
           onSigninCallback: () => {
             window.history.replaceState(
               {},

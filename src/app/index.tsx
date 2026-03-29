@@ -73,7 +73,6 @@ export function App() {
   if (auth.isLoading || !auth.isAuthenticated) {
     return null;
   }
-
   return (
     <BrowserRouter>
       <Helmet

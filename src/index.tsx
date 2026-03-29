@@ -34,11 +34,11 @@ const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 ReactDOMClient.createRoot(MOUNT_NODE!).render(
   <Provider store={store}>
     <HelmetProvider>
-      <OidcWrapper>
-        <React.StrictMode>
+      <React.StrictMode>
+        <OidcWrapper>
           <App />
-        </React.StrictMode>
-      </OidcWrapper>
+        </OidcWrapper>
+      </React.StrictMode>
     </HelmetProvider>
   </Provider>,
 );
