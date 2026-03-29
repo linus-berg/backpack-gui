@@ -169,14 +169,16 @@ export const AddArtifactForm = memo((props: Props) => {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-        <Button
-          icon="eye-open"
-          onClick={() => setIsPreviewOpen(true)}
-          disabled={name === ''}
-          style={{ flex: 1 }}
-        >
-          Preview
-        </Button>
+        {!props.processor.is_external && !props.processor.direct_collect && (
+          <Button
+            icon="eye-open"
+            onClick={() => setIsPreviewOpen(true)}
+            disabled={name === ''}
+            style={{ flex: 1 }}
+          >
+            Preview
+          </Button>
+        )}
         <Button
           icon="cube-add"
           intent="primary"
