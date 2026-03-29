@@ -45,7 +45,7 @@ const Div = styled.div`
   display: grid;
   width: 100%;
   grid-template-rows: 100%;
-  grid-template-columns: 80% 20%;
+  grid-template-columns: 70% 30%;
 `;
 const TableDiv = styled.div`
   display: flex;
