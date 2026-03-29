@@ -46,9 +46,6 @@ export const AddArtifactForm = memo((props: Props) => {
 
   // Preview State
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [previewData, setPreviewData] = useState<Artifact | null>(null);
-  const [previewError, setPreviewError] = useState<string | null>(null);
-  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const UpdateValue = (fnc, evt: React.ChangeEvent<HTMLInputElement>) => {
     fnc(evt.currentTarget.value);
@@ -72,24 +69,6 @@ export const AddArtifactForm = memo((props: Props) => {
       dependencies: {},
     });
     SetName('');
-  };
-
-  const OnPreview = async () => {
-    if (name === '') return;
-    
-    setIsPreviewLoading(true);
-    setPreviewError(null);
-    setPreviewData(null);
-    setIsPreviewOpen(true);
-
-    try {
-      const res = await backpack.PreviewArtifact(name, props.processor.id);
-      setPreviewData(res.data);
-    } catch (err: any) {
-      setPreviewError(err.response?.data || "Failed to fetch preview");
-    } finally {
-      setIsPreviewLoading(false);
-    }
   };
 
   const aux: AuxDict = JSON.parse(props.processor.config);
@@ -188,11 +167,11 @@ export const AddArtifactForm = memo((props: Props) => {
         <H6>Auxiliary Configuration</H6>
         <AuxInput onChange={UpdateField} config={aux} values={config} />
       </div>
-      
+
       <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
         <Button
           icon="eye-open"
-          onClick={OnPreview}
+          onClick={() => setIsPreviewOpen(true)}
           disabled={name === ''}
           style={{ flex: 1 }}
         >
@@ -210,12 +189,11 @@ export const AddArtifactForm = memo((props: Props) => {
         </Button>
       </div>
 
-      <PreviewArtifactDialog 
+      <PreviewArtifactDialog
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
-        isLoading={isPreviewLoading}
-        artifact={previewData}
-        error={previewError}
+        artifactId={name}
+        processor={props.processor.id}
         filter={filter}
       />
     </Div>

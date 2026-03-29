@@ -12,16 +12,16 @@ import {
   Icon,
   Tooltip,
 } from '@blueprintjs/core';
-import { Artifact } from 'types';
 import styled from 'styled-components';
 import { map } from 'lodash-es';
+import { useQuery } from '@tanstack/react-query';
+import { useBackpackApi } from 'api/backpack';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  isLoading: boolean;
-  artifact: Artifact | null;
-  error: string | null;
+  artifactId: string;
+  processor: string;
   filter: string;
 }
 
@@ -47,11 +47,24 @@ const TableSection = styled.div`
 export const PreviewArtifactDialog = ({
   isOpen,
   onClose,
-  isLoading,
-  artifact,
-  error,
+  artifactId,
+  processor,
   filter,
 }: Props) => {
+  const backpack = useBackpackApi();
+
+  const { data, isLoading, error } = useQuery(
+    ['artifact_preview', artifactId, processor],
+    () => backpack.PreviewArtifact(artifactId, processor),
+    {
+      enabled: isOpen && artifactId !== '',
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  const artifact = data?.data || null;
+
   const matchesFilter = (version: string) => {
     if (!filter || filter === '*') return true;
     try {
@@ -61,6 +74,10 @@ export const PreviewArtifactDialog = ({
       return false;
     }
   };
+
+  const previewError = error
+    ? (error as any).response?.data || 'Failed to fetch preview'
+    : null;
 
   return (
     <Dialog
@@ -80,9 +97,9 @@ export const PreviewArtifactDialog = ({
           </div>
         )}
 
-        {error && (
+        {previewError && (
           <Callout intent={Intent.DANGER} icon="error" title="Preview Failed">
-            {error}
+            {previewError}
           </Callout>
         )}
 
