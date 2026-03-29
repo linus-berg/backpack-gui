@@ -11,6 +11,7 @@ import {
   MenuDivider,
   Menu,
   Position,
+  Tooltip,
 } from '@blueprintjs/core';
 import { ValidateAllButton } from './components/ValidateAllButton/Loadable';
 import { TrackAllButton } from './components/TrackAllButton/Loadable';
@@ -24,6 +25,7 @@ import styled from 'styled-components';
 import LogoImage from './logo.png';
 import { ThemeToggle } from './components/ThemeToggle';
 import { useUser } from './context/UserContext';
+import { HelpDialog } from './components/HelpDialog';
 
 const LogoBox = styled.div`
   display: flex;
@@ -57,6 +59,7 @@ export function Layout() {
   const auth = useAuth();
   const { hasRole } = useUser();
   const isAdmin = hasRole('Administrator');
+  const [isHelpOpen, setIsHelpOpen] = React.useState(false);
 
   const MaintenanceMenu = (
     <Menu>
@@ -100,6 +103,14 @@ export function Layout() {
           </NavContainer>
         </Navbar.Group>
         <Navbar.Group align={Alignment.RIGHT}>
+          <Tooltip content="Documentation & Help" position={Position.BOTTOM}>
+            <Button 
+              icon="help" 
+              minimal 
+              onClick={() => setIsHelpOpen(true)} 
+            />
+          </Tooltip>
+          <Navbar.Divider />
           <ThemeToggle />
           <Navbar.Divider />
           <Button
@@ -114,6 +125,8 @@ export function Layout() {
       <main style={{ height: 'calc(100vh - 50px)', overflow: 'hidden' }}>
         <Outlet />
       </main>
+
+      <HelpDialog isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </>
   );
 }
