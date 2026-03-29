@@ -134,6 +134,12 @@ export const useBackpackApi = () => {
     });
   };
 
+  const PreviewArtifact = (id: string, processor: string) => {
+    return backpack.get<Artifact>(BACKPACK_ARTIFACTS + '/preview', {
+      params: { id, processor },
+    });
+  };
+
   const GetPendingArtifacts = () => {
     return backpack.get<PendingArtifact[]>(BACKPACK_ARTIFACTS + '/pending');
   };
@@ -215,6 +221,7 @@ export const useBackpackApi = () => {
     GetArtifact,
     TrackAllArtifacts,
     TrackArtifact,
+    PreviewArtifact,
     DeleteArtifact,
     GetAllProcessors,
     GetAllProcessorArtifacts,

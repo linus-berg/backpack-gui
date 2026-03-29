@@ -11,7 +11,7 @@ import {
 } from '@blueprintjs/core';
 
 import { Popover2 } from '@blueprintjs/popover2';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import React, { memo, useState } from 'react';
 import styled from 'styled-components';
@@ -21,6 +21,7 @@ import { Processor } from '../../../types/Processor';
 import { Artifact } from 'types';
 import { AuxDict } from 'types/AuxDict';
 import { AxiosResponse } from 'axios';
+import { PreviewArtifactDialog } from './PreviewArtifactDialog';
 
 interface Props {
   processor: Processor;
@@ -38,9 +39,16 @@ export const AddArtifactForm = memo((props: Props) => {
       });
     },
   });
+
   const [name, SetName] = useState<string>('');
   const [filter, SetFilter] = useState('');
   const [config, SetConfig] = useState<Artifact['config']>({});
+
+  // Preview State
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState<Artifact | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const UpdateValue = (fnc, evt: React.ChangeEvent<HTMLInputElement>) => {
     fnc(evt.currentTarget.value);
@@ -64,6 +72,24 @@ export const AddArtifactForm = memo((props: Props) => {
       dependencies: {},
     });
     SetName('');
+  };
+
+  const OnPreview = async () => {
+    if (name === '') return;
+    
+    setIsPreviewLoading(true);
+    setPreviewError(null);
+    setPreviewData(null);
+    setIsPreviewOpen(true);
+
+    try {
+      const res = await backpack.PreviewArtifact(name, props.processor.id);
+      setPreviewData(res.data);
+    } catch (err: any) {
+      setPreviewError(err.response?.data || "Failed to fetch preview");
+    } finally {
+      setIsPreviewLoading(false);
+    }
   };
 
   const aux: AuxDict = JSON.parse(props.processor.config);
@@ -162,16 +188,36 @@ export const AddArtifactForm = memo((props: Props) => {
         <H6>Auxiliary Configuration</H6>
         <AuxInput onChange={UpdateField} config={aux} values={config} />
       </div>
-      <Button
-        icon="cube-add"
-        intent="primary"
-        onClick={() => OnAdd()}
-        loading={mutation.isLoading}
-        disabled={name === ''}
-        style={{ marginTop: '8px' }}
-      >
-        Add Artifact
-      </Button>
+      
+      <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+        <Button
+          icon="eye-open"
+          onClick={OnPreview}
+          disabled={name === ''}
+          style={{ flex: 1 }}
+        >
+          Preview
+        </Button>
+        <Button
+          icon="cube-add"
+          intent="primary"
+          onClick={() => OnAdd()}
+          loading={mutation.isLoading}
+          disabled={name === ''}
+          style={{ flex: 2 }}
+        >
+          Add Artifact
+        </Button>
+      </div>
+
+      <PreviewArtifactDialog 
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        isLoading={isPreviewLoading}
+        artifact={previewData}
+        error={previewError}
+        filter={filter}
+      />
     </Div>
   );
 });
