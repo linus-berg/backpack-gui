@@ -26,8 +26,8 @@ import dayjs from 'dayjs';
 const Container = styled.div`
   padding: 30px;
   height: 100%;
-  overflow-y: auto;
   background-color: var(--page-bg);
+  overflow: hidden;
 `;
 
 const ContentGrid = styled.div`
@@ -36,6 +36,21 @@ const ContentGrid = styled.div`
   gap: 40px;
   max-width: 1400px;
   margin: 0 auto;
+  height: 100%;
+`;
+
+const NewsColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+`;
+
+const ScrollableNews = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  margin-top: 10px;
 `;
 
 const PostCard = styled(Card)`
@@ -56,6 +71,22 @@ const MarkdownBody = styled.div`
     border-radius: 3px;
     font-family: monospace;
   }
+`;
+
+const EditorGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 15px;
+  height: 450px; /* Explicit fixed height */
+`;
+
+const PreviewPane = styled(Card)`
+  background: var(--card-bg);
+  border: 1px solid var(--table-border);
+  overflow-y: auto;
+  padding: 15px;
+  height: calc(450px - 35px); /* Match Grid height minus header */
 `;
 
 export const LandingPage = () => {
@@ -107,7 +138,8 @@ export const LandingPage = () => {
               marginBottom: '20px',
             }}
           >
-            The "I can't believe it's not Nexus" Mirror Engine
+            Collecting the Internet, one <code>node_modules</code> folder at a
+            time.
           </div>
           <Divider />
           <div
@@ -128,20 +160,11 @@ export const LandingPage = () => {
               Perfect for airgapped sites, high-security bunkers, or people who
               just really, really distrust the internet.
             </p>
-            <Divider style={{ margin: '20px 0' }} />
-            <p style={{ fontSize: '0.85rem' }}>
-              <b>Obsession Level:</b> Recursive
-              <br />
-              <b>Hoarding Method:</b> S3 Data Lake
-              <br />
-              <b>Vibe Check:</b>{' '}
-              <span style={{ color: '#0f9960' }}>Operational</span>
-            </p>
           </div>
         </div>
 
         {/* Right Column: News Feed */}
-        <div>
+        <NewsColumn>
           <div
             style={{
               display: 'flex',
@@ -165,68 +188,72 @@ export const LandingPage = () => {
             )}
           </div>
 
-          <Divider style={{ marginBottom: '20px' }} />
+          <Divider />
 
-          {isLoading ? (
-            <div style={{ textAlign: 'center', padding: '4rem' }}>
-              <Spinner size={40} />
-            </div>
-          ) : (
-            newsPosts?.map((post: NewsPost) => (
-              <PostCard
-                key={post.id}
-                elevation={Elevation.ZERO}
-                style={{ border: '1px solid var(--table-border)' }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                  }}
+          <ScrollableNews>
+            {isLoading ? (
+              <div style={{ textAlign: 'center', padding: '4rem' }}>
+                <Spinner size={40} />
+              </div>
+            ) : (
+              newsPosts?.map((post: NewsPost) => (
+                <PostCard
+                  key={post.id}
+                  elevation={Elevation.ZERO}
+                  style={{ border: '1px solid var(--table-border)' }}
                 >
-                  <div>
-                    <H5 style={{ margin: 0, fontWeight: 600 }}>{post.title}</H5>
-                    <div
-                      style={{
-                        color: '#abb3bf',
-                        fontSize: '0.8rem',
-                        marginTop: '4px',
-                      }}
-                    >
-                      Published by <b>{post.author}</b> on{' '}
-                      {dayjs(post.timestamp).format('YYYY-MM-DD HH:mm')}
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <div>
+                      <H5 style={{ margin: 0, fontWeight: 600 }}>
+                        {post.title}
+                      </H5>
+                      <div
+                        style={{
+                          color: '#abb3bf',
+                          fontSize: '0.8rem',
+                          marginTop: '4px',
+                        }}
+                      >
+                        Published by <b>{post.author}</b> on{' '}
+                        {dayjs(post.timestamp).format('YYYY-MM-DD HH:mm')}
+                      </div>
                     </div>
+                    {isAdmin && (
+                      <Button
+                        icon="trash"
+                        minimal
+                        small
+                        intent={Intent.DANGER}
+                        onClick={() => {
+                          if (confirm('Permanently delete this announcement?'))
+                            deleteMutation.mutate(post.id);
+                        }}
+                      />
+                    )}
                   </div>
-                  {isAdmin && (
-                    <Button
-                      icon="trash"
-                      minimal
-                      small
-                      intent={Intent.DANGER}
-                      onClick={() => {
-                        if (confirm('Permanently delete this announcement?'))
-                          deleteMutation.mutate(post.id);
-                      }}
-                    />
-                  )}
-                </div>
-                <Divider style={{ margin: '15px 0' }} />
-                <MarkdownBody>
-                  <ReactMarkdown>{post.content}</ReactMarkdown>
-                </MarkdownBody>
-              </PostCard>
-            ))
-          )}
+                  <Divider style={{ margin: '15px 0' }} />
+                  <MarkdownBody>
+                    <ReactMarkdown>{post.content}</ReactMarkdown>
+                  </MarkdownBody>
+                </PostCard>
+              ))
+            )}
 
-          {newsPosts?.length === 0 && !isLoading && (
-            <NonIdealState
-              icon="info-sign"
-              title="No Announcements"
-              description="There are currently no system updates or news posts to display."
-            />
-          )}
-        </div>
+            {newsPosts?.length === 0 && !isLoading && (
+              <NonIdealState
+                icon="info-sign"
+                title="No Announcements"
+                description="There are currently no system updates or news posts to display."
+              />
+            )}
+          </ScrollableNews>
+        </NewsColumn>
       </ContentGrid>
 
       <Dialog
@@ -234,49 +261,46 @@ export const LandingPage = () => {
         onClose={() => setIsPostDialogOpen(false)}
         title="Create System Announcement"
         icon="edit"
-        style={{ width: '700px' }}
+        style={{ width: '80vw' }}
       >
-        <div className={Classes.DIALOG_BODY}>
-          <div style={{ marginBottom: '15px' }}>
-            <H5>Title</H5>
-            <InputGroup
-              placeholder="Post title..."
-              value={newPost.title}
-              onChange={e => setNewPost({ ...newPost, title: e.target.value })}
-            />
-          </div>
-          <div>
-            <H5>Content (Markdown)</H5>
-            <TextArea
-              fill
-              placeholder="Write your update here... Markdown is supported."
-              style={{
-                minHeight: '250px',
-                fontFamily: 'monospace',
-                fontSize: '0.9rem',
-              }}
-              value={newPost.content}
-              onChange={e =>
-                setNewPost({ ...newPost, content: e.target.value })
-              }
-            />
-          </div>
-          {newPost.content && (
-            <div style={{ marginTop: '20px' }}>
-              <H5>Preview</H5>
-              <Card
+        <div
+          className={Classes.DIALOG_BODY}
+          style={{ height: '70vh', overflow: 'hidden' }}
+        >
+          <H5>Title</H5>
+          <InputGroup
+            placeholder="Post title..."
+            value={newPost.title}
+            onChange={e => setNewPost({ ...newPost, title: e.target.value })}
+          />
+
+          <EditorGrid>
+            <div style={{ height: '100%' }}>
+              <H5>Content (Markdown)</H5>
+              <TextArea
+                fill
+                placeholder="Markdown is supported..."
                 style={{
-                  background: 'var(--card-bg)',
-                  border: '1px solid var(--table-border)',
+                  height: 'calc(100% - 35px)',
+                  fontFamily: 'monospace',
+                  fontSize: '0.9rem',
+                  resize: 'none',
                 }}
-                elevation={Elevation.ZERO}
-              >
+                value={newPost.content}
+                onChange={e =>
+                  setNewPost({ ...newPost, content: e.target.value })
+                }
+              />
+            </div>
+            <div style={{ height: '100%' }}>
+              <H5>Live Preview</H5>
+              <PreviewPane elevation={Elevation.ZERO}>
                 <MarkdownBody>
                   <ReactMarkdown>{newPost.content}</ReactMarkdown>
                 </MarkdownBody>
-              </Card>
+              </PreviewPane>
             </div>
-          )}
+          </EditorGrid>
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
