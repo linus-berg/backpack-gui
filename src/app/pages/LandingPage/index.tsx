@@ -153,8 +153,10 @@ export const LandingPage = () => {
             <p>
               Our strategy is simple: <b>Greed is Good™</b>. If a package has a
               dependency, we want it. If that dependency has a dependency, we
-              want that too. We won't stop until your local Nexus is so full of
-              recursive code that it starts questioning its own existence.
+              want that too. We won't stop until your local Nexus is so full
+              of... well, whatever those 15,000 sub-dependencies actually do. Do
+              we really need all of them? Probably not. Are we going to stop?
+              Absolutely not.
             </p>
             <p>
               Perfect for airgapped sites, high-security bunkers, or people who
