@@ -185,11 +185,6 @@ export const ArtifactTable = memo((props: Props) => {
           enableColumnResizing
           defaultRowHeight={32}
           numRows={artifacts.length}
-          columnHeaderCellRenderer={idx => (
-            <div style={{ padding: '8px', fontWeight: 600, color: '#5c7080' }}>
-              {columns[idx].name}
-            </div>
-          )}
         >
           {columns.map(column => (
             <Column
@@ -208,7 +203,7 @@ export const ArtifactTable = memo((props: Props) => {
 
 const Div = styled.div`
   width: 100%;
-  height: 100%;
+  height: 80vh;
   display: flex;
   flex-direction: column;
 `;
