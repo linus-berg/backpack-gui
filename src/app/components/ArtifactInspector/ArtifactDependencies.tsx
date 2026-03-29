@@ -24,15 +24,11 @@ const ScrollContainer = styled.div`
 
 export const ArtifactDependencies = memo((props: Props) => {
   const dependencies = props.artifact.dependencies;
-  
+
   return (
     <div>
       <ScrollContainer>
-        <HTMLTable
-          condensed
-          striped
-          style={{ width: '100%' }}
-        >
+        <HTMLTable condensed striped style={{ width: '100%' }}>
           <thead>
             <tr>
               <th>Processor</th>
@@ -40,17 +36,27 @@ export const ArtifactDependencies = memo((props: Props) => {
             </tr>
           </thead>
           <tbody>
-            {map(dependencies, (dependency: ArtifactDependency, idx: number) => (
-              <tr key={idx}>
-                <td>
-                  <Tag minimal>{dependency.processor}</Tag>
-                </td>
-                <td style={{ fontFamily: 'monospace' }}>{dependency.id}</td>
-              </tr>
-            ))}
-            {(!dependencies || dependencies.length === 0) && (
+            {map(
+              dependencies,
+              (dependency: ArtifactDependency, idx: number) => (
+                <tr key={idx}>
+                  <td>
+                    <Tag minimal>{dependency.processor}</Tag>
+                  </td>
+                  <td style={{ fontFamily: 'monospace' }}>{dependency.id}</td>
+                </tr>
+              ),
+            )}
+            {(!dependencies || Object.keys(dependencies).length === 0) && (
               <tr>
-                <td colSpan={2} style={{ textAlign: 'center', padding: '2rem', color: '#abb3bf' }}>
+                <td
+                  colSpan={2}
+                  style={{
+                    textAlign: 'center',
+                    padding: '2rem',
+                    color: '#abb3bf',
+                  }}
+                >
                   No dependencies discovered.
                 </td>
               </tr>
