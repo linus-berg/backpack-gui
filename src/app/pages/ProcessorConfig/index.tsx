@@ -39,6 +39,7 @@ export const ProcessorConfig = memo((props: Props) => {
   const [newRequiresApproval, setNewRequiresApproval] = useState(false);
   const [newMultiAdd, setNewMultiAdd] = useState(false);
   const [newIsExternal, setNewIsExternal] = useState(false);
+  const [newPreviewEnabled, setNewPreviewEnabled] = useState(true);
 
   const addMutation = useMutation(backpack.AddProcessor, {
     onSuccess: () => {
@@ -48,6 +49,7 @@ export const ProcessorConfig = memo((props: Props) => {
       setNewRequiresApproval(false);
       setNewMultiAdd(false);
       setNewIsExternal(false);
+      setNewPreviewEnabled(true);
     },
   });
 
@@ -132,6 +134,11 @@ export const ProcessorConfig = memo((props: Props) => {
             checked={newIsExternal}
             onChange={() => setNewIsExternal(!newIsExternal)}
           />
+          <Checkbox
+            label="Enable Preview"
+            checked={newPreviewEnabled}
+            onChange={() => setNewPreviewEnabled(!newPreviewEnabled)}
+          />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
@@ -144,6 +151,7 @@ export const ProcessorConfig = memo((props: Props) => {
                   requires_approval: newRequiresApproval,
                   multi_add: newMultiAdd,
                   is_external: newIsExternal,
+                  preview_enabled: newPreviewEnabled,
                 })
               }
               loading={addMutation.isLoading}

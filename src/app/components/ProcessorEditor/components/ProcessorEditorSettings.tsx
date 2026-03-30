@@ -11,6 +11,8 @@ interface Props {
   onMultiAddChange: (value: boolean) => void;
   isExternal: boolean;
   onIsExternalChange: (value: boolean) => void;
+  previewEnabled: boolean;
+  onPreviewEnabledChange: (value: boolean) => void;
 }
 
 const HelpIcon = styled(Icon)`
@@ -28,9 +30,18 @@ export const ProcessorEditorSettings = ({
   onMultiAddChange,
   isExternal,
   onIsExternalChange,
+  previewEnabled,
+  onPreviewEnabledChange,
 }: Props) => {
   return (
-    <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', flexWrap: 'wrap' }}>
+    <div
+      style={{
+        display: 'flex',
+        gap: '2rem',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <Checkbox
           label="Direct Collect"
@@ -38,7 +49,10 @@ export const ProcessorEditorSettings = ({
           onChange={() => onDirectCollectChange(!directCollect)}
           style={{ marginBottom: 0, marginTop: '1rem' }}
         />
-        <Tooltip content="If enabled, the collector will fetch artifacts directly by ID instead of performing a full repository crawl." position="top">
+        <Tooltip
+          content="If enabled, the collector will fetch artifacts directly by ID instead of performing a full repository crawl."
+          position="top"
+        >
           <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
         </Tooltip>
       </div>
@@ -49,7 +63,10 @@ export const ProcessorEditorSettings = ({
           onChange={() => onRequiresApprovalChange(!requiresApproval)}
           style={{ marginBottom: 0, marginTop: '1rem' }}
         />
-        <Tooltip content="New artifacts added to this processor must be approved by an administrator before they are mirrored." position="top">
+        <Tooltip
+          content="New artifacts added to this processor must be approved by an administrator before they are mirrored."
+          position="top"
+        >
           <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
         </Tooltip>
       </div>
@@ -60,7 +77,10 @@ export const ProcessorEditorSettings = ({
           onChange={() => onMultiAddChange(!multiAdd)}
           style={{ marginBottom: 0, marginTop: '1rem' }}
         />
-        <Tooltip content="Enables the 'Bulk Add' button in the processor panel for adding multiple artifacts via text input." position="top">
+        <Tooltip
+          content="Enables the 'Bulk Add' button in the processor panel for adding multiple artifacts via text input."
+          position="top"
+        >
           <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
         </Tooltip>
       </div>
@@ -71,7 +91,24 @@ export const ProcessorEditorSettings = ({
           onChange={() => onIsExternalChange(!isExternal)}
           style={{ marginBottom: 0, marginTop: '1rem' }}
         />
-        <Tooltip content="If enabled, Backpack only tracks the artifact IDs. No background collection or processing will be performed." position="top">
+        <Tooltip
+          content="If enabled, Backpack only tracks the artifact IDs. No background collection or processing will be performed."
+          position="top"
+        >
+          <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
+        </Tooltip>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Checkbox
+          label="Enable Preview"
+          checked={previewEnabled}
+          onChange={() => onPreviewEnabledChange(!previewEnabled)}
+          style={{ marginBottom: 0, marginTop: '1rem' }}
+        />
+        <Tooltip
+          content="If enabled, the 'Preview' button will be available for artifacts managed by this processor."
+          position="top"
+        >
           <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
         </Tooltip>
       </div>

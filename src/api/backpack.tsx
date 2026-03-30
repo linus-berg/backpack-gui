@@ -208,12 +208,14 @@ export const useBackpackApi = () => {
     requires_approval,
     multi_add,
     is_external,
+    preview_enabled,
   }) => {
     return backpack.post(BACKPACK_PROCESSOR, {
       processor_id: processor_id,
       requires_approval: requires_approval,
       multi_add: multi_add,
       is_external: is_external,
+      preview_enabled: preview_enabled,
     });
   };
 
@@ -226,6 +228,7 @@ export const useBackpackApi = () => {
       requires_approval: processor.requires_approval,
       multi_add: processor.multi_add,
       is_external: processor.is_external,
+      preview_enabled: processor.preview_enabled,
     });
   };
 

@@ -57,6 +57,7 @@ export const ProcessorEditor = memo((props: Props) => {
   const [requires_approval, SetRequiresApproval] = useState(processor.requires_approval);
   const [multi_add, SetMultiAdd] = useState(processor.multi_add);
   const [is_external, SetIsExternal] = useState(processor.is_external);
+  const [preview_enabled, SetPreviewEnabled] = useState(processor.preview_enabled);
 
   const Save = () => {
     mutation.mutate({
@@ -67,6 +68,7 @@ export const ProcessorEditor = memo((props: Props) => {
       requires_approval,
       multi_add,
       is_external,
+      preview_enabled,
     });
   };
 
@@ -90,6 +92,8 @@ export const ProcessorEditor = memo((props: Props) => {
         onMultiAddChange={SetMultiAdd}
         isExternal={is_external}
         onIsExternalChange={SetIsExternal}
+        previewEnabled={preview_enabled}
+        onPreviewEnabledChange={SetPreviewEnabled}
       />
 
       <ProcessorEditorFields
