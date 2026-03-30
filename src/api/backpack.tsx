@@ -104,7 +104,19 @@ export const useBackpackApi = () => {
   };
 
   const UpdateSchedule = (schedule: Schedule) => {
+    return backpack.put('/scheduler', schedule);
+  };
+
+  const AddSchedule = (schedule: Schedule) => {
     return backpack.post('/scheduler', schedule);
+  };
+
+  const DeleteSchedule = (id: string) => {
+    return backpack.delete(`/scheduler/${id}`);
+  };
+
+  const ValidateSchedule = (schedule: Schedule) => {
+    return backpack.post('/scheduler/validate', schedule);
   };
 
   const PurgeQueue = (queue_name: string) => {
@@ -226,6 +238,10 @@ export const useBackpackApi = () => {
     GetUserInfo,
     GetEvents,
     GetSchedules,
+    AddSchedule,
+    UpdateSchedule,
+    DeleteSchedule,
+    ValidateSchedule,
     GetApiKeys,
     CreateApiKey,
     DeleteApiKey,
@@ -233,7 +249,6 @@ export const useBackpackApi = () => {
     CreateNewsPost,
     DeleteNewsPost,
     TriggerSync,
-    UpdateSchedule,
     PurgeQueue,
     AddProcessor,
     UpdateProcessor,
