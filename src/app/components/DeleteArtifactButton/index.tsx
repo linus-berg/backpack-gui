@@ -22,10 +22,12 @@ export const DeleteArtifactButton = memo((props: Props) => {
   const query_client = useQueryClient();
   const mutation = useMutation({
     mutationFn: backpack.DeleteArtifact,
-    onSuccess: (data: AxiosResponse<Artifact>) => {
-      const artifact = data.data;
+    onSuccess: () => {
       query_client.invalidateQueries({
-        queryKey: ['artifact_table', artifact.processor, true],
+        queryKey: ['artifact_table', props.processor, true],
+      });
+      query_client.invalidateQueries({
+        queryKey: ['artifact_table', props.processor, false],
       });
     },
   });
@@ -43,7 +45,7 @@ export const DeleteArtifactButton = memo((props: Props) => {
           mutation.mutate({ id: props.id, processor: props.processor });
         }
       }}
-      loading={mutation.isLoading}
+      loading={mutation.isPending}
       icon="trash"
     ></Button>
   );

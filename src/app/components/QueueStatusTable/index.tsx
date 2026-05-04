@@ -23,13 +23,16 @@ export const QueueStatusTable = memo((props: Props) => {
   const queryClient = useQueryClient();
   const isAdmin = hasRole('Administrator');
 
-  const query = useQuery(['queue_status'], backpack.GetQueueStatus, {
+  const query = useQuery({
+    queryKey: ['queue_status'],
+    queryFn: backpack.GetQueueStatus,
     refetchInterval: 5000,
   });
 
-  const purgeMutation = useMutation(backpack.PurgeQueue, {
+  const purgeMutation = useMutation({
+    mutationFn: backpack.PurgeQueue,
     onSuccess: () => {
-      queryClient.invalidateQueries(['queue_status']);
+      queryClient.invalidateQueries({ queryKey: ['queue_status'] });
     },
   });
 
@@ -67,7 +70,7 @@ export const QueueStatusTable = memo((props: Props) => {
               intent={Intent.DANGER}
               icon="trash"
               loading={
-                purgeMutation.isLoading &&
+                purgeMutation.isPending &&
                 purgeMutation.variables === queue.name
               }
               onClick={() => purgeMutation.mutate(queue.name)}

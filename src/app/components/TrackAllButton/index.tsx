@@ -14,7 +14,9 @@ interface Props {}
 export const TrackAllButton = memo((props: Props) => {
   const backpack = useBackpackApi();
   const { hasRole } = useUser();
-  const mutation = useMutation(backpack.TrackAllArtifacts);
+  const mutation = useMutation({
+    mutationFn: backpack.TrackAllArtifacts,
+  });
 
   if (!hasRole('Administrator')) {
     return null;
@@ -23,7 +25,7 @@ export const TrackAllButton = memo((props: Props) => {
   return (
     <Button
       intent="success"
-      loading={mutation.isLoading}
+      loading={mutation.isPending}
       onClick={() => mutation.mutate()}
     >
       Track All Artifacts

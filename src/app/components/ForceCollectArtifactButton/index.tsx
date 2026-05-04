@@ -15,14 +15,16 @@ interface Props {
 
 export const ForceCollectArtifactButton = memo((props: Props) => {
   const backpack = useBackpackApi();
-  const mutation = useMutation(backpack.ValidateArtifact);
+  const mutation = useMutation({
+    mutationFn: backpack.ValidateArtifact,
+  });
   const tooltip = 'Force collect';
 
   return (
     <Tooltip content={tooltip} lazy>
       <AnchorButton
         intent="danger"
-        loading={mutation.isLoading}
+        loading={mutation.isPending}
         onClick={() =>
           mutation.mutate({
             id: props.id,

@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from 'axios';
+import { InternalAxiosRequestConfig } from 'axios';
 
 export class AuthInterceptor {
   private token_: string = '';
@@ -6,10 +6,10 @@ export class AuthInterceptor {
     this.token_ = token;
   }
 
-  Intercept(request: AxiosRequestConfig) {
-    request.headers = {
-      Authorization: `Bearer ${this.token_}`,
-    };
+  Intercept(request: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
+    if (this.token_) {
+      request.headers.Authorization = `Bearer ${this.token_}`;
+    }
     return request;
   }
 }

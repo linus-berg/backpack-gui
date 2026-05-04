@@ -27,10 +27,17 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [nextOccurrences, setNextOccurrences] = useState<string[]>([]);
 
-  const { data: schedules, isLoading } = useQuery(['schedules'], backpack.GetSchedules);
-  const { data: processors } = useQuery(['processors'], backpack.GetAllProcessors);
+  const { data: schedules, isLoading } = useQuery({
+    queryKey: ['schedules'],
+    queryFn: backpack.GetSchedules,
+  });
+  const { data: processors } = useQuery({
+    queryKey: ['processors'],
+    queryFn: backpack.GetAllProcessors,
+  });
 
-  const validateMutation = useMutation(backpack.ValidateSchedule, {
+  const validateMutation = useMutation({
+    mutationFn: backpack.ValidateSchedule,
     onSuccess: (data: any) => {
       if (data.data.valid) {
         setValidationError(null);
@@ -38,32 +45,37 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
       }
     },
     onError: (err: any) => {
-      setValidationError(err.response?.data?.error || 'Invalid Cron Expression');
+      setValidationError(
+        err.response?.data?.error || 'Invalid Cron Expression',
+      );
       setNextOccurrences([]);
     },
   });
 
-  const addMutation = useMutation(backpack.AddSchedule, {
+  const addMutation = useMutation({
+    mutationFn: backpack.AddSchedule,
     onSuccess: () => {
-      queryClient.invalidateQueries(['schedules']);
+      queryClient.invalidateQueries({ queryKey: ['schedules'] });
       setEditingSchedule(null);
       setValidationError(null);
       setNextOccurrences([]);
     },
   });
 
-  const updateMutation = useMutation(backpack.UpdateSchedule, {
+  const updateMutation = useMutation({
+    mutationFn: backpack.UpdateSchedule,
     onSuccess: () => {
-      queryClient.invalidateQueries(['schedules']);
+      queryClient.invalidateQueries({ queryKey: ['schedules'] });
       setEditingSchedule(null);
       setValidationError(null);
       setNextOccurrences([]);
     },
   });
 
-  const deleteMutation = useMutation(backpack.DeleteSchedule, {
+  const deleteMutation = useMutation({
+    mutationFn: backpack.DeleteSchedule,
     onSuccess: () => {
-      queryClient.invalidateQueries(['schedules']);
+      queryClient.invalidateQueries({ queryKey: ['schedules'] });
     },
   });
 
@@ -173,7 +185,7 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
               <Button 
                 intent={Intent.SUCCESS} 
                 onClick={handleSave}
-                loading={validateMutation.isLoading || addMutation.isLoading || updateMutation.isLoading}
+                loading={validateMutation.isPending || addMutation.isPending || updateMutation.isPending}
               >
                 Save
               </Button>
@@ -206,7 +218,7 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
                         minimal 
                         intent={Intent.DANGER} 
                         icon="trash" 
-                        loading={deleteMutation.isLoading && deleteMutation.variables === s.id}
+                        loading={deleteMutation.isPending && deleteMutation.variables === s.id}
                         onClick={() => {
                             if (window.confirm(`Are you sure you want to delete the schedule for ${s.processor}?`)) {
                                 deleteMutation.mutate(s.id);

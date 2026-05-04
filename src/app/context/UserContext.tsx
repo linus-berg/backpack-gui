@@ -15,7 +15,9 @@ const UserContext = createContext<IUserContext>({} as IUserContext);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const backpack = useBackpackApi();
   
-  const { data, isLoading } = useQuery(['user_info'], backpack.GetUserInfo, {
+  const { data, isLoading } = useQuery({
+    queryKey: ['user_info'],
+    queryFn: backpack.GetUserInfo,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 1,
   });

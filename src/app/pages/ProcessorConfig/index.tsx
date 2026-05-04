@@ -30,7 +30,10 @@ export const ProcessorConfig = memo((props: Props) => {
   const queryClient = useQueryClient();
   const { hasRole } = useUser();
   const isAdmin = hasRole('Administrator');
-  const query = useQuery(['processor_list'], backpack.GetAllProcessors);
+  const query = useQuery({
+    queryKey: ['processor_list'],
+    queryFn: backpack.GetAllProcessors,
+  });
   const params = useParams();
   const nav = useNavigate();
 
@@ -41,9 +44,10 @@ export const ProcessorConfig = memo((props: Props) => {
   const [newIsExternal, setNewIsExternal] = useState(false);
   const [newPreviewEnabled, setNewPreviewEnabled] = useState(true);
 
-  const addMutation = useMutation(backpack.AddProcessor, {
+  const addMutation = useMutation({
+    mutationFn: backpack.AddProcessor,
     onSuccess: () => {
-      queryClient.invalidateQueries(['processor_list']);
+      queryClient.invalidateQueries({ queryKey: ['processor_list'] });
       setIsDialogOpen(false);
       setNewProcessorId('');
       setNewRequiresApproval(false);
@@ -154,7 +158,7 @@ export const ProcessorConfig = memo((props: Props) => {
                   preview_enabled: newPreviewEnabled,
                 })
               }
-              loading={addMutation.isLoading}
+              loading={addMutation.isPending}
               disabled={!newProcessorId}
             >
               Add

@@ -59,13 +59,11 @@ export const ArtifactInspectorBody = memo((props: Props) => {
   const backpack = useBackpackApi();
   const [activeTab, setActiveTab] = useState<string>('versions');
 
-  const query = useQuery(
-    ['get-artifact', props.artifact?.processor, props.artifact?.id],
-    backpack.GetArtifact,
-    {
-      enabled: props.artifact !== null,
-    },
-  );
+  const query = useQuery({
+    queryKey: ['get-artifact', props.artifact?.processor, props.artifact?.id],
+    queryFn: backpack.GetArtifact,
+    enabled: props.artifact !== null,
+  });
 
   if (query.isLoading || !query.data || props.artifact === null) {
     return (

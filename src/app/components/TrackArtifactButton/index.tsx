@@ -15,13 +15,15 @@ interface Props {
 
 export const TrackArtifactButton = memo((props: Props) => {
   const backpack = useBackpackApi();
-  const mutation = useMutation(backpack.TrackArtifact);
+  const mutation = useMutation({
+    mutationFn: backpack.TrackArtifact,
+  });
   const tooltip = `Check for ${props.id} updates`;
   return (
     <Tooltip content={tooltip} lazy>
       <AnchorButton
         intent="success"
-        loading={mutation.isLoading}
+        loading={mutation.isPending}
         onClick={() =>
           mutation.mutate({ id: props.id, processor: props.processor })
         }

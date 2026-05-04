@@ -20,20 +20,25 @@ export const ApprovalsPage = memo(() => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
   
-  const { data, isLoading } = useQuery(['pending_approvals'], backpack.GetPendingArtifacts);
-
-  const approveMutation = useMutation(backpack.ApproveArtifact, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(['pending_approvals']);
-      queryClient.invalidateQueries(['events']);
-    }
+  const { data, isLoading } = useQuery({
+    queryKey: ['pending_approvals'],
+    queryFn: backpack.GetPendingArtifacts,
   });
 
-  const rejectMutation = useMutation(backpack.RejectArtifact, {
+  const approveMutation = useMutation({
+    mutationFn: backpack.ApproveArtifact,
     onSuccess: () => {
-      queryClient.invalidateQueries(['pending_approvals']);
-      queryClient.invalidateQueries(['events']);
-    }
+      queryClient.invalidateQueries({ queryKey: ['pending_approvals'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: backpack.RejectArtifact,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pending_approvals'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
   });
 
   const isValidRegex = (pattern: string) => {
@@ -112,7 +117,7 @@ export const ApprovalsPage = memo(() => {
                           small
                           intent={Intent.SUCCESS}
                           icon="tick"
-                          loading={approveMutation.isLoading && (approveMutation.variables as any)?.id === pending.id}
+                          loading={approveMutation.isPending && (approveMutation.variables as any)?.id === pending.id}
                           onClick={() => approveMutation.mutate({ id: pending.id, processor: pending.processor })}
                         >
                           Approve
@@ -121,7 +126,7 @@ export const ApprovalsPage = memo(() => {
                           small
                           intent={Intent.DANGER}
                           icon="cross"
-                          loading={rejectMutation.isLoading && (rejectMutation.variables as any)?.id === pending.id}
+                          loading={rejectMutation.isPending && (rejectMutation.variables as any)?.id === pending.id}
                           onClick={() => rejectMutation.mutate({ id: pending.id, processor: pending.processor })}
                         >
                           Reject

@@ -29,15 +29,17 @@ export const ProcessorEditor = memo((props: Props) => {
   const { hasRole } = useUser();
   const isAdmin = hasRole('Administrator');
 
-  const mutation = useMutation(backpack.UpdateProcessor, {
+  const mutation = useMutation({
+    mutationFn: backpack.UpdateProcessor,
     onSuccess: () => {
-      queryClient.invalidateQueries(['processor_list']);
+      queryClient.invalidateQueries({ queryKey: ['processor_list'] });
     },
   });
 
-  const deleteMutation = useMutation(backpack.DeleteProcessor, {
+  const deleteMutation = useMutation({
+    mutationFn: backpack.DeleteProcessor,
     onSuccess: () => {
-      queryClient.invalidateQueries(['processor_list']);
+      queryClient.invalidateQueries({ queryKey: ['processor_list'] });
     },
   });
 
@@ -78,8 +80,8 @@ export const ProcessorEditor = memo((props: Props) => {
         processorId={processor.id}
         onSave={Save}
         onDelete={() => deleteMutation.mutate(processor.id)}
-        isSaving={mutation.isLoading}
-        isDeleting={deleteMutation.isLoading}
+        isSaving={mutation.isPending}
+        isDeleting={deleteMutation.isPending}
         isAdmin={isAdmin}
       />
       

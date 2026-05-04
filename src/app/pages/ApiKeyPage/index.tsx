@@ -34,26 +34,31 @@ const Title = styled(H3)`
 export const ApiKeyPage = memo(() => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
-  
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
   const [newIsAdmin, setNewIsAdmin] = useState(false);
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
 
-  const { data, isLoading } = useQuery(['api_keys'], backpack.GetApiKeys);
+  const { data, isLoading } = useQuery({
+    queryKey: ['api_keys'],
+    queryFn: backpack.GetApiKeys,
+  });
 
-  const createMutation = useMutation(backpack.CreateApiKey, {
-    onSuccess: (res) => {
-      queryClient.invalidateQueries(['api_keys']);
-      setGeneratedKey((res.data as any).key);
+  const createMutation = useMutation({
+    mutationFn: backpack.CreateApiKey,
+    onSuccess: res => {
+      queryClient.invalidateQueries({ queryKey: ['api_keys'] });
+      setGeneratedKey(res.data.key || null);
       setNewKeyName('');
       setNewIsAdmin(false);
     },
   });
 
-  const deleteMutation = useMutation(backpack.DeleteApiKey, {
+  const deleteMutation = useMutation({
+    mutationFn: backpack.DeleteApiKey,
     onSuccess: () => {
-      queryClient.invalidateQueries(['api_keys']);
+      queryClient.invalidateQueries({ queryKey: ['api_keys'] });
     },
   });
 
@@ -67,7 +72,14 @@ export const ApiKeyPage = memo(() => {
         <title>API Keys</title>
       </Helmet>
       <PageDiv>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1rem',
+          }}
+        >
           <Title>
             <Icon icon="key" style={{ marginRight: '10px' }} />
             API Key Management
@@ -101,7 +113,10 @@ export const ApiKeyPage = memo(() => {
                 <tr key={key.id}>
                   <td style={{ fontWeight: 'bold' }}>{key.name}</td>
                   <td>
-                    <Tag minimal intent={key.is_admin ? Intent.DANGER : Intent.NONE}>
+                    <Tag
+                      minimal
+                      intent={key.is_admin ? Intent.DANGER : Intent.NONE}
+                    >
                       {key.is_admin ? 'Administrator' : 'User'}
                     </Tag>
                   </td>
@@ -116,7 +131,8 @@ export const ApiKeyPage = memo(() => {
                       minimal
                       intent={Intent.DANGER}
                       icon="trash"
-                      loading={deleteMutation.isLoading && deleteMutation.variables === key.id}
+                      loading={deleteMutation.isPending && deleteMutation.variables === key.id}
+
                       onClick={() => deleteMutation.mutate(key.id)}
                     />
                   </td>
@@ -124,7 +140,14 @@ export const ApiKeyPage = memo(() => {
               ))}
               {data?.data.length === 0 && (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: '#abb3bf' }}>
+                  <td
+                    colSpan={6}
+                    style={{
+                      textAlign: 'center',
+                      padding: '2rem',
+                      color: '#abb3bf',
+                    }}
+                  >
                     No API keys found.
                   </td>
                 </tr>
@@ -140,12 +163,28 @@ export const ApiKeyPage = memo(() => {
         >
           <div className={Classes.DIALOG_BODY}>
             {generatedKey ? (
-              <Callout intent={Intent.SUCCESS} title="Key Generated Successfully" icon="tick">
-                <p>Please copy this key now. You will not be able to see it again.</p>
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px', alignItems: 'center' }}>
-                  <Code style={{ fontSize: '1.2em', flex: 1 }}>{generatedKey}</Code>
-                  <Button 
-                    icon="clipboard" 
+              <Callout
+                intent={Intent.SUCCESS}
+                title="Key Generated Successfully"
+                icon="tick"
+              >
+                <p>
+                  Please copy this key now. You will not be able to see it
+                  again.
+                </p>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '10px',
+                    marginTop: '10px',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Code style={{ fontSize: '1.2em', flex: 1 }}>
+                    {generatedKey}
+                  </Code>
+                  <Button
+                    icon="clipboard"
                     onClick={() => navigator.clipboard.writeText(generatedKey)}
                   />
                 </div>
@@ -171,9 +210,14 @@ export const ApiKeyPage = memo(() => {
                   onChange={() => setNewIsAdmin(!newIsAdmin)}
                 />
                 {newIsAdmin && (
-                  <Callout intent={Intent.DANGER} style={{ marginTop: '1rem' }} icon="warning-sign">
+                  <Callout
+                    intent={Intent.DANGER}
+                    style={{ marginTop: '1rem' }}
+                    icon="warning-sign"
+                  >
                     <div style={{ fontSize: '0.85em' }}>
-                      Administrator keys have full access to all API endpoints, including deleting artifacts and managing processors.
+                      Administrator keys have full access to all API endpoints,
+                      including deleting artifacts and managing processors.
                     </div>
                   </Callout>
                 )}
@@ -183,14 +227,24 @@ export const ApiKeyPage = memo(() => {
           <div className={Classes.DIALOG_FOOTER}>
             <div className={Classes.DIALOG_FOOTER_ACTIONS}>
               {generatedKey ? (
-                <Button intent={Intent.PRIMARY} onClick={() => setIsDialogOpen(false)}>Done</Button>
+                <Button
+                  intent={Intent.PRIMARY}
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Done
+                </Button>
               ) : (
                 <>
                   <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
                   <Button
                     intent={Intent.PRIMARY}
-                    onClick={() => createMutation.mutate({ name: newKeyName, is_admin: newIsAdmin })}
-                    loading={createMutation.isLoading}
+                    onClick={() =>
+                      createMutation.mutate({
+                        name: newKeyName,
+                        is_admin: newIsAdmin,
+                      })
+                    }
+                    loading={createMutation.isPending}
                     disabled={!newKeyName}
                   >
                     Generate

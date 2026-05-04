@@ -15,7 +15,10 @@ interface Props {}
 
 export function ProcessorList(props: Props) {
   const backpack = useBackpackApi();
-  const query = useQuery(['processor_list'], backpack.GetAllProcessors);
+  const query = useQuery({
+    queryKey: ['processor_list'],
+    queryFn: backpack.GetAllProcessors,
+  });
   const params = useParams();
   const nav = useNavigate();
   if (query.isLoading) {

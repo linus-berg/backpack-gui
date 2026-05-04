@@ -36,7 +36,9 @@ const SeverityToIcon = (severity: EventSeverity): any => {
 
 export const EventFeed = memo((props: Props) => {
   const backpack = useBackpackApi();
-  const query = useQuery(['events'], backpack.GetEvents, {
+  const query = useQuery({
+    queryKey: ['events'],
+    queryFn: backpack.GetEvents,
     refetchInterval: 10000,
   });
 

@@ -15,14 +15,16 @@ interface Props {
 
 export const ValidateArtifactButton = memo((props: Props) => {
   const backpack = useBackpackApi();
-  const mutation = useMutation(backpack.ValidateArtifact);
+  const mutation = useMutation({
+    mutationFn: backpack.ValidateArtifact,
+  });
   const tooltip = 'Verify files downloaded';
 
   return (
     <Tooltip content={tooltip} lazy>
       <AnchorButton
         intent="warning"
-        loading={mutation.isLoading}
+        loading={mutation.isPending}
         onClick={() =>
           mutation.mutate({
             id: props.id,

@@ -53,15 +53,13 @@ export const PreviewArtifactDialog = ({
 }: Props) => {
   const backpack = useBackpackApi();
 
-  const { data, isLoading, error } = useQuery(
-    ['artifact_preview', artifactId, processor],
-    () => backpack.PreviewArtifact(artifactId, processor),
-    {
-      enabled: isOpen && artifactId !== '',
-      retry: false,
-      refetchOnWindowFocus: false,
-    },
-  );
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['artifact_preview', artifactId, processor],
+    queryFn: () => backpack.PreviewArtifact(artifactId, processor),
+    enabled: isOpen && artifactId !== '',
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
 
   const artifact = data?.data || null;
 

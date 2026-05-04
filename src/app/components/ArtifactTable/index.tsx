@@ -66,10 +66,10 @@ export const ArtifactTable = memo((props: Props) => {
   const [deep_filter, SetDeepFilter] = useState(false);
   const [inspect, SetInspect] = useState<null | Artifact>(null);
   const [search_filter, SetSearchFilter] = useState('');
-  const query = useQuery(
-    ['artifact_table', props.processor.id, only_roots],
-    backpack.GetAllProcessorArtifacts,
-  );
+  const query = useQuery({
+    queryKey: ['artifact_table', props.processor.id, only_roots],
+    queryFn: backpack.GetAllProcessorArtifacts,
+  });
 
   if (query.isLoading) {
     return <Spinner />;

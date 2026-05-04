@@ -16,7 +16,10 @@ interface Props {}
 
 export const ProcessorBrowser = memo((props: Props) => {
   const backpack = useBackpackApi();
-  const query = useQuery(['processor_browser'], backpack.GetAllProcessors);
+  const query = useQuery({
+    queryKey: ['processor_browser'],
+    queryFn: backpack.GetAllProcessors,
+  });
   const params = useParams();
   const nav = useNavigate();
 

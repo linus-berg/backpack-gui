@@ -32,10 +32,12 @@ export const AddArtifactForm = memo((props: Props) => {
   const query_client = useQueryClient();
   const mutation = useMutation({
     mutationFn: backpack.AddArtifact,
-    onSuccess: (data: AxiosResponse<Artifact>) => {
-      const artifact: Artifact = data.data;
+    onSuccess: () => {
       query_client.invalidateQueries({
-        queryKey: ['artifact_table', artifact.processor, true],
+        queryKey: ['artifact_table', props.processor.id, true],
+      });
+      query_client.invalidateQueries({
+        queryKey: ['artifact_table', props.processor.id, false],
       });
     },
   });
@@ -185,7 +187,7 @@ export const AddArtifactForm = memo((props: Props) => {
           icon="cube-add"
           intent="primary"
           onClick={() => OnAdd()}
-          loading={mutation.isLoading}
+          loading={mutation.isPending}
           disabled={name === ''}
           style={{ flex: 2 }}
         >

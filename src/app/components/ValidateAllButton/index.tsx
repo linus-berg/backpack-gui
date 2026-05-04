@@ -14,14 +14,16 @@ interface Props {}
 export const ValidateAllButton = memo((props: Props) => {
   const backpack = useBackpackApi();
   const { hasRole } = useUser();
-  const mutation = useMutation(backpack.ValidateAllArtifacts);
+  const mutation = useMutation({
+    mutationFn: backpack.ValidateAllArtifacts,
+  });
   if (!hasRole('Administrator')) {
     return null;
   }
   return (
     <Button
       intent="warning"
-      loading={mutation.isLoading}
+      loading={mutation.isPending}
       onClick={() => mutation.mutate()}
     >
       Validate All Artifacts

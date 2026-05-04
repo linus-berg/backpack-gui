@@ -44,9 +44,12 @@ export const BulkAddDialog = memo(({ processor, isOpen, onClose }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
 
-  const mutation = useMutation(backpack.AddArtifact, {
+  const mutation = useMutation({
+    mutationFn: backpack.AddArtifact,
     onSuccess: () => {
-      queryClient.invalidateQueries(['artifact_table', processor.id]);
+      queryClient.invalidateQueries({
+        queryKey: ['artifact_table', processor.id],
+      });
     },
   });
 

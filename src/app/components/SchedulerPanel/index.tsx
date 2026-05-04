@@ -15,13 +15,16 @@ export const SchedulerPanel = memo((props: Props) => {
   const isAdmin = hasRole('Administrator');
   const [isManageDialogOpen, setIsManageDialogOpen] = useState(false);
 
-  const { data, isLoading } = useQuery(['schedules'], backpack.GetSchedules, {
+  const { data, isLoading } = useQuery({
+    queryKey: ['schedules'],
+    queryFn: backpack.GetSchedules,
     refetchInterval: 10000,
   });
 
-  const syncMutation = useMutation(backpack.TriggerSync, {
+  const syncMutation = useMutation({
+    mutationFn: backpack.TriggerSync,
     onSuccess: () => {
-      queryClient.invalidateQueries(['events']);
+      queryClient.invalidateQueries({ queryKey: ['events'] });
     },
   });
 
@@ -78,7 +81,7 @@ export const SchedulerPanel = memo((props: Props) => {
                       intent={Intent.PRIMARY}
                       icon="refresh"
                       loading={
-                        syncMutation.isLoading &&
+                        syncMutation.isPending &&
                         syncMutation.variables === schedule.processor
                       }
                       onClick={() => syncMutation.mutate(schedule.processor)}

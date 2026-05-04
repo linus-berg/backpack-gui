@@ -98,26 +98,26 @@ export const LandingPage = () => {
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', content: '' });
 
-  const { data: newsPosts, isLoading } = useQuery(['news'], () =>
-    backpack.GetNewsPosts().then(r => r.data),
-  );
+  const { data: newsPosts, isLoading } = useQuery({
+    queryKey: ['news'],
+    queryFn: () => backpack.GetNewsPosts().then(r => r.data),
+  });
 
-  const createMutation = useMutation(backpack.CreateNewsPost, {
+  const createMutation = useMutation({
+    mutationFn: backpack.CreateNewsPost,
     onSuccess: () => {
-      queryClient.invalidateQueries(['news']);
+      queryClient.invalidateQueries({ queryKey: ['news'] });
       setIsPostDialogOpen(false);
       setNewPost({ title: '', content: '' });
     },
   });
 
-  const deleteMutation = useMutation(
-    (id: string) => backpack.DeleteNewsPost(id),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['news']);
-      },
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => backpack.DeleteNewsPost(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['news'] });
     },
-  );
+  });
 
   const handleCreatePost = () => {
     if (!newPost.title || !newPost.content) return;
@@ -310,7 +310,7 @@ export const LandingPage = () => {
             <Button
               intent={Intent.PRIMARY}
               onClick={handleCreatePost}
-              loading={createMutation.isLoading}
+              loading={createMutation.isPending}
               disabled={!newPost.title || !newPost.content}
             >
               Publish Announcement

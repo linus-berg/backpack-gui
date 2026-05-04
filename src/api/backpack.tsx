@@ -1,5 +1,5 @@
 import { useAuth } from 'react-oidc-context';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import React, { createContext, useContext, useEffect } from 'react';
 import { Artifact } from 'types';
 import type { AxiosInstance } from 'axios';
@@ -56,86 +56,110 @@ export const useAxios = () => {
 export const useBackpackApi = () => {
   const backpack = useAxios();
   /* Getters */
-  const GetAllProcessors = () => {
-    return backpack.get(BACKPACK_PROCESSOR + '/processors');
+  const GetAllProcessors = (): Promise<AxiosResponse<Processor[]>> => {
+    return backpack.get<Processor[]>(BACKPACK_PROCESSOR + '/processors');
   };
-  const GetQueueStatus = () => {
+  const GetQueueStatus = (): Promise<AxiosResponse<QueueStatus[]>> => {
     return backpack.get<QueueStatus[]>('/status/queue');
   };
 
-  const GetUserInfo = () => {
+  const GetUserInfo = (): Promise<AxiosResponse<User>> => {
     return backpack.get<User>('/auth/me');
   };
 
-  const GetEvents = () => {
+  const GetEvents = (): Promise<AxiosResponse<Event[]>> => {
     return backpack.get<Event[]>('/event');
   };
 
-  const GetSchedules = () => {
+  const GetSchedules = (): Promise<AxiosResponse<Schedule[]>> => {
     return backpack.get<Schedule[]>('/scheduler');
   };
 
-  const GetApiKeys = () => {
+  const GetApiKeys = (): Promise<AxiosResponse<ApiKey[]>> => {
     return backpack.get<ApiKey[]>('/apikey');
   };
 
-  const CreateApiKey = ({ name, is_admin }) => {
+  const CreateApiKey = ({
+    name,
+    is_admin,
+  }: {
+    name: string;
+    is_admin: boolean;
+  }): Promise<AxiosResponse<ApiKey>> => {
     return backpack.post('/apikey', { name: name, is_admin: is_admin });
   };
 
-  const DeleteApiKey = (id: string) => {
+  const DeleteApiKey = (id: string): Promise<AxiosResponse<void>> => {
     return backpack.delete(`/apikey/${id}`);
   };
 
-  const GetNewsPosts = () => {
+  const GetNewsPosts = (): Promise<AxiosResponse<NewsPost[]>> => {
     return backpack.get<NewsPost[]>('/news');
   };
 
-  const CreateNewsPost = (post: Partial<NewsPost>) => {
+  const CreateNewsPost = (
+    post: Partial<NewsPost>,
+  ): Promise<AxiosResponse<NewsPost>> => {
     return backpack.post('/news', post);
   };
 
-  const DeleteNewsPost = (id: string) => {
+  const DeleteNewsPost = (id: string): Promise<AxiosResponse<void>> => {
     return backpack.delete(`/news/${id}`);
   };
 
-  const TriggerSync = (processor: string) => {
+  const TriggerSync = (processor: string): Promise<AxiosResponse<void>> => {
     return backpack.post(`/scheduler/trigger/${processor}`);
   };
 
-  const UpdateSchedule = (schedule: Schedule) => {
+  const UpdateSchedule = (schedule: Schedule): Promise<AxiosResponse<void>> => {
     return backpack.put('/scheduler', schedule);
   };
 
-  const AddSchedule = (schedule: Schedule) => {
+  const AddSchedule = (schedule: Schedule): Promise<AxiosResponse<void>> => {
     return backpack.post('/scheduler', schedule);
   };
 
-  const DeleteSchedule = (id: string) => {
+  const DeleteSchedule = (id: string): Promise<AxiosResponse<void>> => {
     return backpack.delete(`/scheduler/${id}`);
   };
 
-  const ValidateSchedule = (schedule: Schedule) => {
+  const ValidateSchedule = (
+    schedule: Schedule,
+  ): Promise<AxiosResponse<void>> => {
     return backpack.post('/scheduler/validate', schedule);
   };
 
-  const PurgeQueue = (queue_name: string) => {
+  const PurgeQueue = (queue_name: string): Promise<AxiosResponse<void>> => {
     return backpack.delete(`/status/queue/${queue_name}`);
   };
 
-  const GetAllProcessorArtifacts = ({ queryKey }) => {
-    return backpack.get(BACKPACK_ARTIFACTS + '/all', {
+  const GetAllProcessorArtifacts = ({
+    queryKey,
+  }: {
+    queryKey: any[];
+  }): Promise<AxiosResponse<Artifact[]>> => {
+    return backpack.get<Artifact[]>(BACKPACK_ARTIFACTS + '/all', {
       params: { processor: queryKey[1], only_roots: queryKey[2] },
     });
   };
 
-  const GetArtifact = ({ queryKey }) => {
-    return backpack.get(BACKPACK_ARTIFACTS, {
+  const GetArtifact = ({
+    queryKey,
+  }: {
+    queryKey: any[];
+  }): Promise<AxiosResponse<Artifact>> => {
+    return backpack.get<Artifact>(BACKPACK_ARTIFACTS, {
       params: { processor: queryKey[1], id: queryKey[2] },
     });
   };
 
-  const DeleteArtifact = ({ id, processor }) => {
+  const DeleteArtifact = ({
+    id,
+    processor,
+  }: {
+    id: string;
+    processor: string;
+  }): Promise<AxiosResponse<void>> => {
     return backpack.delete(BACKPACK_ARTIFACTS, {
       data: {
         id: id,
@@ -144,14 +168,28 @@ export const useBackpackApi = () => {
     });
   };
 
-  const TrackArtifact = ({ id, processor }) => {
+  const TrackArtifact = ({
+    id,
+    processor,
+  }: {
+    id: string;
+    processor: string;
+  }): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/track', {
       id: id,
       processor: processor,
     });
   };
 
-  const ValidateArtifact = ({ id, processor, force }) => {
+  const ValidateArtifact = ({
+    id,
+    processor,
+    force,
+  }: {
+    id: string;
+    processor: string;
+    force: boolean;
+  }): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/validate', {
       id: id,
       processor: processor,
@@ -159,24 +197,39 @@ export const useBackpackApi = () => {
     });
   };
 
-  const PreviewArtifact = (id: string, processor: string) => {
+  const PreviewArtifact = (
+    id: string,
+    processor: string,
+  ): Promise<AxiosResponse<Artifact>> => {
     return backpack.get<Artifact>(BACKPACK_ARTIFACTS + '/preview', {
       params: { id, processor },
     });
   };
 
-  const GetPendingArtifacts = () => {
+  const GetPendingArtifacts = (): Promise<AxiosResponse<PendingArtifact[]>> => {
     return backpack.get<PendingArtifact[]>(BACKPACK_ARTIFACTS + '/pending');
   };
 
-  const ApproveArtifact = ({ id, processor }) => {
+  const ApproveArtifact = ({
+    id,
+    processor,
+  }: {
+    id: string;
+    processor: string;
+  }): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/approve', {
       id: id,
       processor: processor,
     });
   };
 
-  const RejectArtifact = ({ id, processor }) => {
+  const RejectArtifact = ({
+    id,
+    processor,
+  }: {
+    id: string;
+    processor: string;
+  }): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/reject', {
       id: id,
       processor: processor,
@@ -184,7 +237,7 @@ export const useBackpackApi = () => {
   };
 
   /* Add */
-  const AddArtifact = (artifact: Artifact) => {
+  const AddArtifact = (artifact: Artifact): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_ARTIFACTS, {
       id: artifact.id,
       processor: artifact.processor,
@@ -194,11 +247,11 @@ export const useBackpackApi = () => {
       dependencies: {},
     });
   };
-  const TrackAllArtifacts = () => {
+  const TrackAllArtifacts = (): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/track/all');
   };
 
-  const ValidateAllArtifacts = () => {
+  const ValidateAllArtifacts = (): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/validate/all');
   };
 
@@ -209,7 +262,13 @@ export const useBackpackApi = () => {
     multi_add,
     is_external,
     preview_enabled,
-  }) => {
+  }: {
+    processor_id: string;
+    requires_approval: boolean;
+    multi_add: boolean;
+    is_external: boolean;
+    preview_enabled: boolean;
+  }): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_PROCESSOR, {
       processor_id: processor_id,
       requires_approval: requires_approval,
@@ -219,7 +278,9 @@ export const useBackpackApi = () => {
     });
   };
 
-  const UpdateProcessor = (processor: Processor) => {
+  const UpdateProcessor = (
+    processor: Processor,
+  ): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_PROCESSOR + '/update', {
       processor_id: processor.id,
       description: processor.description,
@@ -232,7 +293,9 @@ export const useBackpackApi = () => {
     });
   };
 
-  const DeleteProcessor = (processor_id: string) => {
+  const DeleteProcessor = (
+    processor_id: string,
+  ): Promise<AxiosResponse<void>> => {
     return backpack.delete(BACKPACK_PROCESSOR + '/' + processor_id);
   };
 
