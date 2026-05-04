@@ -4,7 +4,7 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY yarn.lock ./
-RUN yarn install --frozen-lockfile --network-timeout 1000000
+RUN yarn install --frozen-lockfile
 COPY . ./
 RUN npm run build
 
