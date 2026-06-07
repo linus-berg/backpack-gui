@@ -7,7 +7,7 @@ import React, { memo } from 'react';
 
 interface Props {
   name: string;
-  value: any;
+  value: React.ReactNode;
 }
 
 export const ArtifactField = memo((props: Props) => {

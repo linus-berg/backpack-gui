@@ -5,7 +5,7 @@ import { ConvertedToObjectType, TranslationJsonType } from './types';
  * Your components can import this file in 'messages.ts' files which would ruin the HMR if this isn't a separate module
  */
 export const translations: ConvertedToObjectType<TranslationJsonType> =
-  {} as any;
+  {} as ConvertedToObjectType<TranslationJsonType>;
 
 /*
  * Converts the static JSON file into an object where keys are identical
@@ -14,8 +14,8 @@ export const translations: ConvertedToObjectType<TranslationJsonType> =
  * along with type-safety
  */
 export const convertLanguageJsonToObject = (
-  json: any,
-  objToConvertTo = translations,
+  json: Record<string, any>,
+  objToConvertTo: any = translations,
   current?: string,
 ) => {
   Object.keys(json).forEach(key => {

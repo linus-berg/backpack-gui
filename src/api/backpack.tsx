@@ -9,6 +9,7 @@ import { Processor } from '../types/Processor';
 import { QueueStatus } from '../types/QueueStatus';
 import { Event } from '../types/Event';
 import { Schedule } from '../types/Schedule';
+import { ScheduleValidationResult } from '../types/ScheduleValidationResult';
 import { PendingArtifact } from '../types/PendingArtifact';
 import { ApiKey } from '../types/ApiKey';
 import { User } from '../types/User';
@@ -125,7 +126,7 @@ export const useBackpackApi = () => {
 
   const ValidateSchedule = (
     schedule: Schedule,
-  ): Promise<AxiosResponse<void>> => {
+  ): Promise<AxiosResponse<ScheduleValidationResult>> => {
     return backpack.post('/scheduler/validate', schedule);
   };
 

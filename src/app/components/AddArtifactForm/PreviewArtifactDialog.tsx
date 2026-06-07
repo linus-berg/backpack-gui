@@ -17,6 +17,7 @@ import { map } from 'lodash-es';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import { Artifact } from '../../../types';
+import axios from 'axios';
 
 interface Props {
   isOpen: boolean;
@@ -86,8 +87,10 @@ export const PreviewArtifactDialog = ({
     }
   };
 
-  const previewError = error
-    ? (error as any).response?.data || 'Failed to fetch preview'
+  const previewError = axios.isAxiosError(error)
+    ? error.response?.data || 'Failed to fetch preview'
+    : error
+    ? 'An unexpected error occurred'
     : null;
 
   return (

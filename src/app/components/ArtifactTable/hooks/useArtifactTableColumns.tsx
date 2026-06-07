@@ -41,10 +41,10 @@ export const useArtifactTableColumns = ({ processor, onInspect }: Config) => {
         key: 'root',
         name: 'Type',
         interactive: true,
-        render: (row: any, key: string) => (
+        render: (row: Artifact, key: string) => (
           <Center>
-            <Tag minimal intent={row[key] ? 'success' : 'warning'}>
-              {row[key] ? 'root' : 'branch'}
+            <Tag minimal intent={row[key as keyof Artifact] ? 'success' : 'warning'}>
+              {row[key as keyof Artifact] ? 'root' : 'branch'}
             </Tag>
           </Center>
         ),
@@ -53,13 +53,13 @@ export const useArtifactTableColumns = ({ processor, onInspect }: Config) => {
         key: 'versions',
         name: 'Versions',
         interactive: false,
-        render: (row: any, key: string) => (
+        render: (row: Artifact, key: string) => (
           <Center>
             {processor.is_external || processor.direct_collect ? (
               <Tag minimal>N/A</Tag>
             ) : (
               <Tag round minimal>
-                {row[key]}
+                {row[key as keyof Artifact] as React.ReactNode}
               </Tag>
             )}
           </Center>
@@ -69,13 +69,13 @@ export const useArtifactTableColumns = ({ processor, onInspect }: Config) => {
         key: 'dependencies',
         name: 'Dependencies',
         interactive: false,
-        render: (row: any, key: string) => (
+        render: (row: Artifact, key: string) => (
           <Center>
             {processor.is_external || processor.direct_collect ? (
               <Tag minimal>N/A</Tag>
             ) : (
               <Tag round minimal>
-                {row[key]}
+                {row[key as keyof Artifact] as React.ReactNode}
               </Tag>
             )}
           </Center>

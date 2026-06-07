@@ -14,6 +14,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
 import { Schedule } from 'types/Schedule';
+import axios from 'axios';
 
 interface Props {
   isOpen: boolean;
@@ -23,7 +24,8 @@ interface Props {
 export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
-  const [editingSchedule, setEditingSchedule] = useState<Partial<Schedule> | null>(null);
+  const [editingSchedule, setEditingSchedule] =
+    useState<Partial<Schedule> | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [nextOccurrences, setNextOccurrences] = useState<string[]>([]);
 
@@ -38,16 +40,19 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
 
   const validateMutation = useMutation({
     mutationFn: backpack.ValidateSchedule,
-    onSuccess: (data: any) => {
-      if (data.data.valid) {
+    onSuccess: response => {
+      const data = response.data;
+      if (data.valid) {
         setValidationError(null);
-        setNextOccurrences(data.data.nextOccurrences);
+        setNextOccurrences(data.nextOccurrences);
       }
     },
-    onError: (err: any) => {
-      setValidationError(
-        err.response?.data?.error || 'Invalid Cron Expression',
-      );
+    onError: (err: unknown) => {
+      let message = 'Invalid Cron Expression';
+      if (axios.isAxiosError(err)) {
+        message = err.response?.data?.error || message;
+      }
+      setValidationError(message);
       setNextOccurrences([]);
     },
   });
@@ -93,7 +98,7 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
       setValidationError('Processor and Cron are required');
       return;
     }
-    
+
     if (validationError) return;
 
     if (editingSchedule?.id) {
@@ -125,13 +130,25 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
     >
       <div className={Classes.DIALOG_BODY}>
         {editingSchedule ? (
-          <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ccc', borderRadius: '5px' }}>
+          <div
+            style={{
+              marginBottom: '20px',
+              padding: '15px',
+              border: '1px solid #ccc',
+              borderRadius: '5px',
+            }}
+          >
             <h4>{editingSchedule.id ? 'Edit Schedule' : 'Add New Schedule'}</h4>
             <FormGroup label="Processor" labelFor="processor-select">
               <HTMLSelect
                 id="processor-select"
                 value={editingSchedule.processor}
-                onChange={e => setEditingSchedule({ ...editingSchedule, processor: e.target.value })}
+                onChange={e =>
+                  setEditingSchedule({
+                    ...editingSchedule,
+                    processor: e.target.value,
+                  })
+                }
               >
                 <option value="">Select a processor...</option>
                 {processors?.data.map(p => (
@@ -141,32 +158,47 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
                 ))}
               </HTMLSelect>
             </FormGroup>
-            <FormGroup 
-                label="Cron Expression (with seconds)" 
-                labelFor="cron-input"
-                helperText="Format: second minute hour day-of-month month day-of-week"
+            <FormGroup
+              label="Cron Expression (with seconds)"
+              labelFor="cron-input"
+              helperText="Format: second minute hour day-of-month month day-of-week"
             >
               <InputGroup
                 id="cron-input"
                 value={editingSchedule.cron}
-                onChange={e => setEditingSchedule({ ...editingSchedule, cron: e.target.value })}
+                onChange={e =>
+                  setEditingSchedule({
+                    ...editingSchedule,
+                    cron: e.target.value,
+                  })
+                }
                 placeholder="0 0 * * * ?"
               />
             </FormGroup>
             {validationError && (
-              <Callout intent={Intent.DANGER} title="Validation Error" style={{ marginBottom: '10px' }}>
+              <Callout
+                intent={Intent.DANGER}
+                title="Validation Error"
+                style={{ marginBottom: '10px' }}
+              >
                 {validationError}
               </Callout>
             )}
             {!validationError && nextOccurrences.length > 0 && (
-              <Callout intent={Intent.SUCCESS} title="Schedule Preview" style={{ marginBottom: '10px' }}>
+              <Callout
+                intent={Intent.SUCCESS}
+                title="Schedule Preview"
+                style={{ marginBottom: '10px' }}
+              >
                 <p>This schedule will run at:</p>
                 <ul style={{ margin: 0, paddingLeft: '20px' }}>
                   {nextOccurrences.map((occ, i) => (
                     <li key={i}>
                       {new Date(occ).toLocaleString()}
                       {i === 0 && (
-                        <span style={{ marginLeft: '10px', fontWeight: 'bold' }}>
+                        <span
+                          style={{ marginLeft: '10px', fontWeight: 'bold' }}
+                        >
                           (Next run)
                         </span>
                       )}
@@ -174,25 +206,47 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
                   ))}
                 </ul>
                 {nextOccurrences.length > 1 && (
-                    <div style={{ marginTop: '5px', fontStyle: 'italic' }}>
-                        Approximate interval: {Math.round((new Date(nextOccurrences[1]).getTime() - new Date(nextOccurrences[0]).getTime()) / 1000 / 60)} minutes
-                    </div>
+                  <div style={{ marginTop: '5px', fontStyle: 'italic' }}>
+                    Approximate interval:{' '}
+                    {Math.round(
+                      (new Date(nextOccurrences[1]).getTime() -
+                        new Date(nextOccurrences[0]).getTime()) /
+                        1000 /
+                        60,
+                    )}{' '}
+                    minutes
+                  </div>
                 )}
               </Callout>
             )}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+              }}
+            >
               <Button onClick={() => setEditingSchedule(null)}>Cancel</Button>
-              <Button 
-                intent={Intent.SUCCESS} 
+              <Button
+                intent={Intent.SUCCESS}
                 onClick={handleSave}
-                loading={validateMutation.isPending || addMutation.isPending || updateMutation.isPending}
+                loading={
+                  validateMutation.isPending ||
+                  addMutation.isPending ||
+                  updateMutation.isPending
+                }
               >
                 Save
               </Button>
             </div>
           </div>
         ) : (
-          <Button icon="add" intent={Intent.PRIMARY} onClick={handleAddNew} style={{ marginBottom: '15px' }}>
+          <Button
+            icon="add"
+            intent={Intent.PRIMARY}
+            onClick={handleAddNew}
+            style={{ marginBottom: '15px' }}
+          >
             Add New Schedule
           </Button>
         )}
@@ -209,21 +263,35 @@ export const SchedulerManagerDialog = ({ isOpen, onClose }: Props) => {
             {schedules?.data.map(s => (
               <tr key={s.id}>
                 <td>{s.processor}</td>
-                <td><code>{s.cron}</code></td>
+                <td>
+                  <code>{s.cron}</code>
+                </td>
                 <td>
                   <div style={{ display: 'flex', gap: '5px' }}>
-                    <Button small minimal icon="edit" onClick={() => handleEdit(s)} />
-                    <Button 
-                        small 
-                        minimal 
-                        intent={Intent.DANGER} 
-                        icon="trash" 
-                        loading={deleteMutation.isPending && deleteMutation.variables === s.id}
-                        onClick={() => {
-                            if (window.confirm(`Are you sure you want to delete the schedule for ${s.processor}?`)) {
-                                deleteMutation.mutate(s.id);
-                            }
-                        }} 
+                    <Button
+                      small
+                      minimal
+                      icon="edit"
+                      onClick={() => handleEdit(s)}
+                    />
+                    <Button
+                      small
+                      minimal
+                      intent={Intent.DANGER}
+                      icon="trash"
+                      loading={
+                        deleteMutation.isPending &&
+                        deleteMutation.variables === s.id
+                      }
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `Are you sure you want to delete the schedule for ${s.processor}?`,
+                          )
+                        ) {
+                          deleteMutation.mutate(s.id);
+                        }
+                      }}
                     />
                   </div>
                 </td>

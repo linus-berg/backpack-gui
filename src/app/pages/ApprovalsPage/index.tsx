@@ -117,7 +117,7 @@ export const ApprovalsPage = memo(() => {
                           small
                           intent={Intent.SUCCESS}
                           icon="tick"
-                          loading={approveMutation.isPending && (approveMutation.variables as any)?.id === pending.id}
+                          loading={approveMutation.isPending && approveMutation.variables?.id === pending.id}
                           onClick={() => approveMutation.mutate({ id: pending.id, processor: pending.processor })}
                         >
                           Approve
@@ -126,7 +126,7 @@ export const ApprovalsPage = memo(() => {
                           small
                           intent={Intent.DANGER}
                           icon="cross"
-                          loading={rejectMutation.isPending && (rejectMutation.variables as any)?.id === pending.id}
+                          loading={rejectMutation.isPending && rejectMutation.variables?.id === pending.id}
                           onClick={() => rejectMutation.mutate({ id: pending.id, processor: pending.processor })}
                         >
                           Reject

@@ -1,8 +1,14 @@
 import React, { memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
-import { Spinner, HTMLTable, Icon, Intent, Tag } from '@blueprintjs/core';
-import styled from 'styled-components';
+import {
+  Spinner,
+  HTMLTable,
+  Icon,
+  Intent,
+  Tag,
+  IconName,
+} from '@blueprintjs/core';
 import { EventSeverity } from 'types/Event';
 import { ScrollTableContainer } from '../ScrollTableContainer';
 
@@ -21,7 +27,7 @@ const SeverityToIntent = (severity: EventSeverity): Intent => {
   }
 };
 
-const SeverityToIcon = (severity: EventSeverity): any => {
+const SeverityToIcon = (severity: EventSeverity): IconName => {
   switch (severity) {
     case EventSeverity.SUCCESS:
       return 'tick-circle';

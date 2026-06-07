@@ -9,7 +9,7 @@ const slice = createSlice({
   name: 'processorBrowser',
   initialState,
   reducers: {
-    someAction(state, action: PayloadAction<any>) {},
+    someAction(state, action: PayloadAction<unknown>) {},
   },
 });
 
