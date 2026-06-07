@@ -1,6 +1,7 @@
 # build environment
 FROM node:26-alpine as build
 WORKDIR /app
+RUN npm install --global yarn
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY yarn.lock ./
