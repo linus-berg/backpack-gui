@@ -3,6 +3,7 @@ import React, { memo } from 'react';
 import styled from 'styled-components';
 import { AuxField } from 'types/AuxField';
 import { StringInput } from './StringInput';
+import { BoolInput } from './BoolInput';
 import { AuxDict } from 'types/AuxDict';
 
 interface Props {
@@ -27,6 +28,16 @@ export const AuxInput = memo((props: Props) => {
           key={key}
           onChange={OnChange}
           value={props.values[field.key]}
+        />
+      );
+    }
+    if (field.type.toLowerCase() == 'bool') {
+      return (
+        <BoolInput
+          field={field}
+          key={key}
+          onChange={OnChange}
+          value={props.values[field.key] || 'false'}
         />
       );
     }
