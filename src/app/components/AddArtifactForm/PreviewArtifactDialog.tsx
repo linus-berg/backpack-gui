@@ -16,12 +16,14 @@ import styled from 'styled-components';
 import { map } from 'lodash-es';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
+import { Artifact } from '../../../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   artifactId: string;
   processor: string;
+  config: Artifact['config'];
   filter: string;
 }
 
@@ -49,13 +51,24 @@ export const PreviewArtifactDialog = ({
   onClose,
   artifactId,
   processor,
+  config,
   filter,
 }: Props) => {
   const backpack = useBackpackApi();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['artifact_preview', artifactId, processor],
-    queryFn: () => backpack.PreviewArtifact(artifactId, processor),
+    queryFn: () => {
+      return backpack.PreviewArtifact({
+        id: artifactId,
+        processor: processor,
+        filter: filter,
+        config: config,
+        root: true,
+        versions: {},
+        dependencies: {},
+      });
+    },
     enabled: isOpen && artifactId !== '',
     retry: false,
     refetchOnWindowFocus: false,

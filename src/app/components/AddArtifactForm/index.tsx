@@ -20,7 +20,6 @@ import { AuxField } from 'types/AuxField';
 import { Processor } from '../../../types/Processor';
 import { Artifact } from 'types';
 import { AuxDict } from 'types/AuxDict';
-import { AxiosResponse } from 'axios';
 import { PreviewArtifactDialog } from './PreviewArtifactDialog';
 
 interface Props {
@@ -200,6 +199,7 @@ export const AddArtifactForm = memo((props: Props) => {
         onClose={() => setIsPreviewOpen(false)}
         artifactId={name}
         processor={props.processor.id}
+        config={config}
         filter={filter}
       />
     </Div>

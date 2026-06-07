@@ -198,12 +198,9 @@ export const useBackpackApi = () => {
   };
 
   const PreviewArtifact = (
-    id: string,
-    processor: string,
+    artifact: Artifact,
   ): Promise<AxiosResponse<Artifact>> => {
-    return backpack.get<Artifact>(BACKPACK_ARTIFACTS + '/preview', {
-      params: { id, processor },
-    });
+    return backpack.post<Artifact>(BACKPACK_ARTIFACTS + '/preview', artifact);
   };
 
   const GetPendingArtifacts = (): Promise<AxiosResponse<PendingArtifact[]>> => {
