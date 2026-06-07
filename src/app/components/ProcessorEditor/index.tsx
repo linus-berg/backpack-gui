@@ -3,7 +3,7 @@
  * ProcessorEditor
  *
  */
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import { Processor } from 'types/Processor';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -12,9 +12,20 @@ import { useUser } from '../../context/UserContext';
 import { ProcessorEditorHeader } from './components/ProcessorEditorHeader';
 import { ProcessorEditorSettings } from './components/ProcessorEditorSettings';
 import { ProcessorEditorFields } from './components/ProcessorEditorFields';
+import { useForm } from 'react-hook-form';
 
 interface Props {
   processor: Processor;
+}
+
+interface FormData {
+  description: string;
+  config: string;
+  direct_collect: boolean;
+  requires_approval: boolean;
+  multi_add: boolean;
+  is_external: boolean;
+  preview_enabled: boolean;
 }
 
 const Div = styled.div`
@@ -53,24 +64,24 @@ export const ProcessorEditor = memo((props: Props) => {
     }
   };
 
-  const [description, SetDescription] = useState(processor.description);
-  const [config, SetConfig] = useState(formatJson(processor.config));
-  const [direct_collect, SetDirectCollect] = useState(processor.direct_collect);
-  const [requires_approval, SetRequiresApproval] = useState(processor.requires_approval);
-  const [multi_add, SetMultiAdd] = useState(processor.multi_add);
-  const [is_external, SetIsExternal] = useState(processor.is_external);
-  const [preview_enabled, SetPreviewEnabled] = useState(processor.preview_enabled);
+  const { watch, setValue, handleSubmit } = useForm<FormData>({
+    defaultValues: {
+      description: processor.description,
+      config: formatJson(processor.config),
+      direct_collect: processor.direct_collect,
+      requires_approval: processor.requires_approval,
+      multi_add: processor.multi_add,
+      is_external: processor.is_external,
+      preview_enabled: processor.preview_enabled,
+    },
+  });
 
-  const Save = () => {
+  const values = watch();
+
+  const Save = (data: FormData) => {
     mutation.mutate({
       id: processor.id,
-      description,
-      config,
-      direct_collect,
-      requires_approval,
-      multi_add,
-      is_external,
-      preview_enabled,
+      ...data,
     });
   };
 
@@ -78,31 +89,31 @@ export const ProcessorEditor = memo((props: Props) => {
     <Div>
       <ProcessorEditorHeader
         processorId={processor.id}
-        onSave={Save}
+        onSave={handleSubmit(Save)}
         onDelete={() => deleteMutation.mutate(processor.id)}
         isSaving={mutation.isPending}
         isDeleting={deleteMutation.isPending}
         isAdmin={isAdmin}
       />
-      
+
       <ProcessorEditorSettings
-        directCollect={direct_collect}
-        onDirectCollectChange={SetDirectCollect}
-        requiresApproval={requires_approval}
-        onRequiresApprovalChange={SetRequiresApproval}
-        multiAdd={multi_add}
-        onMultiAddChange={SetMultiAdd}
-        isExternal={is_external}
-        onIsExternalChange={SetIsExternal}
-        previewEnabled={preview_enabled}
-        onPreviewEnabledChange={SetPreviewEnabled}
+        directCollect={values.direct_collect}
+        onDirectCollectChange={val => setValue('direct_collect', val)}
+        requiresApproval={values.requires_approval}
+        onRequiresApprovalChange={val => setValue('requires_approval', val)}
+        multiAdd={values.multi_add}
+        onMultiAddChange={val => setValue('multi_add', val)}
+        isExternal={values.is_external}
+        onIsExternalChange={val => setValue('is_external', val)}
+        previewEnabled={values.preview_enabled}
+        onPreviewEnabledChange={val => setValue('preview_enabled', val)}
       />
 
       <ProcessorEditorFields
-        description={description}
-        onDescriptionChange={SetDescription}
-        config={config}
-        onConfigChange={SetConfig}
+        description={values.description}
+        onDescriptionChange={val => setValue('description', val)}
+        config={values.config}
+        onConfigChange={val => setValue('config', val)}
       />
     </Div>
   );

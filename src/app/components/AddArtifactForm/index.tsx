@@ -21,14 +21,34 @@ import { Processor } from '../../../types/Processor';
 import { Artifact } from 'types';
 import { AuxDict } from 'types/AuxDict';
 import { PreviewArtifactDialog } from './PreviewArtifactDialog';
+import { useForm, Controller } from 'react-hook-form';
 
 interface Props {
   processor: Processor;
 }
 
+interface FormData {
+  name: string;
+  filter: string;
+  config: Artifact['config'];
+}
+
 export const AddArtifactForm = memo((props: Props) => {
   const backpack = useBackpackApi();
   const query_client = useQueryClient();
+
+  const { control, handleSubmit, watch, setValue, reset } = useForm<FormData>({
+    defaultValues: {
+      name: '',
+      filter: '',
+      config: {},
+    },
+  });
+
+  const name = watch('name');
+  const filter = watch('filter');
+  const config = watch('config');
+
   const mutation = useMutation({
     mutationFn: backpack.AddArtifact,
     onSuccess: () => {
@@ -38,38 +58,27 @@ export const AddArtifactForm = memo((props: Props) => {
       query_client.invalidateQueries({
         queryKey: ['artifact_table', props.processor.id, false],
       });
+      reset();
     },
   });
-
-  const [name, SetName] = useState<string>('');
-  const [filter, SetFilter] = useState('');
-  const [config, SetConfig] = useState<Artifact['config']>({});
 
   // Preview State
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const UpdateValue = (fnc, evt: React.ChangeEvent<HTMLInputElement>) => {
-    fnc(evt.currentTarget.value);
-  };
-
   const UpdateField = (field: AuxField, value: string) => {
-    SetConfig({ ...config, [field.key]: value });
+    setValue('config', { ...config, [field.key]: value });
   };
 
-  const OnAdd = () => {
-    if (name === '') {
-      return;
-    }
+  const OnAdd = (data: FormData) => {
     mutation.mutate({
-      id: name,
+      id: data.name,
       processor: props.processor.id,
-      filter: filter,
-      config: config,
+      filter: data.filter,
+      config: data.config,
       root: true,
       versions: {},
       dependencies: {},
     });
-    SetName('');
   };
 
   const aux: AuxDict = JSON.parse(props.processor.config);
@@ -123,12 +132,17 @@ export const AddArtifactForm = memo((props: Props) => {
       </Card>
 
       <FormRow>
-        <InputGroup
-          fill
-          placeholder="Artifact Name (ex. react)"
-          value={name}
-          onChange={evt => UpdateValue(SetName, evt)}
-          leftIcon="cube"
+        <Controller
+          name="name"
+          control={control}
+          render={({ field }) => (
+            <InputGroup
+              fill
+              placeholder="Artifact Name (ex. react)"
+              {...field}
+              leftIcon="cube"
+            />
+          )}
         />
         <Tooltip
           content="The unique identifier for the package (e.g., 'lodash' or 'ubuntu')"
@@ -149,12 +163,17 @@ export const AddArtifactForm = memo((props: Props) => {
       </FormRow>
 
       <FormRow>
-        <InputGroup
-          fill
-          placeholder="Regex version filter"
-          value={filter}
-          onChange={evt => UpdateValue(SetFilter, evt)}
-          leftIcon="filter"
+        <Controller
+          name="filter"
+          control={control}
+          render={({ field }) => (
+            <InputGroup
+              fill
+              placeholder="Regex version filter"
+              {...field}
+              leftIcon="filter"
+            />
+          )}
         />
         <Tooltip
           content="Optional: A regular expression to filter which versions should be mirrored (e.g., '^18\..*')"
@@ -185,7 +204,7 @@ export const AddArtifactForm = memo((props: Props) => {
         <Button
           icon="cube-add"
           intent="primary"
-          onClick={() => OnAdd()}
+          onClick={handleSubmit(OnAdd)}
           loading={mutation.isPending}
           disabled={name === ''}
           style={{ flex: 2 }}
