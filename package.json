@@ -99,7 +99,7 @@
   "devDependencies": {
     "@types/lodash-es": "4.17.12",
     "@vitejs/plugin-react": "6.0.1",
-    "vite": "8.0.10",
+    "vite": "8.3.5",
     "vite-plugin-svgr": "4.5.0"
   }
 }
