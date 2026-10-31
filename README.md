@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="images/backpack-logo-dark.svg">
+    <img src="images/backpack-logo.svg" alt="Backpack logo" width="128">
+  </picture>
+</p>
+
 # Backpack UI
 
 Web interface for [Backpack](../backpack-backend/README.md): browse mirrored

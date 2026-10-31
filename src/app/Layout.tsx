@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import { useBackpackApi } from 'api/backpack';
 import { usePendingApprovals } from 'api/queries';
 import { notify } from 'utils/toaster';
-import LogoImage from './logo.png';
+import LogoMark from './logo.svg?react';
 import { ThemeToggle } from './components/ThemeToggle';
 import { HelpDialog } from './components/HelpDialog';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
@@ -40,15 +40,21 @@ const LogoBox = styled(NavLink)`
     text-decoration: none;
   }
 `;
-const Logo = styled.img`
+/* Inline, so the mark's currentColor follows the navbar text colour. */
+const Logo = styled(LogoMark)`
   height: 28px;
+  width: 28px;
+  flex-shrink: 0;
 `;
+/* Same ink as the mark; the tracked, heavy caps match the README and
+   social preview wordmark. The negative margin cancels the trailing
+   letter-spacing so the text sits centred before the divider. */
 const LogoText = styled.span`
-  margin-left: 8px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  font-size: 1.1rem;
-  color: var(--brand-text);
+  margin-left: 10px;
+  margin-right: -0.14em;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
 `;
 
 const NavContainer = styled.div`
@@ -208,7 +214,7 @@ export function Layout() {
         <Navbar.Group align={Alignment.START}>
           <Navbar.Heading>
             <LogoBox to="/" aria-label="Backpack home">
-              <Logo src={LogoImage} alt="" />
+              <Logo aria-hidden="true" focusable="false" />
               <LogoText className="nav-text">BACKPACK</LogoText>
             </LogoBox>
           </Navbar.Heading>
