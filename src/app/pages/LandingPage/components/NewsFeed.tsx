@@ -1,34 +1,16 @@
 import React, { useState } from 'react';
-import {
-  H5,
-  Button,
-  Intent,
-  Divider,
-  Spinner,
-  Icon,
-  NonIdealState,
-} from '@blueprintjs/core';
-import styled from 'styled-components';
+import { Button, Classes, H5, Icon, Intent } from '@blueprintjs/core';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
+import { queryKeys } from 'api/queries';
 import { useUser } from 'app/context/UserContext';
-import { NewsPost } from 'types/NewsPost';
+import {
+  EmptyState,
+  LoadingState,
+  QueryErrorState,
+} from 'app/components/common/States';
 import { NewsPostCard } from './NewsPostCard';
 import { CreateNewsPostDialog } from './CreateNewsPostDialog';
-
-const NewsColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-`;
-
-const ScrollableNews = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 10px;
-  margin-top: 10px;
-`;
 
 export const NewsFeed = () => {
   const backpack = useBackpackApi();
@@ -36,62 +18,67 @@ export const NewsFeed = () => {
   const isAdmin = hasRole('Administrator');
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
 
-  const { data: newsPosts, isLoading } = useQuery({
-    queryKey: ['news'],
+  const query = useQuery({
+    queryKey: queryKeys.news,
     queryFn: () => backpack.GetNewsPosts().then(r => r.data),
   });
+  const posts = query.data ?? [];
 
   return (
-    <NewsColumn>
+    <section aria-labelledby="news-title">
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '15px',
+          marginBottom: 12,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Icon icon="feed" color="#5c7080" />
-          <H5 style={{ margin: 0 }}>System Announcements</H5>
-        </div>
+        <H5 id="news-title" style={{ margin: 0 }}>
+          <Icon
+            icon="feed"
+            className={Classes.TEXT_MUTED}
+            style={{ marginRight: 8 }}
+          />
+          Announcements
+        </H5>
         {isAdmin && (
           <Button
             icon="add"
             small
             intent={Intent.PRIMARY}
-            text="New Post"
+            text="New announcement"
             onClick={() => setIsPostDialogOpen(true)}
           />
         )}
       </div>
 
-      <Divider />
+      {query.isLoading ? (
+        <LoadingState />
+      ) : query.isError ? (
+        <QueryErrorState
+          title="Couldn't load announcements"
+          error={query.error}
+          onRetry={() => query.refetch()}
+        />
+      ) : posts.length === 0 ? (
+        <EmptyState
+          icon="feed"
+          title="No announcements"
+          description="System updates and news will appear here."
+        />
+      ) : (
+        posts.map(post => (
+          <NewsPostCard key={post.id} post={post} isAdmin={isAdmin} />
+        ))
+      )}
 
-      <ScrollableNews>
-        {isLoading ? (
-          <div style={{ textAlign: 'center', padding: '4rem' }}>
-            <Spinner size={40} />
-          </div>
-        ) : (
-          newsPosts?.map((post: NewsPost) => (
-            <NewsPostCard key={post.id} post={post} isAdmin={isAdmin} />
-          ))
-        )}
-
-        {newsPosts?.length === 0 && !isLoading && (
-          <NonIdealState
-            icon="info-sign"
-            title="No Announcements"
-            description="There are currently no system updates or news posts to display."
-          />
-        )}
-      </ScrollableNews>
-
-      <CreateNewsPostDialog
-        isOpen={isPostDialogOpen}
-        onClose={() => setIsPostDialogOpen(false)}
-      />
-    </NewsColumn>
+      {isAdmin && (
+        <CreateNewsPostDialog
+          isOpen={isPostDialogOpen}
+          onClose={() => setIsPostDialogOpen(false)}
+        />
+      )}
+    </section>
   );
 };

@@ -1,16 +1,19 @@
 import React from 'react';
 import {
-  Dialog,
-  Classes,
   Button,
-  Intent,
+  Callout,
+  Classes,
+  Dialog,
+  Divider,
   H5,
   H6,
   Icon,
-  Callout,
-  Divider,
+  IconName,
+  Intent,
+  Tag,
 } from '@blueprintjs/core';
 import styled from 'styled-components';
+import { ARTIFACT_ACTIONS } from 'app/components/ArtifactActions/actions';
 
 interface Props {
   isOpen: boolean;
@@ -18,187 +21,149 @@ interface Props {
 }
 
 const HelpSection = styled.div`
-  margin-bottom: 24px;
+  margin-top: 16px;
+
+  p {
+    margin: 6px 0 0;
+  }
 `;
 
 const ActionHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
-`;
 
-const AdminBadge = styled.span`
-  background: rgba(219, 61, 61, 0.15);
-  color: #ff7373;
-  font-size: 0.65rem;
-  padding: 2px 6px;
-  border-radius: 3px;
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  border: 1px solid rgba(219, 61, 61, 0.3);
+  h6 {
+    margin: 0;
+  }
 `;
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 40px;
 `;
 
-export const HelpDialog = ({ isOpen, onClose }: Props) => {
-  return (
-    <Dialog
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Backpack User Guide"
-      icon="help"
-      style={{ width: '1100px' }}
-    >
-      <div className={Classes.DIALOG_BODY}>
-        <Grid>
-          <div>
-            <H5>User Actions</H5>
-            <Divider />
+const AdminTag = () => (
+  <Tag minimal intent={Intent.DANGER}>
+    Admin only
+  </Tag>
+);
 
-            <HelpSection style={{ marginTop: '16px' }}>
-              <ActionHeader>
-                <Icon icon="eye-open" intent={Intent.PRIMARY} />
-                <H6 style={{ margin: 0 }}>Artifact Preview</H6>
-              </ActionHeader>
-              <p>
-                Before adding an artifact, use the <b>Preview</b> button. This
-                queries the upstream registry in real-time to show you which
-                versions exist, their file contents, and their direct
-                dependencies. This is useful for verifying if a package name is
-                correct or if your regex filter will match the desired versions.
-              </p>
-            </HelpSection>
+const Item = ({
+  icon,
+  title,
+  admin,
+  children,
+}: {
+  icon: IconName;
+  title: string;
+  admin?: boolean;
+  children: React.ReactNode;
+}) => (
+  <HelpSection>
+    <ActionHeader>
+      <Icon icon={icon} />
+      <H6>{title}</H6>
+      {admin && <AdminTag />}
+    </ActionHeader>
+    {children}
+  </HelpSection>
+);
 
-            <HelpSection>
-              <ActionHeader>
-                <Icon icon="cube-add" intent={Intent.PRIMARY} />
-                <H6 style={{ margin: 0 }}>Add Artifact</H6>
-              </ActionHeader>
-              <p>
-                Registers a new "Root" artifact in Backpack. Once added, the
-                system will begin recursive discovery of all its versions and
-                dependencies.
-              </p>
-              <Callout
-                intent={Intent.WARNING}
-                icon="shield"
-                style={{ marginTop: '8px' }}
-              >
-                If a processor is configured with <b>Approval Required</b>, the
-                artifact will stay in a pending state until an{' '}
-                <AdminBadge>Administrator</AdminBadge> approves it.
-              </Callout>
-            </HelpSection>
+const userActions = [
+  ARTIFACT_ACTIONS.preview,
+  ARTIFACT_ACTIONS.add,
+  ARTIFACT_ACTIONS.inspect,
+  ARTIFACT_ACTIONS.track,
+  ARTIFACT_ACTIONS.validate,
+  ARTIFACT_ACTIONS.forceCollect,
+];
 
-            <HelpSection>
-              <ActionHeader>
-                <Icon icon="refresh" intent={Intent.SUCCESS} />
-                <H6 style={{ margin: 0 }}>Request Update (Re-track)</H6>
-              </ActionHeader>
-              <p>
-                Forces the system to re-scan the upstream registry for an
-                existing artifact. This is used when you know a new version has
-                been released upstream but Backpack hasn't picked it up yet.
-              </p>
-            </HelpSection>
-
-            <HelpSection>
-              <ActionHeader>
-                <Icon icon="confirm" intent={Intent.WARNING} />
-                <H6 style={{ margin: 0 }}>Validate Artifact</H6>
-              </ActionHeader>
-              <p>
-                Verifies the integrity of mirrored files. This action checks
-                that every file registered in the Backpack metadata actually
-                exists in S3 storage and matches the recorded metadata. Useful
-                for auditing the health of your local mirror.
-              </p>
-            </HelpSection>
-
-            <HelpSection>
-              <ActionHeader>
-                <Icon icon="refresh" intent={Intent.DANGER} />
-                <H6 style={{ margin: 0 }}>
-                  Force Collection (only available on <i>direct</i> processors)
-                </H6>
-              </ActionHeader>
-              <p>
-                Triggers an immediate download attempt for specific versions
-                that may have failed or are stuck in a pending state.
-              </p>
-            </HelpSection>
-          </div>
-
-          <div>
-            <H5>Administrative Actions</H5>
-            <Divider />
-
-            <HelpSection style={{ marginTop: '16px' }}>
-              <ActionHeader>
-                <Icon icon="shield" intent={Intent.DANGER} />
-                <H6 style={{ margin: 0 }}>Approvals Portal</H6>
-                <AdminBadge>Admin Only</AdminBadge>
-              </ActionHeader>
-              <p>
-                Review and vet artifact requests from users. Admins can inspect
-                the metadata and regex filters before allowing the ingestion to
-                start.
-              </p>
-            </HelpSection>
-
-            <HelpSection>
-              <ActionHeader>
-                <Icon icon="key" intent={Intent.DANGER} />
-                <H6 style={{ margin: 0 }}>API Key Management</H6>
-                <AdminBadge>Admin Only</AdminBadge>
-              </ActionHeader>
-              <p>
-                Generate and revoke API keys for automation. Keys can be scoped
-                as <b>User</b> (read-only/add) or <b>Administrator</b>{' '}
-                (destructive actions).
-              </p>
-            </HelpSection>
-
-            <HelpSection>
-              <ActionHeader>
-                <Icon icon="settings" intent={Intent.DANGER} />
-                <H6 style={{ margin: 0 }}>Processor Configuration</H6>
-                <AdminBadge>Admin Only</AdminBadge>
-              </ActionHeader>
-              <p>
-                Modify ecosystem-wide settings, such as enabling{' '}
-                <b>External Management</b> (metadata-only tracking) or{' '}
-                <b>Direct Collection</b>.
-              </p>
-            </HelpSection>
-
-            <HelpSection>
-              <ActionHeader>
-                <Icon icon="trash" intent={Intent.DANGER} />
-                <H6 style={{ margin: 0 }}>Delete Artifact</H6>
-                <AdminBadge>Admin Only</AdminBadge>
-              </ActionHeader>
-              <p>
-                Permanently removes an artifact and all its tracked
-                metadata/files from the mirror.
-              </p>
-            </HelpSection>
-          </div>
-        </Grid>
-      </div>
-      <div className={Classes.DIALOG_FOOTER}>
-        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} intent={Intent.PRIMARY}>
-            Got it!
-          </Button>
+export const HelpDialog = ({ isOpen, onClose }: Props) => (
+  <Dialog
+    isOpen={isOpen}
+    onClose={onClose}
+    title="Backpack user guide"
+    icon="help"
+    style={{ width: 'min(1100px, 95vw)' }}
+  >
+    <div className={Classes.DIALOG_BODY}>
+      <Grid>
+        <div>
+          <H5>Working with artifacts</H5>
+          <Divider />
+          {userActions.map(action => (
+            <Item key={action.label} icon={action.icon} title={action.label}>
+              <p>{action.description}</p>
+            </Item>
+          ))}
+          <HelpSection>
+            <Callout
+              intent={Intent.PRIMARY}
+              icon="filter"
+              title="Version filters"
+            >
+              A filter is a regular expression matched against each version,
+              e.g. <code>^4\.</code> for 4.x only. Leave it empty to mirror
+              every version. <code>*</code> on its own is not valid; use{' '}
+              <code>.*</code> or leave the field empty.
+            </Callout>
+          </HelpSection>
+          <HelpSection>
+            <Callout intent={Intent.WARNING} icon="shield">
+              On processors that require approval, new artifacts wait until an
+              administrator approves them. You’ll see a notice when you add one.
+            </Callout>
+          </HelpSection>
         </div>
+
+        <div>
+          <H5>Administration</H5>
+          <Divider />
+          <Item icon="confirm" title="Approvals" admin>
+            <p>
+              Review requested artifacts, their filters and configuration, then
+              approve or reject them (optionally with a reason). The navigation
+              bar shows how many are waiting.
+            </p>
+          </Item>
+          <Item icon="key" title="API keys" admin>
+            <p>
+              Generate and revoke keys for automation. <b>User</b> keys can read
+              and add artifacts; <b>Administrator</b> keys can also delete and
+              reconfigure.
+            </p>
+          </Item>
+          <Item icon="cog" title="Processor configuration" admin>
+            <p>
+              Change processor behaviour (approval, preview, bulk add, external
+              or direct collection), its description and its configuration
+              fields.
+            </p>
+          </Item>
+          <Item icon="calendar" title="Tracking schedules" admin>
+            <p>
+              Check processors for new versions automatically on a cron
+              schedule, or trigger a sync now. Find them on the Status page.
+            </p>
+          </Item>
+          <Item
+            icon={ARTIFACT_ACTIONS.delete.icon}
+            title={ARTIFACT_ACTIONS.delete.label}
+            admin
+          >
+            <p>{ARTIFACT_ACTIONS.delete.description}</p>
+          </Item>
+        </div>
+      </Grid>
+    </div>
+    <div className={Classes.DIALOG_FOOTER}>
+      <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+        <Button onClick={onClose} intent={Intent.PRIMARY}>
+          Close
+        </Button>
       </div>
-    </Dialog>
-  );
-};
+    </div>
+  </Dialog>
+);

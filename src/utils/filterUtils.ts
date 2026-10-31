@@ -1,11 +1,11 @@
 import { filter } from 'lodash-es';
-import { Artifact } from 'types';
 
 /**
  * Recursively filters an object based on a string query.
  * @param query The search query.
  * @param obj The object to search within.
- * @param deep Whether to search recursively in nested objects.
+ * @param deep Whether to search recursively in nested objects. When false,
+ * nested objects are skipped instead of being matched as "[object Object]".
  * @returns True if the query is found in any value.
  */
 export const filterObject = (
@@ -16,17 +16,15 @@ export const filterObject = (
   if (obj === undefined || obj === null) {
     return false;
   }
-  const keys = Object.keys(obj);
-  for (const key of keys) {
+  const needle = query.toLowerCase();
+  for (const key of Object.keys(obj)) {
     const value = obj[key];
-    if (deep && typeof value === 'object' && value !== null) {
-      if (filterObject(query, value, deep)) {
+    if (typeof value === 'object' && value !== null) {
+      if (deep && filterObject(query, value, deep)) {
         return true;
       }
-    } else {
-      if (String(value).toLowerCase().includes(query.toLowerCase())) {
-        return true;
-      }
+    } else if (String(value).toLowerCase().includes(needle)) {
+      return true;
     }
   }
   return false;
@@ -39,15 +37,16 @@ export const filterObject = (
  * @param deep Whether to search recursively in artifact configuration.
  * @returns Filtered array of artifacts.
  */
-export const filterArtifacts = (
+export const filterArtifacts = <T extends object>(
   query: string,
-  artifacts: Artifact[],
+  artifacts: T[],
   deep = false,
-): Artifact[] => {
-  if (query === '') {
+): T[] => {
+  const trimmed = query.trim();
+  if (trimmed === '') {
     return artifacts;
   }
   return filter(artifacts, artifact =>
-    filterObject(query, artifact, deep),
+    filterObject(trimmed, artifact as Record<string, any>, deep),
   );
 };

@@ -1,61 +1,63 @@
-import React, { useState } from 'react';
-import { Alert, Button, H3, Intent } from '@blueprintjs/core';
+import React from 'react';
+import { Button, H3, Intent, Tag } from '@blueprintjs/core';
+import styled from 'styled-components';
 
 interface Props {
   processorId: string;
+  isDirty: boolean;
+  canSave: boolean;
   onSave: () => void;
+  onDiscard: () => void;
   onDelete: () => void;
   isSaving: boolean;
   isDeleting: boolean;
-  isAdmin: boolean;
 }
+
+const Row = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+`;
 
 export const ProcessorEditorHeader = ({
   processorId,
+  isDirty,
+  canSave,
   onSave,
+  onDiscard,
   onDelete,
   isSaving,
   isDeleting,
-  isAdmin,
-}: Props) => {
-  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-
-  return (
-    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-      <H3 style={{ margin: 0 }}>Processor: {processorId}</H3>
-      <Button
-        onClick={onSave}
-        loading={isSaving}
-        intent={Intent.SUCCESS}
-      >
-        Save
-      </Button>
-      {isAdmin && (
-        <Button
-          onClick={() => setShowDeleteAlert(true)}
-          loading={isDeleting}
-          intent={Intent.DANGER}
-        >
-          Delete
-        </Button>
-      )}
-      <Alert
-        cancelButtonText="Cancel"
-        confirmButtonText="Delete"
-        icon="trash"
-        intent={Intent.DANGER}
-        isOpen={showDeleteAlert}
-        onCancel={() => setShowDeleteAlert(false)}
-        onConfirm={() => {
-          setShowDeleteAlert(false);
-          onDelete();
-        }}
-      >
-        <p>
-          Are you sure you want to delete the processor <b>{processorId}</b>?
-          This action cannot be undone.
-        </p>
-      </Alert>
-    </div>
-  );
-};
+}: Props) => (
+  <Row>
+    <H3 style={{ margin: 0 }}>{processorId}</H3>
+    {isDirty && (
+      <Tag minimal intent={Intent.WARNING} icon="edit">
+        Unsaved changes
+      </Tag>
+    )}
+    <div style={{ flex: 1 }} />
+    <Button
+      text="Discard changes"
+      disabled={!isDirty || isSaving}
+      onClick={onDiscard}
+    />
+    <Button
+      icon="floppy-disk"
+      text="Save"
+      intent={Intent.PRIMARY}
+      onClick={onSave}
+      loading={isSaving}
+      disabled={!isDirty || !canSave}
+    />
+    <Button
+      icon="trash"
+      text="Delete processor…"
+      intent={Intent.DANGER}
+      minimal
+      onClick={onDelete}
+      loading={isDeleting}
+    />
+  </Row>
+);

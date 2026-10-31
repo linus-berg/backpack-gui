@@ -14,6 +14,8 @@ import { Provider } from 'react-redux';
 
 // Use consistent styling
 import 'sanitize.css/sanitize.css';
+// Self-hosted UI font (works offline and in locked-down networks)
+import '@fontsource-variable/inter';
 
 // Import root app
 import { App } from 'app';

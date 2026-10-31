@@ -1,49 +1,51 @@
-// using node-style package resolution in a CSS file: 
-@import "normalize.css";
-@import "@blueprintjs/icons/lib/css/blueprint-icons.css";
-@import "@blueprintjs/core/lib/scss/variables";
-@import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
-@import "@blueprintjs/table/lib/css/table.css";
-@import "@blueprintjs/core/lib/css/blueprint.css";
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+// using node-style package resolution in a CSS file:
+@import 'normalize.css';
+@import '@blueprintjs/icons/lib/css/blueprint-icons.css';
+@import '@blueprintjs/core/lib/scss/variables';
+@import '@blueprintjs/table/lib/css/table.css';
+@import '@blueprintjs/core/lib/css/blueprint.css';
 
-@font-face {
-  font-family: blender;
-  src: url(fonts/BlenderPro-Medium.woff2);
-  font-style: normal;
-}
-
+// Inter is bundled via @fontsource-variable/inter (see src/index.tsx), so no
+// request leaves the network.
 body {
-  font-family: "Inter", sans-serif !important;
+  font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+  background-color: var(--page-bg);
 }
 
-.dark-bg {
-  background-color: $pt-dark-app-background-color;
-}
-
-.light-bg {
-  background-color: $pt-app-background-color;//#f6f7f9;
-}
-.theme-toggle {
-  margin-bottom: 0;
-}
-
-p, label {
-  font-family: "Inter", sans-serif !important;
-}
-
-.processor-config-tab {
-  height: 100%;
-}
-
+// Theme tokens. Components use these instead of hard-coded colors so both
+// themes stay readable. Portals (dialogs, toasts) inherit them from <body>.
 :root {
+  --page-bg: #{$pt-app-background-color};
+  --card-bg: #{$white};
+  --code-bg: #{rgba($dark-gray1, 0.07)};
+  --hover-bg: #{rgba($gray3, 0.15)};
+  --active-bg: #{rgba($blue3, 0.15)};
+  --brand-text: #{$blue3};
+  --danger-text: #{$red2};
   --table-header-bg: #{$light-gray5};
   --table-header-shadow: #{$light-gray3};
   --table-border: #{$light-gray2};
 }
 
 .bp4-dark {
+  // Native scrollbars otherwise stay light in some browsers.
+  scrollbar-color: $dark-gray5 $dark-gray2;
+  --page-bg: #{$pt-dark-app-background-color};
+  --card-bg: #{$dark-gray3};
+  --code-bg: #{rgba($white, 0.08)};
+  --hover-bg: #{rgba($gray3, 0.15)};
+  --active-bg: #{rgba($blue4, 0.25)};
+  --brand-text: #{$blue5};
+  --danger-text: #{$red5};
   --table-header-bg: #{$dark-gray3};
   --table-header-shadow: #{$dark-gray2};
   --table-border: #{$dark-gray1};
+}
+
+// Blueprint renders popover wrappers inside <label> as blocks (for selects);
+// keep inline help icons on the same line as their label text.
+label.bp4-label .help-tip.bp4-popover-wrapper {
+  display: inline-block;
+  margin-top: 0;
 }

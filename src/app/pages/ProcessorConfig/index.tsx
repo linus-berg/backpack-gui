@@ -1,176 +1,259 @@
 /**
  *
- * Administration
+ * Processor configuration (administrators only)
  *
  */
-import React, { memo, useState } from 'react';
-import styled from 'styled-components';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useBackpackApi } from 'api/backpack';
+import React, { memo, useCallback, useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Button,
   Classes,
-  Checkbox,
   Dialog,
   FormGroup,
   InputGroup,
   Intent,
-  Spinner,
-  Tab,
-  Tabs,
 } from '@blueprintjs/core';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useBackpackApi } from 'api/backpack';
+import { queryKeys, useProcessors } from 'api/queries';
+import { useConfirm } from 'app/context/ConfirmContext';
+import {
+  FillPage,
+  PageHeader,
+  SplitContent,
+  SplitLayout,
+} from 'app/components/common/PageHeader';
+import {
+  EmptyState,
+  LoadingState,
+  QueryErrorState,
+} from 'app/components/common/States';
+import { LinkButton } from 'app/components/common/LinkButton';
+import { ProcessorSidebar } from 'app/components/ProcessorSidebar';
 import { ProcessorEditor } from 'app/components/ProcessorEditor/Loadable';
-import { useUser } from '../../context/UserContext';
+import { ProcessorEditorSettings } from 'app/components/ProcessorEditor/components/ProcessorEditorSettings';
+import { ProcessorFlags } from 'app/components/ProcessorEditor/processorFlags';
+import { notify } from 'utils/toaster';
 
-interface Props {}
+const NEW_FLAGS: ProcessorFlags = {
+  requires_approval: false,
+  multi_add: false,
+  is_external: false,
+  preview_enabled: true,
+  direct_collect: false,
+};
 
-export const ProcessorConfig = memo((props: Props) => {
+const AddProcessorDialog = ({
+  isOpen,
+  onClose,
+  existingIds,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  existingIds: string[];
+}) => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
-  const { hasRole } = useUser();
-  const isAdmin = hasRole('Administrator');
-  const query = useQuery({
-    queryKey: ['processor_list'],
-    queryFn: backpack.GetAllProcessors,
-  });
-  const params = useParams();
-  const nav = useNavigate();
+  const navigate = useNavigate();
+  const [id, setId] = useState('');
+  const [flags, setFlags] = useState<ProcessorFlags>(NEW_FLAGS);
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newProcessorId, setNewProcessorId] = useState('');
-  const [newRequiresApproval, setNewRequiresApproval] = useState(false);
-  const [newMultiAdd, setNewMultiAdd] = useState(false);
-  const [newIsExternal, setNewIsExternal] = useState(false);
-  const [newPreviewEnabled, setNewPreviewEnabled] = useState(true);
+  const trimmed = id.trim();
+  const error = !trimmed
+    ? null
+    : /\s/.test(trimmed)
+    ? 'Processor IDs cannot contain spaces.'
+    : existingIds.some(e => e.toLowerCase() === trimmed.toLowerCase())
+    ? `A processor called "${trimmed}" already exists.`
+    : null;
 
-  const addMutation = useMutation({
+  const mutation = useMutation({
     mutationFn: backpack.AddProcessor,
+    meta: { errorTitle: 'Could not add the processor' },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['processor_list'] });
-      setIsDialogOpen(false);
-      setNewProcessorId('');
-      setNewRequiresApproval(false);
-      setNewMultiAdd(false);
-      setNewIsExternal(false);
-      setNewPreviewEnabled(true);
+      notify.success(`Added processor ${trimmed}.`);
+      queryClient.invalidateQueries({ queryKey: queryKeys.processors });
+      onClose();
+      setId('');
+      setFlags(NEW_FLAGS);
+      navigate(`/config/${encodeURIComponent(trimmed)}`);
     },
   });
 
-  if (query.isLoading) {
-    return <Spinner />;
-  }
-
-  if (query.data === undefined) {
-    return <Div>Oops</Div>;
-  }
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!trimmed || error) {
+      return;
+    }
+    mutation.mutate({ processor_id: trimmed, ...flags });
+  };
 
   return (
-    <Div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '1rem',
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <Tabs
-            className="processor-config-tab"
-            renderActiveTabPanelOnly
-            selectedTabId={params.processor}
-            onChange={newTabId => nav(`/config/${newTabId}`)}
-          >
-            {query?.data?.data.map(processor => (
-              <Tab
-                className={'processor-config-tab'}
-                key={processor.id}
-                id={processor.id}
-                title={processor.id}
-                panel={<ProcessorEditor processor={processor} />}
-              />
-            ))}
-          </Tabs>
-        </div>
-        {isAdmin && (
-          <Button
-            icon="plus"
-            intent={Intent.PRIMARY}
-            onClick={() => setIsDialogOpen(true)}
-            style={{ alignSelf: 'flex-start', marginTop: '6px' }}
-          >
-            Add Processor
-          </Button>
-        )}
-      </div>
-
-      <Dialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        title="Add New Processor"
-      >
+    <Dialog isOpen={isOpen} onClose={onClose} title="Add processor" icon="plus">
+      <form onSubmit={submit}>
         <div className={Classes.DIALOG_BODY}>
           <FormGroup
             label="Processor ID"
             labelFor="processor-id"
             labelInfo="(required)"
+            intent={error ? Intent.DANGER : Intent.NONE}
+            helperText={
+              error ??
+              'Must match the processor service, e.g. "npm". Used in URLs and message routing.'
+            }
           >
             <InputGroup
               id="processor-id"
-              placeholder="e.g. Processor.NPM"
-              value={newProcessorId}
-              onChange={e => setNewProcessorId(e.target.value)}
+              placeholder="e.g. npm"
+              value={id}
+              autoFocus
+              intent={error ? Intent.DANGER : Intent.NONE}
+              onChange={e => setId(e.currentTarget.value)}
             />
           </FormGroup>
-          <Checkbox
-            label="Requires Approval for new artifacts"
-            checked={newRequiresApproval}
-            onChange={() => setNewRequiresApproval(!newRequiresApproval)}
-          />
-          <Checkbox
-            label="Enable Bulk Add"
-            checked={newMultiAdd}
-            onChange={() => setNewMultiAdd(!newMultiAdd)}
-          />
-          <Checkbox
-            label="External Handling"
-            checked={newIsExternal}
-            onChange={() => setNewIsExternal(!newIsExternal)}
-          />
-          <Checkbox
-            label="Enable Preview"
-            checked={newPreviewEnabled}
-            onChange={() => setNewPreviewEnabled(!newPreviewEnabled)}
+          <ProcessorEditorSettings
+            values={flags}
+            createOnly
+            layout="column"
+            onChange={(flag, value) =>
+              setFlags(prev => ({ ...prev, [flag]: value }))
+            }
           />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+            <Button onClick={onClose}>Cancel</Button>
             <Button
+              type="submit"
               intent={Intent.PRIMARY}
-              onClick={() =>
-                addMutation.mutate({
-                  processor_id: newProcessorId,
-                  requires_approval: newRequiresApproval,
-                  multi_add: newMultiAdd,
-                  is_external: newIsExternal,
-                  preview_enabled: newPreviewEnabled,
-                })
-              }
-              loading={addMutation.isPending}
-              disabled={!newProcessorId}
+              loading={mutation.isPending}
+              disabled={!trimmed || !!error}
             >
-              Add
+              Add processor
             </Button>
           </div>
         </div>
-      </Dialog>
-    </Div>
+      </form>
+    </Dialog>
+  );
+};
+
+export const ProcessorConfig = memo(() => {
+  const processors = useProcessors();
+  const { processor: selectedId } = useParams();
+  const confirm = useConfirm();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const dirty = useRef(false);
+
+  const onDirtyChange = useCallback((value: boolean) => {
+    dirty.current = value;
+  }, []);
+
+  const confirmLeave = useCallback(async () => {
+    if (!dirty.current) {
+      return true;
+    }
+    const ok = await confirm({
+      title: 'Discard unsaved changes?',
+      message: 'Your edits to this processor haven’t been saved.',
+      confirmText: 'Discard changes',
+      intent: Intent.WARNING,
+      icon: 'edit',
+    });
+    if (ok) {
+      dirty.current = false;
+    }
+    return ok;
+  }, [confirm]);
+
+  if (processors.isLoading) {
+    return <LoadingState label="Loading processors…" />;
+  }
+  if (processors.isError) {
+    return (
+      <QueryErrorState
+        title="Couldn't load processors"
+        error={processors.error}
+        onRetry={() => processors.refetch()}
+      />
+    );
+  }
+
+  const list = processors.data ?? [];
+  if (list.length > 0 && !selectedId) {
+    return (
+      <Navigate to={`/config/${encodeURIComponent(list[0].id)}`} replace />
+    );
+  }
+  const selected = list.find(p => p.id === selectedId);
+
+  return (
+    <>
+      <Helmet>
+        <title>
+          {selected ? `Configure ${selected.id}` : 'Processor configuration'}
+        </title>
+        <meta name="description" content="Configure Backpack processors" />
+      </Helmet>
+      <FillPage>
+        <PageHeader
+          icon="cog"
+          title="Processor configuration"
+          actions={
+            <Button
+              icon="plus"
+              intent={Intent.PRIMARY}
+              onClick={() => setIsDialogOpen(true)}
+            >
+              Add processor
+            </Button>
+          }
+        />
+        {list.length === 0 ? (
+          <EmptyState
+            icon="cog"
+            title="No processors yet"
+            description="Add a processor to start mirroring an ecosystem."
+          />
+        ) : (
+          <SplitLayout>
+            <ProcessorSidebar
+              processors={list}
+              basePath="/config"
+              onBeforeNavigate={confirmLeave}
+              label="Processors"
+            />
+            <SplitContent style={{ overflowY: 'auto' }}>
+              {selected ? (
+                <ProcessorEditor
+                  key={selected.id}
+                  processor={selected}
+                  onDirtyChange={onDirtyChange}
+                />
+              ) : (
+                <EmptyState
+                  icon="search"
+                  title="Unknown processor"
+                  description={`There's no processor called “${selectedId}”. It may have been deleted.`}
+                  action={
+                    <LinkButton
+                      to={`/config/${encodeURIComponent(list[0].id)}`}
+                      text={`Go to ${list[0].id}`}
+                    />
+                  }
+                />
+              )}
+            </SplitContent>
+          </SplitLayout>
+        )}
+      </FillPage>
+
+      <AddProcessorDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        existingIds={list.map(p => p.id)}
+      />
+    </>
   );
 });
-
-const Div = styled.div`
-  height: 100%;
-  padding: 1rem;
-`;

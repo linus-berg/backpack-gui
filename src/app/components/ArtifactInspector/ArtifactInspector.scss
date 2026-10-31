@@ -1,38 +1,10 @@
-.artifact-field-grid {
-  display: grid;
-  grid-template-columns: 10rem auto;
+// The drawer is 60% wide, but never so narrow that the tables become unusable.
+.artifact-inspector-drawer {
+  min-width: min(600px, 100vw);
 }
 
-.artifact-field-name {
-  font-weight: bold;
-}
-
-.inspection-drawer-body {
-  display: grid;
-  height: 100%;
-  grid-template-rows: 30% 70%;
-}
-.artifact-metadata {
-  padding-top: 1rem;
-  padding-left: 1rem;
-}
-.artifact-grid {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  grid-template-columns: 50% 50%;
-}
-
-.artifact-table-wrapper {
-  overflow: auto;
-}
-
-.artifact-table {
-  width: 100%;
-  overflow: auto;
-}
 .files-dialog {
-  width: 60vw;
+  width: min(960px, 95vw);
 }
 
 .files-table {

@@ -1,5 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
 
+// Fonts and colors live in app/app.scss; this only sets up the page box.
 export const GlobalStyle = createGlobalStyle`
   html,
   body {
@@ -7,22 +8,12 @@ export const GlobalStyle = createGlobalStyle`
     width: 100%;
   }
 
-  body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  }
-
   #root {
     min-height: 100%;
     min-width: 100%;
   }
 
-  p,
-  label {
-    font-family: Georgia, Times, 'Times New Roman', serif;
-    line-height: 1.5em;
-  }
-
-  input, select {
+  input, select, textarea {
     font-family: inherit;
     font-size: inherit;
   }

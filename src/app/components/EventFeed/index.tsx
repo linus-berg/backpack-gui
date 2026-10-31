@@ -1,99 +1,174 @@
-import React, { memo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useBackpackApi } from 'api/backpack';
+import React, { memo, useMemo, useState } from 'react';
 import {
-  Spinner,
+  Classes,
+  HTMLSelect,
   HTMLTable,
   Icon,
-  Intent,
+  InputGroup,
+  Spinner,
   Tag,
-  IconName,
 } from '@blueprintjs/core';
+import styled from 'styled-components';
+import { useEvents } from 'api/queries';
 import { EventSeverity } from 'types/Event';
+import { SeverityToIcon, SeverityToIntent } from 'utils/events';
+import { DateTime } from 'app/components/common/DateTime';
+import { LoadingState, QueryErrorState } from 'app/components/common/States';
 import { ScrollTableContainer } from '../ScrollTableContainer';
 
-interface Props {}
+const LIMITS = [100, 250, 500, 1000];
 
-const SeverityToIntent = (severity: EventSeverity): Intent => {
-  switch (severity) {
-    case EventSeverity.SUCCESS:
-      return Intent.SUCCESS;
-    case EventSeverity.ERROR:
-      return Intent.DANGER;
-    case EventSeverity.WARNING:
-      return Intent.WARNING;
-    default:
-      return Intent.NONE;
-  }
-};
+const Toolbar = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+`;
 
-const SeverityToIcon = (severity: EventSeverity): IconName => {
-  switch (severity) {
-    case EventSeverity.SUCCESS:
-      return 'tick-circle';
-    case EventSeverity.ERROR:
-      return 'error';
-    case EventSeverity.WARNING:
-      return 'warning-sign';
-    default:
-      return 'info-sign';
-  }
-};
+export const EventFeed = memo(() => {
+  const [limit, setLimit] = useState(100);
+  const [severity, setSeverity] = useState<'' | EventSeverity>('');
+  const [source, setSource] = useState('');
+  const [search, setSearch] = useState('');
+  const query = useEvents(limit);
 
-export const EventFeed = memo((props: Props) => {
-  const backpack = useBackpackApi();
-  const query = useQuery({
-    queryKey: ['events'],
-    queryFn: backpack.GetEvents,
-    refetchInterval: 10000,
-  });
+  const events = useMemo(() => query.data ?? [], [query.data]);
+  const sources = useMemo(
+    () => Array.from(new Set(events.map(e => e.source))).sort(),
+    [events],
+  );
+  const shown = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    return events.filter(
+      e =>
+        (!severity || e.severity === severity) &&
+        (!source || e.source === source) &&
+        (!needle ||
+          e.message.toLowerCase().includes(needle) ||
+          (e.user ?? '').toLowerCase().includes(needle)),
+    );
+  }, [events, severity, source, search]);
 
   if (query.isLoading) {
-    return <Spinner />;
+    return <LoadingState />;
+  }
+  if (query.isError && !query.data) {
+    return (
+      <QueryErrorState
+        title="Couldn't load events"
+        error={query.error}
+        onRetry={() => query.refetch()}
+      />
+    );
   }
 
   return (
-    <ScrollTableContainer>
-      <HTMLTable striped condensed style={{ width: '100%' }}>
-        <thead>
-          <tr>
-            <th style={{ width: '180px' }}>Timestamp</th>
-            <th style={{ width: '100px' }}>Source</th>
-            <th>Message</th>
-            <th style={{ width: '120px' }}>User</th>
-          </tr>
-        </thead>
-        <tbody>
-          {query.data?.data.map(event => (
-            <tr key={event.id}>
-              <td style={{ fontSize: '0.85em', color: '#abb3bf' }}>
-                {new Date(event.timestamp).toLocaleString()}
-              </td>
-              <td>
-                <Tag
-                  minimal
-                  intent={SeverityToIntent(event.severity)}
-                  icon={SeverityToIcon(event.severity)}
-                >
-                  {event.source}
-                </Tag>
-              </td>
-              <td
-                style={{
-                  fontWeight:
-                    event.severity === EventSeverity.ERROR ? 'bold' : 'normal',
-                }}
-              >
-                {event.message}
-              </td>
-              <td>
-                <Icon icon="user" size={12} style={{ marginRight: '5px' }} />
-                {event.user}
-              </td>
+    <>
+      <Toolbar>
+        <InputGroup
+          type="search"
+          leftIcon="search"
+          placeholder="Search messages or users…"
+          aria-label="Search events"
+          value={search}
+          onChange={e => setSearch(e.currentTarget.value)}
+          style={{ width: 260 }}
+        />
+        <HTMLSelect
+          aria-label="Severity"
+          value={severity}
+          onChange={e =>
+            setSeverity(e.currentTarget.value as '' | EventSeverity)
+          }
+          options={[
+            { value: '', label: 'All severities' },
+            { value: EventSeverity.ERROR, label: 'Errors' },
+            { value: EventSeverity.WARNING, label: 'Warnings' },
+            { value: EventSeverity.SUCCESS, label: 'Success' },
+            { value: EventSeverity.INFO, label: 'Info' },
+          ]}
+        />
+        <HTMLSelect
+          aria-label="Source"
+          value={source}
+          onChange={e => setSource(e.currentTarget.value)}
+          options={[
+            { value: '', label: 'All sources' },
+            ...sources.map(s => ({ value: s, label: s })),
+          ]}
+        />
+        <HTMLSelect
+          aria-label="Number of events to load"
+          value={limit}
+          onChange={e => setLimit(Number(e.currentTarget.value))}
+          options={LIMITS.map(l => ({ value: l, label: `Last ${l}` }))}
+        />
+        <span className={Classes.TEXT_MUTED} aria-live="polite">
+          {shown.length === events.length
+            ? `${events.length} events`
+            : `${shown.length} of ${events.length} events`}
+        </span>
+        {query.isFetching && <Spinner size={16} aria-label="Refreshing" />}
+      </Toolbar>
+      <ScrollTableContainer>
+        <HTMLTable striped condensed style={{ width: '100%' }}>
+          <thead>
+            <tr>
+              <th style={{ width: 140 }}>When</th>
+              <th style={{ width: 130 }}>Source</th>
+              <th>Message</th>
+              <th style={{ width: 160 }}>User</th>
             </tr>
-          ))}
-        </tbody>
-      </HTMLTable>
-    </ScrollTableContainer>
+          </thead>
+          <tbody>
+            {shown.map(event => (
+              <tr key={event.id}>
+                <td className={Classes.TEXT_MUTED}>
+                  <DateTime value={event.timestamp} mode="relative" />
+                </td>
+                <td>
+                  <Tag
+                    minimal
+                    intent={SeverityToIntent(event.severity)}
+                    icon={SeverityToIcon(event.severity)}
+                    htmlTitle={event.severity}
+                  >
+                    {event.source}
+                  </Tag>
+                </td>
+                <td
+                  style={{
+                    fontWeight:
+                      event.severity === EventSeverity.ERROR ? 600 : undefined,
+                    overflowWrap: 'anywhere',
+                  }}
+                >
+                  {event.message}
+                </td>
+                <td>
+                  <Icon icon="user" size={12} style={{ marginRight: 5 }} />
+                  {event.user}
+                </td>
+              </tr>
+            ))}
+            {shown.length === 0 && (
+              <tr>
+                <td
+                  colSpan={4}
+                  className={Classes.TEXT_MUTED}
+                  style={{ textAlign: 'center', padding: '2rem' }}
+                >
+                  {events.length === 0
+                    ? 'No events recorded yet.'
+                    : 'No events match these filters.'}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </HTMLTable>
+      </ScrollTableContainer>
+    </>
   );
 });

@@ -1,19 +1,60 @@
-import React from 'react';
-import { H3, Icon, Tooltip } from '@blueprintjs/core';
+import React, { useState } from 'react';
+import {
+  Button,
+  ButtonGroup,
+  Callout,
+  Card,
+  Classes,
+  H4,
+  Intent,
+} from '@blueprintjs/core';
 import Editor from '@monaco-editor/react';
 import styled from 'styled-components';
+import { useTheme } from 'app/context/ThemeContext';
+import { HelpTip } from 'app/components/common/HelpTip';
+import { RichMarkdownView } from 'app/components/common/RichMarkdownView';
+import '../monaco';
 
 interface Props {
   description: string;
   onDescriptionChange: (value: string) => void;
   config: string;
   onConfigChange: (value: string) => void;
+  configError: string | null;
 }
 
-const HelpIcon = styled(Icon)`
-  margin-left: 8px;
-  color: #abb3bf;
-  cursor: help;
+const Columns = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+  margin-top: 1rem;
+`;
+
+const Panel = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+`;
+
+const PanelHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+
+  h4 {
+    margin: 0;
+  }
+`;
+
+const EditorBox = styled.div`
+  flex: 1;
+  min-height: 300px;
+  border: 1px solid var(--table-border);
+  border-radius: 3px;
+  overflow: hidden;
 `;
 
 export const ProcessorEditorFields = ({
@@ -21,47 +62,79 @@ export const ProcessorEditorFields = ({
   onDescriptionChange,
   config,
   onConfigChange,
+  configError,
 }: Props) => {
+  const { isDark } = useTheme();
+  const theme = isDark ? 'vs-dark' : 'light';
+  const [showPreview, setShowPreview] = useState(false);
+
   return (
-    <div style={{ display: 'flex', gap: '1rem', flex: 1, marginTop: '1rem' }}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <H3 style={{ marginBottom: '0.5rem' }}>Description</H3>
-          <Tooltip content="HTML documentation for this processor shown to users when adding artifacts." position="right">
-            <HelpIcon icon="help" size={14} style={{ marginBottom: '0.5rem' }} />
-          </Tooltip>
-        </div>
-        <Editor
-          theme="vs-dark"
-          onChange={value => onDescriptionChange(value ?? '')}
-          language="html"
-          height="100%"
-          value={description}
-        />
-      </div>
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          height: '20rem',
-          width: '100%',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <H3 style={{ marginBottom: '0.5rem' }}>Configuration (JSON)</H3>
-          <Tooltip content="Technical configuration dictionary for the processor logic." position="right">
-            <HelpIcon icon="help" size={14} style={{ marginBottom: '0.5rem' }} />
-          </Tooltip>
-        </div>
-        <Editor
-          theme="vs-dark"
-          onChange={value => onConfigChange(value ?? '')}
-          language="json"
-          height="100%"
-          value={config}
-        />
-      </div>
-    </div>
+    <Columns>
+      <Panel>
+        <PanelHeader>
+          <H4>
+            Description
+            <HelpTip content="Markdown shown to users above the add-artifact form. Basic HTML is allowed; scripts and styles are removed." />
+          </H4>
+          <ButtonGroup>
+            <Button
+              small
+              text="Edit"
+              active={!showPreview}
+              onClick={() => setShowPreview(false)}
+            />
+            <Button
+              small
+              text="Preview"
+              active={showPreview}
+              onClick={() => setShowPreview(true)}
+            />
+          </ButtonGroup>
+        </PanelHeader>
+        <EditorBox>
+          {showPreview ? (
+            <Card style={{ height: '100%', overflowY: 'auto' }}>
+              {description.trim() ? (
+                <RichMarkdownView>{description}</RichMarkdownView>
+              ) : (
+                <span className={Classes.TEXT_MUTED}>No description.</span>
+              )}
+            </Card>
+          ) : (
+            <Editor
+              theme={theme}
+              onChange={value => onDescriptionChange(value ?? '')}
+              language="markdown"
+              height="100%"
+              value={description}
+              options={{ minimap: { enabled: false }, wordWrap: 'on' }}
+            />
+          )}
+        </EditorBox>
+      </Panel>
+      <Panel>
+        <PanelHeader>
+          <H4>
+            Configuration fields (JSON)
+            <HelpTip content='Extra inputs shown when adding an artifact. Each entry: { "key", "type": "string" | "bool", "name", "placeholder", "default" }.' />
+          </H4>
+        </PanelHeader>
+        <EditorBox>
+          <Editor
+            theme={theme}
+            onChange={value => onConfigChange(value ?? '')}
+            language="json"
+            height="100%"
+            value={config}
+            options={{ minimap: { enabled: false } }}
+          />
+        </EditorBox>
+        {configError && (
+          <Callout intent={Intent.DANGER} icon="error" style={{ marginTop: 8 }}>
+            {configError}
+          </Callout>
+        )}
+      </Panel>
+    </Columns>
   );
 };

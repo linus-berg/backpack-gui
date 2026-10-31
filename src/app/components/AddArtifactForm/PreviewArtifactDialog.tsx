@@ -1,50 +1,50 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
-  Dialog,
-  Classes,
   Button,
-  Intent,
-  Spinner,
-  HTMLTable,
-  Tag,
-  H5,
   Callout,
+  Classes,
+  Code,
+  Dialog,
+  HTMLTable,
   Icon,
-  Tooltip,
+  Intent,
+  Tag,
 } from '@blueprintjs/core';
 import styled from 'styled-components';
-import { map } from 'lodash-es';
+import { sortBy } from 'lodash-es';
 import { useQuery } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
-import { Artifact } from '../../../types';
-import axios from 'axios';
+import { queryKeys } from 'api/queries';
+import { compareVersionsDesc } from 'utils/versions';
+import { compileFilter, matchesFilter } from 'utils/versionFilter';
+import { LoadingState, QueryErrorState } from 'app/components/common/States';
+import { ScrollTableContainer } from 'app/components/ScrollTableContainer';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   artifactId: string;
   processor: string;
-  config: Artifact['config'];
+  config: Record<string, string>;
   filter: string;
+  onAdd: () => void;
+  addLabel: string;
+  canAdd: boolean;
+  isAdding: boolean;
 }
 
-const ScrollDiv = styled.div`
-  max-height: 350px;
-  overflow-y: auto;
-  margin-top: 10px;
-  border: 1px solid var(--table-border);
-  border-radius: 3px;
-`;
-
-const FlexContainer = styled.div`
-  display: flex;
+const Columns = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
-  width: 100%;
 `;
 
-const TableSection = styled.div`
-  flex: 1;
-  min-width: 0;
+const SectionTitle = styled.h6`
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  font-weight: 600;
 `;
 
 export const PreviewArtifactDialog = ({
@@ -54,169 +54,172 @@ export const PreviewArtifactDialog = ({
   processor,
   config,
   filter,
+  onAdd,
+  addLabel,
+  canAdd,
+  isAdding,
 }: Props) => {
   const backpack = useBackpackApi();
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['artifact_preview', artifactId, processor],
-    queryFn: () => {
-      return backpack.PreviewArtifact({
-        id: artifactId,
-        processor: processor,
-        filter: filter,
-        config: config,
-        root: true,
-        versions: {},
-        dependencies: {},
-      });
-    },
+  // The preview depends on the ID and config; the filter is applied here.
+  const query = useQuery({
+    queryKey: queryKeys.preview(processor, artifactId, config),
+    queryFn: () =>
+      backpack
+        .PreviewArtifact({ id: artifactId, processor, filter, config })
+        .then(r => r.data),
     enabled: isOpen && artifactId !== '',
     retry: false,
+    staleTime: 60_000,
     refetchOnWindowFocus: false,
   });
 
-  const artifact = data?.data || null;
-
-  const matchesFilter = (version: string) => {
-    if (!filter || filter === '*') return true;
-    try {
-      const regex = new RegExp(filter);
-      return regex.test(version);
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const previewError = axios.isAxiosError(error)
-    ? error.response?.data || 'Failed to fetch preview'
-    : error
-    ? 'An unexpected error occurred'
-    : null;
+  const artifact = query.data;
+  const compiled = useMemo(() => compileFilter(filter), [filter]);
+  const versions = useMemo(
+    () =>
+      Object.entries(artifact?.versions ?? {}).sort(([a], [b]) =>
+        compareVersionsDesc(a, b),
+      ),
+    [artifact],
+  );
+  const matching = versions.filter(([v]) => matchesFilter(compiled, v)).length;
+  const dependencies = useMemo(
+    () =>
+      sortBy(Object.values(artifact?.dependencies ?? {}), [
+        d => d.processor,
+        d => d.id.toLowerCase(),
+      ]),
+    [artifact],
+  );
 
   return (
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
-      title="Artifact Preview"
+      title={`Preview: ${processor}/${artifactId}`}
       icon="eye-open"
-      style={{ width: '90%' }}
+      style={{ width: 'min(1200px, 95vw)' }}
     >
       <div className={Classes.DIALOG_BODY}>
-        {isLoading && (
-          <div style={{ padding: '4rem', textAlign: 'center' }}>
-            <Spinner size={50} />
-            <div style={{ marginTop: '10px', fontSize: '1.1rem' }}>
-              Querying upstream registry...
-            </div>
-          </div>
+        {query.isFetching && !artifact && (
+          <LoadingState label="Querying the upstream registry…" />
         )}
 
-        {previewError && (
-          <Callout intent={Intent.DANGER} icon="error" title="Preview Failed">
-            {previewError}
-          </Callout>
+        {query.isError && (
+          <QueryErrorState
+            title="Preview failed"
+            error={query.error}
+            onRetry={() => query.refetch()}
+          />
         )}
 
-        {artifact && !isLoading && (
+        {artifact && (
           <>
             <div
               style={{
                 display: 'flex',
+                flexWrap: 'wrap',
                 justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                marginBottom: '1rem',
+                alignItems: 'center',
+                gap: 12,
+                marginBottom: 16,
               }}
             >
               <div>
-                <H5 style={{ margin: 0, fontSize: '1.4rem' }}>{artifact.id}</H5>
-                <div style={{ color: '#abb3bf', marginTop: '4px' }}>
-                  Processor: <Tag minimal>{artifact.processor}</Tag>
-                </div>
+                {compiled.kind === 'all' ? (
+                  <>
+                    No filter: all <b>{versions.length}</b> versions will be
+                    mirrored.
+                  </>
+                ) : compiled.kind === 'regex' ? (
+                  <>
+                    <b>{matching}</b> of {versions.length} versions match{' '}
+                    <Code>{filter}</Code> and will be mirrored.
+                  </>
+                ) : null}
               </div>
-              {filter && (
-                <Tag large icon="filter" intent={Intent.PRIMARY} minimal>
-                  Active Filter: <code>{filter}</code>
-                </Tag>
-              )}
+              <Button
+                small
+                minimal
+                icon="refresh"
+                text="Refresh"
+                loading={query.isFetching}
+                onClick={() => query.refetch()}
+              />
             </div>
 
-            <FlexContainer>
-              <TableSection>
-                <H6>
-                  {' '}
-                  Discovered Versions (
-                  {Object.keys(artifact.versions || {}).length}){' '}
-                </H6>
-                <ScrollDiv>
+            {compiled.kind === 'invalid' && (
+              <Callout intent={Intent.DANGER} style={{ marginBottom: 16 }}>
+                The version filter is invalid: {compiled.error}
+              </Callout>
+            )}
+
+            <Columns>
+              <div>
+                <SectionTitle className={Classes.TEXT_MUTED}>
+                  Discovered versions ({versions.length})
+                </SectionTitle>
+                <ScrollTableContainer style={{ maxHeight: '50vh' }}>
                   <HTMLTable striped condensed style={{ width: '100%' }}>
                     <thead>
                       <tr>
-                        <th style={{ width: '40px' }}></th>
+                        <th style={{ width: 40 }} />
                         <th>Version</th>
-                        <th>Files / Location</th>
+                        <th>Files</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.entries(artifact.versions || {}).map(
-                        ([v, data]) => {
-                          const isMatch = matchesFilter(v);
-                          return (
-                            <tr key={v} style={{ opacity: isMatch ? 1 : 0.5 }}>
-                              <td>
-                                <Tooltip
-                                  content={
-                                    isMatch ? 'Matches Filter' : 'Filtered Out'
-                                  }
-                                  position="left"
+                      {versions.map(([v, data]) => {
+                        const isMatch = matchesFilter(compiled, v);
+                        const label = isMatch
+                          ? 'Matches the filter: will be mirrored'
+                          : 'Filtered out: will not be mirrored';
+                        return (
+                          <tr key={v} style={{ opacity: isMatch ? 1 : 0.55 }}>
+                            <td>
+                              <Icon
+                                icon={isMatch ? 'tick-circle' : 'disable'}
+                                intent={isMatch ? Intent.SUCCESS : Intent.NONE}
+                                title={label}
+                                htmlTitle={label}
+                              />
+                            </td>
+                            <td style={{ fontWeight: 600 }}>{v}</td>
+                            <td>
+                              {Object.values(data.files ?? {}).map(f => (
+                                <div
+                                  key={f.uri}
+                                  style={{
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.75rem',
+                                    overflowWrap: 'anywhere',
+                                  }}
                                 >
-                                  <Icon
-                                    icon={isMatch ? 'tick-circle' : 'disable'}
-                                    intent={
-                                      isMatch ? Intent.SUCCESS : Intent.NONE
-                                    }
-                                  />
-                                </Tooltip>
-                              </td>
-                              <td style={{ fontWeight: 'bold' }}>{v}</td>
-                              <td>
-                                {data.files && (
-                                  <div
-                                    style={{
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: '2px',
-                                    }}
-                                  >
-                                    {map(data.files, (f, i) => (
-                                      <code
-                                        key={i}
-                                        style={{
-                                          fontSize: '0.75rem',
-                                          color: '#2d72d2',
-                                        }}
-                                      >
-                                        {f.uri}
-                                      </code>
-                                    ))}
-                                  </div>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        },
+                                  {f.uri}
+                                </div>
+                              ))}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {versions.length === 0 && (
+                        <tr>
+                          <td colSpan={3} className={Classes.TEXT_MUTED}>
+                            The registry returned no versions.
+                          </td>
+                        </tr>
                       )}
                     </tbody>
                   </HTMLTable>
-                </ScrollDiv>
-              </TableSection>
+                </ScrollTableContainer>
+              </div>
 
-              <TableSection>
-                <H6>
-                  {' '}
-                  Discovered Dependencies (
-                  {Object.keys(artifact.dependencies).length || 0}){' '}
-                </H6>
-                <ScrollDiv>
+              <div>
+                <SectionTitle className={Classes.TEXT_MUTED}>
+                  Direct dependencies ({dependencies.length})
+                </SectionTitle>
+                <ScrollTableContainer style={{ maxHeight: '50vh' }}>
                   <HTMLTable striped condensed style={{ width: '100%' }}>
                     <thead>
                       <tr>
@@ -225,54 +228,43 @@ export const PreviewArtifactDialog = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {map(artifact.dependencies, (dep, idx) => (
-                        <tr key={idx}>
+                      {dependencies.map(dep => (
+                        <tr key={`${dep.processor}/${dep.id}`}>
                           <td>
                             <Tag minimal>{dep.processor}</Tag>
                           </td>
                           <td style={{ fontFamily: 'monospace' }}>{dep.id}</td>
                         </tr>
                       ))}
-                      {(!artifact.dependencies ||
-                        Object.keys(artifact.dependencies).length === 0) && (
+                      {dependencies.length === 0 && (
                         <tr>
-                          <td
-                            colSpan={2}
-                            style={{
-                              textAlign: 'center',
-                              padding: '2rem',
-                              color: '#abb3bf',
-                            }}
-                          >
+                          <td colSpan={2} className={Classes.TEXT_MUTED}>
                             No direct dependencies identified.
                           </td>
                         </tr>
                       )}
                     </tbody>
                   </HTMLTable>
-                </ScrollDiv>
-              </TableSection>
-            </FlexContainer>
+                </ScrollTableContainer>
+              </div>
+            </Columns>
           </>
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} intent={Intent.PRIMARY} large>
-            Close Preview
+          <Button onClick={onClose}>Close</Button>
+          <Button
+            intent={Intent.PRIMARY}
+            icon="cube-add"
+            onClick={onAdd}
+            disabled={!artifact || !canAdd}
+            loading={isAdding}
+          >
+            {addLabel}
           </Button>
         </div>
       </div>
     </Dialog>
   );
 };
-
-const H6 = styled.h6`
-  margin: 0;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  color: #abb3bf;
-  letter-spacing: 1px;
-  font-weight: 600;
-`;

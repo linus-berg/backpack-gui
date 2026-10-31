@@ -1,16 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { AuthProvider, AuthProviderProps } from 'react-oidc-context';
-import { Spinner } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 import axios from 'axios';
+import { BACKPACK_API } from 'api/config';
+import { getErrorMessage } from 'utils/errors';
+import { FullPageMessage, FullPageSpinner } from 'app/components/common/States';
 
-export const BACKPACK_API =
-  window.location.protocol + '//' + window.location.hostname + ':8004/api';
+export { BACKPACK_API };
 
 export const OidcWrapper = ({ children }: { children: React.ReactNode }) => {
   const [config, setConfig] = useState<AuthProviderProps | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setLoading(true);
+    setError(null);
     axios
       .get(`${BACKPACK_API}/auth/oidc`)
       .then(res => {
@@ -33,39 +38,33 @@ export const OidcWrapper = ({ children }: { children: React.ReactNode }) => {
       })
       .catch(err => {
         console.error('Failed to fetch OIDC config', err);
-        setError('Failed to load authentication configuration.');
-      });
+        setError(getErrorMessage(err));
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  useEffect(load, [load]);
 
   if (error) {
     return (
-      <div
-        style={{
-          height: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'red',
-        }}
-      >
-        {error}
-      </div>
+      <FullPageMessage
+        icon="offline"
+        title="Couldn't load the sign-in configuration"
+        description={`${error} (${BACKPACK_API}/auth/oidc)`}
+        action={
+          <Button
+            icon="refresh"
+            text="Try again"
+            loading={loading}
+            onClick={load}
+          />
+        }
+      />
     );
   }
 
   if (!config) {
-    return (
-      <div
-        style={{
-          height: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Spinner size={50} />
-      </div>
-    );
+    return <FullPageSpinner label="Loading…" />;
   }
 
   return <AuthProvider {...config}>{children}</AuthProvider>;

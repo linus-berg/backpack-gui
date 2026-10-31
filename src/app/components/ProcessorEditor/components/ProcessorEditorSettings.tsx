@@ -1,117 +1,50 @@
 import React from 'react';
-import { Checkbox, Icon, Tooltip } from '@blueprintjs/core';
+import { Checkbox } from '@blueprintjs/core';
 import styled from 'styled-components';
+import { HelpTip } from 'app/components/common/HelpTip';
+import {
+  PROCESSOR_FLAGS,
+  ProcessorFlag,
+  ProcessorFlags,
+} from '../processorFlags';
 
 interface Props {
-  directCollect: boolean;
-  onDirectCollectChange: (value: boolean) => void;
-  requiresApproval: boolean;
-  onRequiresApprovalChange: (value: boolean) => void;
-  multiAdd: boolean;
-  onMultiAddChange: (value: boolean) => void;
-  isExternal: boolean;
-  onIsExternalChange: (value: boolean) => void;
-  previewEnabled: boolean;
-  onPreviewEnabledChange: (value: boolean) => void;
+  values: ProcessorFlags;
+  onChange: (flag: ProcessorFlag, value: boolean) => void;
+  /** Limit to flags the API accepts when creating a processor. */
+  createOnly?: boolean;
+  layout?: 'row' | 'column';
 }
 
-const HelpIcon = styled(Icon)`
-  margin-left: 8px;
-  color: #abb3bf;
-  cursor: help;
+const Flags = styled.div<{ $column: boolean }>`
+  display: flex;
+  flex-direction: ${p => (p.$column ? 'column' : 'row')};
+  flex-wrap: wrap;
+  gap: ${p => (p.$column ? '4px' : '8px 24px')};
+  margin-top: 1rem;
+
+  .bp4-control {
+    margin-bottom: 0;
+  }
 `;
 
+/** Processor switches, each with an explanation. */
 export const ProcessorEditorSettings = ({
-  directCollect,
-  onDirectCollectChange,
-  requiresApproval,
-  onRequiresApprovalChange,
-  multiAdd,
-  onMultiAddChange,
-  isExternal,
-  onIsExternalChange,
-  previewEnabled,
-  onPreviewEnabledChange,
-}: Props) => {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        gap: '2rem',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+  values,
+  onChange,
+  createOnly,
+  layout = 'row',
+}: Props) => (
+  <Flags $column={layout === 'column'}>
+    {PROCESSOR_FLAGS.filter(f => !createOnly || f.onCreate).map(flag => (
+      <div key={flag.key} style={{ display: 'flex', alignItems: 'center' }}>
         <Checkbox
-          label="Direct Collect"
-          checked={directCollect}
-          onChange={() => onDirectCollectChange(!directCollect)}
-          style={{ marginBottom: 0, marginTop: '1rem' }}
+          label={flag.label}
+          checked={values[flag.key]}
+          onChange={() => onChange(flag.key, !values[flag.key])}
         />
-        <Tooltip
-          content="If enabled, the collector will fetch artifacts directly by ID instead of performing a full repository crawl."
-          position="top"
-        >
-          <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
-        </Tooltip>
+        <HelpTip content={flag.help} label={`About ${flag.label}`} />
       </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Checkbox
-          label="Requires Approval"
-          checked={requiresApproval}
-          onChange={() => onRequiresApprovalChange(!requiresApproval)}
-          style={{ marginBottom: 0, marginTop: '1rem' }}
-        />
-        <Tooltip
-          content="New artifacts added to this processor must be approved by an administrator before they are mirrored."
-          position="top"
-        >
-          <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
-        </Tooltip>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Checkbox
-          label="Enable Bulk Add"
-          checked={multiAdd}
-          onChange={() => onMultiAddChange(!multiAdd)}
-          style={{ marginBottom: 0, marginTop: '1rem' }}
-        />
-        <Tooltip
-          content="Enables the 'Bulk Add' button in the processor panel for adding multiple artifacts via text input."
-          position="top"
-        >
-          <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
-        </Tooltip>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Checkbox
-          label="External Handling"
-          checked={isExternal}
-          onChange={() => onIsExternalChange(!isExternal)}
-          style={{ marginBottom: 0, marginTop: '1rem' }}
-        />
-        <Tooltip
-          content="If enabled, Backpack only tracks the artifact IDs. No background collection or processing will be performed."
-          position="top"
-        >
-          <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
-        </Tooltip>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Checkbox
-          label="Enable Preview"
-          checked={previewEnabled}
-          onChange={() => onPreviewEnabledChange(!previewEnabled)}
-          style={{ marginBottom: 0, marginTop: '1rem' }}
-        />
-        <Tooltip
-          content="If enabled, the 'Preview' button will be available for artifacts managed by this processor."
-          position="top"
-        >
-          <HelpIcon icon="help" size={14} style={{ marginTop: '1rem' }} />
-        </Tooltip>
-      </div>
-    </div>
-  );
-};
+    ))}
+  </Flags>
+);

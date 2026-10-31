@@ -1,119 +1,150 @@
-import { Spinner, HTMLTable, Icon, Button, Intent } from '@blueprintjs/core';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { memo, useMemo } from 'react';
+import { Button, Classes, HTMLTable, Intent, Tag } from '@blueprintjs/core';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { orderBy } from 'lodash-es';
 import { useBackpackApi } from 'api/backpack';
-import React, { memo } from 'react';
-import styled from 'styled-components';
-import { useUser } from '../../context/UserContext';
+import { queryKeys, useQueueStatus } from 'api/queries';
+import { useConfirm } from 'app/context/ConfirmContext';
+import { useUser } from 'app/context/UserContext';
+import { QueueStatus } from 'types/QueueStatus';
+import { getQueueHealth } from 'utils/queueHealth';
+import { notify } from 'utils/toaster';
+import {
+  EmptyState,
+  LoadingState,
+  QueryErrorState,
+} from 'app/components/common/States';
 import { ScrollTableContainer } from '../ScrollTableContainer';
 
-interface Props {}
+const formatRate = (rate?: number | null) =>
+  `${(rate ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}/s`;
 
-const ColumnText = styled.span`
-  margin-left: 4px;
-`;
-
-const Tr = styled.tr``;
-const Td = styled.td`
-  vertical-align: middle !important;
-`;
-
-export const QueueStatusTable = memo((props: Props) => {
+export const QueueStatusTable = memo(() => {
   const backpack = useBackpackApi();
   const { hasRole } = useUser();
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
   const isAdmin = hasRole('Administrator');
-
-  const query = useQuery({
-    queryKey: ['queue_status'],
-    queryFn: backpack.GetQueueStatus,
-    refetchInterval: 5000,
-  });
+  const query = useQueueStatus();
 
   const purgeMutation = useMutation({
     mutationFn: backpack.PurgeQueue,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['queue_status'] });
+    meta: { errorTitle: 'Purge failed' },
+    onSuccess: (_res, name) => {
+      notify.success(`Purged ${name}.`);
+      queryClient.invalidateQueries({ queryKey: queryKeys.queues });
     },
   });
 
-  if (query.isLoading || query.data === null || query.data === undefined) {
-    return <Spinner></Spinner>;
+  const rows = useMemo(
+    () =>
+      orderBy(
+        (query.data ?? []).map(q => ({ queue: q, health: getQueueHealth(q) })),
+        [r => r.health.rank, r => r.queue.messages],
+        ['asc', 'desc'],
+      ),
+    [query.data],
+  );
+
+  if (query.isLoading) {
+    return <LoadingState />;
   }
-  const queue_rows: JSX.Element[] = [];
-  for (let i in query.data?.data) {
-    const queue = query.data.data[i];
-    const healthy = queue.consumers > 0;
-    const ingress =
-      queue.avg_ingress_rate != null ? queue.avg_ingress_rate.toFixed(2) : 0;
-    const egress =
-      queue.avg_egress_rate != null ? queue.avg_egress_rate.toFixed(2) : 0;
-    queue_rows.push(
-      <Tr key={queue.name}>
-        <Td>{queue.name}</Td>
-        <Td>
-          {
-            <Icon
-              icon={healthy ? 'tick' : 'cross'}
-              intent={healthy ? 'success' : 'danger'}
-            />
-          }
-        </Td>
-        <Td>{queue.consumers}</Td>
-        <Td>{queue.messages}</Td>
-        <Td>{ingress}/s</Td>
-        <Td>{egress}/s</Td>
-        {isAdmin && (
-          <Td>
-            <Button
-              minimal
-              small
-              intent={Intent.DANGER}
-              icon="trash"
-              loading={
-                purgeMutation.isPending &&
-                purgeMutation.variables === queue.name
-              }
-              onClick={() => purgeMutation.mutate(queue.name)}
-            >
-              Purge
-            </Button>
-          </Td>
-        )}
-      </Tr>,
+  if (query.isError && !query.data) {
+    return (
+      <QueryErrorState
+        title="Couldn't load queue status"
+        error={query.error}
+        onRetry={() => query.refetch()}
+      />
     );
   }
+  if (rows.length === 0) {
+    return <EmptyState icon="layers" title="No queues reported" />;
+  }
+
+  const purge = async (queue: QueueStatus) => {
+    const ok = await confirm({
+      title: `Purge ${queue.name}?`,
+      message: (
+        <p>
+          This permanently deletes the <b>{queue.messages.toLocaleString()}</b>{' '}
+          queued message
+          {queue.messages === 1 ? '' : 's'}. The work they represent won’t be
+          processed.
+        </p>
+      ),
+      confirmText: 'Purge queue',
+      icon: 'trash',
+      intent: Intent.DANGER,
+    });
+    if (ok) {
+      purgeMutation.mutate(queue.name);
+    }
+  };
 
   return (
     <ScrollTableContainer>
       <HTMLTable striped condensed style={{ width: '100%' }}>
         <thead>
           <tr>
-            <th>
-              <ColumnText>Queue</ColumnText>
-            </th>
-            <th>
-              <ColumnText>Health</ColumnText>
-            </th>
-            <th>
-              <ColumnText>Consumers</ColumnText>
-            </th>
-            <th>
-              <ColumnText>Messages</ColumnText>
-            </th>
-            <th>
-              <ColumnText>Ingress</ColumnText>
-            </th>
-            <th>
-              <ColumnText>Egress</ColumnText>
-            </th>
-            {isAdmin && (
-              <th>
-                <ColumnText>Actions</ColumnText>
-              </th>
-            )}
+            <th>Queue</th>
+            <th>Health</th>
+            <th style={{ textAlign: 'right' }}>Consumers</th>
+            <th style={{ textAlign: 'right' }}>Messages</th>
+            <th style={{ textAlign: 'right' }}>In</th>
+            <th style={{ textAlign: 'right' }}>Out</th>
+            {isAdmin && <th />}
           </tr>
         </thead>
-        <tbody>{queue_rows}</tbody>
+        <tbody>
+          {rows.map(({ queue, health }) => (
+            <tr key={queue.name}>
+              <td style={{ overflowWrap: 'anywhere' }}>{queue.name}</td>
+              <td>
+                <Tag
+                  minimal
+                  intent={health.intent}
+                  icon={health.icon}
+                  htmlTitle={health.description}
+                >
+                  {health.label}
+                </Tag>
+              </td>
+              <td style={{ textAlign: 'right' }}>{queue.consumers}</td>
+              <td
+                style={{
+                  textAlign: 'right',
+                  fontWeight: queue.messages ? 600 : undefined,
+                }}
+              >
+                {queue.messages.toLocaleString()}
+              </td>
+              <td style={{ textAlign: 'right' }} className={Classes.TEXT_MUTED}>
+                {formatRate(queue.avg_ingress_rate)}
+              </td>
+              <td style={{ textAlign: 'right' }} className={Classes.TEXT_MUTED}>
+                {formatRate(queue.avg_egress_rate)}
+              </td>
+              {isAdmin && (
+                <td style={{ textAlign: 'right' }}>
+                  <Button
+                    minimal
+                    small
+                    intent={Intent.DANGER}
+                    icon="trash"
+                    text="Purge…"
+                    disabled={queue.messages === 0}
+                    loading={
+                      purgeMutation.isPending &&
+                      purgeMutation.variables === queue.name
+                    }
+                    onClick={() => purge(queue)}
+                  />
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
       </HTMLTable>
     </ScrollTableContainer>
   );

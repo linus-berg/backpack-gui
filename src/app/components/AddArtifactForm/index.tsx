@@ -1,27 +1,31 @@
 import {
   Button,
-  InputGroup,
-  H6,
-  Card,
   Callout,
+  Card,
+  FormGroup,
+  H5,
+  H6,
+  InputGroup,
   Intent,
-  Tooltip,
-  Position,
-  Icon,
 } from '@blueprintjs/core';
-
-import { Popover2 } from '@blueprintjs/popover2';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useBackpackApi } from 'api/backpack';
-import React, { memo, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import React, { memo, useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import styled from 'styled-components';
-import { AuxInput } from './AuxInput';
+import { ArtifactInput, useBackpackApi } from 'api/backpack';
+import { useInvalidateArtifacts } from 'api/queries';
+import { Processor } from 'types/Processor';
 import { AuxField } from 'types/AuxField';
-import { Processor } from '../../../types/Processor';
-import { Artifact } from 'types';
-import { AuxDict } from 'types/AuxDict';
+import { classifyAddResponse } from 'utils/addArtifact';
+import { auxDefaults, parseAuxConfig } from 'utils/processorConfig';
+import { notify } from 'utils/toaster';
+import { validateFilterInput } from 'utils/versionFilter';
+import { HelpTip } from 'app/components/common/HelpTip';
+import { RichMarkdownView } from 'app/components/common/RichMarkdownView';
+import { ARTIFACT_ACTIONS } from 'app/components/ArtifactActions/actions';
+import { useBrowserParams } from 'app/pages/ProcessorBrowser/useBrowserParams';
+import { AuxInput } from './AuxInput';
 import { PreviewArtifactDialog } from './PreviewArtifactDialog';
-import { useForm, Controller } from 'react-hook-form';
 
 interface Props {
   processor: Processor;
@@ -30,216 +34,253 @@ interface Props {
 interface FormData {
   name: string;
   filter: string;
-  config: Artifact['config'];
+  config: Record<string, string>;
 }
 
-export const AddArtifactForm = memo((props: Props) => {
+export const AddArtifactForm = memo(({ processor }: Props) => {
   const backpack = useBackpackApi();
-  const query_client = useQueryClient();
+  const invalidate = useInvalidateArtifacts();
+  const { inspect } = useBrowserParams();
+  const aux = useMemo(() => parseAuxConfig(processor.config), [processor]);
+  const defaults = useMemo(() => auxDefaults(aux), [aux]);
+  const idPrefix = `add-${processor.id}`;
 
-  const { control, handleSubmit, watch, setValue, reset } = useForm<FormData>({
-    defaultValues: {
-      name: '',
-      filter: '',
-      config: {},
-    },
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    mode: 'onChange',
+    defaultValues: { name: '', filter: '', config: defaults },
   });
 
   const name = watch('name');
   const filter = watch('filter');
   const config = watch('config');
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const mutation = useMutation({
     mutationFn: backpack.AddArtifact,
-    onSuccess: () => {
-      query_client.invalidateQueries({
-        queryKey: ['artifact_table', props.processor.id, true],
-      });
-      query_client.invalidateQueries({
-        queryKey: ['artifact_table', props.processor.id, false],
-      });
-      reset();
+    meta: { errorTitle: 'Could not add the artifact' },
+    onSuccess: (response, input) => {
+      const outcome = classifyAddResponse(response.data);
+      const label = `${processor.id}/${input.id}`;
+      if (outcome === 'pending') {
+        notify.warning(
+          `${label} was submitted for approval. Collection starts once an administrator approves it.`,
+        );
+      } else if (outcome === 'exists') {
+        notify.info(`${label} is already tracked.`, {
+          action: { text: 'Show', onClick: () => inspect(input.id) },
+        });
+      } else {
+        notify.success(
+          processor.is_external
+            ? `Added ${label}. It's tracked here and collected by an external system.`
+            : `Added ${label}. Backpack is now discovering its versions and dependencies.`,
+          { action: { text: 'Show', onClick: () => inspect(input.id) } },
+        );
+      }
+      invalidate(processor.id);
+      reset({ name: '', filter: '', config: defaults });
     },
   });
 
-  // Preview State
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-
-  const UpdateField = (field: AuxField, value: string) => {
-    setValue('config', { ...config, [field.key]: value });
+  const updateField = (field: AuxField, value: string) => {
+    setValue(
+      'config',
+      { ...config, [field.key]: value },
+      { shouldDirty: true },
+    );
   };
 
-  const OnAdd = (data: FormData) => {
-    mutation.mutate({
-      id: data.name,
-      processor: props.processor.id,
-      filter: data.filter,
-      config: data.config,
-      root: true,
-      versions: {},
-      dependencies: {},
-    });
-  };
+  const toInput = (data: FormData): ArtifactInput => ({
+    id: data.name.trim(),
+    processor: processor.id,
+    filter: data.filter.trim(),
+    config: data.config,
+  });
 
-  const aux: AuxDict = JSON.parse(props.processor.config);
+  const onAdd = handleSubmit(data => mutation.mutate(toInput(data)));
+
+  const canPreview =
+    !processor.is_external &&
+    !processor.direct_collect &&
+    processor.preview_enabled;
+  const hasErrors = !!errors.name || !!errors.filter;
+  const auxFieldCount = Object.keys(aux).length;
 
   return (
-    <Div>
-      {props.processor.is_external && (
-        <Popover2
-          position={Position.LEFT}
-          content={
-            <div style={{ padding: '1rem', maxWidth: '300px' }}>
-              Backpack acts as a <b>metadata registry</b> for this ecosystem.
-              The collection, synchronization, and storage of these artifacts
-              are managed by an external system.
-            </div>
-          }
-        >
-          <Callout
-            intent={Intent.WARNING}
-            title="External Management"
-            icon="warning-sign"
-            style={{
-              width: '100%',
-              cursor: 'pointer',
-            }}
-          />
-        </Popover2>
-      )}
-      {props.processor.requires_approval && (
-        <Popover2
-          position={Position.LEFT}
-          content={
-            <div style={{ padding: '1rem', maxWidth: '300px' }}>
-              New artifacts added to this processor will be reviewed by an
-              administrator before collection starts.
-            </div>
-          }
-        >
-          <Callout
-            intent={Intent.WARNING}
-            title="Approval Required"
-            icon="shield"
-            style={{ marginBottom: '10px', cursor: 'pointer' }}
-          />
-        </Popover2>
-      )}
-      <Card>
-        <div
-          dangerouslySetInnerHTML={{ __html: props.processor.description }}
-        />
-      </Card>
+    <Form onSubmit={onAdd} aria-label={`Add ${processor.id} artifact`}>
+      <H5 style={{ margin: 0 }}>Add artifact</H5>
 
-      <FormRow>
-        <Controller
-          name="name"
-          control={control}
-          render={({ field }) => (
+      {processor.is_external && (
+        <Callout
+          intent={Intent.WARNING}
+          title="Managed externally"
+          icon="share"
+        >
+          Backpack acts as a <b>metadata registry</b> for this processor. An
+          external system collects, synchronizes and stores these artifacts.
+        </Callout>
+      )}
+      {processor.requires_approval && (
+        <Callout
+          intent={Intent.WARNING}
+          title="Approval required"
+          icon="shield"
+        >
+          New artifacts are reviewed by an administrator before collection
+          starts.
+        </Callout>
+      )}
+      {processor.description?.trim() && (
+        <Card style={{ padding: 12 }}>
+          <RichMarkdownView>{processor.description}</RichMarkdownView>
+        </Card>
+      )}
+
+      <Controller
+        name="name"
+        control={control}
+        rules={{
+          validate: value => value.trim() !== '' || 'Enter an artifact name.',
+        }}
+        render={({ field, fieldState }) => (
+          <FormGroup
+            label={
+              <>
+                Artifact name
+                <HelpTip content="The package's identifier in its registry, e.g. 'lodash' or 'ubuntu'." />
+              </>
+            }
+            labelFor={`${idPrefix}-name`}
+            labelInfo="(required)"
+            intent={
+              fieldState.error && fieldState.isTouched
+                ? Intent.DANGER
+                : Intent.NONE
+            }
+            helperText={
+              fieldState.isTouched ? fieldState.error?.message : undefined
+            }
+            style={{ marginBottom: 0 }}
+          >
             <InputGroup
-              fill
-              placeholder="Artifact Name (ex. react)"
               {...field}
+              id={`${idPrefix}-name`}
+              fill
+              placeholder="e.g. react"
               leftIcon="cube"
+              autoComplete="off"
+              intent={
+                fieldState.error && fieldState.isTouched
+                  ? Intent.DANGER
+                  : Intent.NONE
+              }
             />
-          )}
-        />
-        <Tooltip
-          content="The unique identifier for the package (e.g., 'lodash' or 'ubuntu')"
-          position={Position.RIGHT}
-        >
-          <HelpIcon icon="help" size={14} />
-        </Tooltip>
-      </FormRow>
+          </FormGroup>
+        )}
+      />
 
-      <FormRow>
-        <InputGroup
-          fill
-          placeholder="Processor"
-          value={props.processor.id}
-          disabled
-        />
-        <div style={{ width: '14px', marginLeft: '8px' }} />
-      </FormRow>
-
-      <FormRow>
-        <Controller
-          name="filter"
-          control={control}
-          render={({ field }) => (
+      <Controller
+        name="filter"
+        control={control}
+        rules={{ validate: value => validateFilterInput(value) ?? true }}
+        render={({ field, fieldState }) => (
+          <FormGroup
+            label={
+              <>
+                Version filter
+                <HelpTip content="A regular expression matched against each version. Only matching versions are mirrored, e.g. '^18\.' for React 18." />
+              </>
+            }
+            labelFor={`${idPrefix}-filter`}
+            labelInfo="(optional)"
+            intent={fieldState.error ? Intent.DANGER : Intent.NONE}
+            helperText={
+              fieldState.error?.message ??
+              'Leave empty to mirror every version.'
+            }
+            style={{ marginBottom: 0 }}
+          >
             <InputGroup
-              fill
-              placeholder="Regex version filter"
               {...field}
+              id={`${idPrefix}-filter`}
+              fill
+              placeholder="e.g. ^4\."
               leftIcon="filter"
+              autoComplete="off"
+              intent={fieldState.error ? Intent.DANGER : Intent.NONE}
+              style={{ fontFamily: 'monospace' }}
             />
-          )}
-        />
-        <Tooltip
-          content="Optional: A regular expression to filter which versions should be mirrored (e.g., '^18\..*')"
-          position={Position.RIGHT}
-        >
-          <HelpIcon icon="help" size={14} />
-        </Tooltip>
-      </FormRow>
+          </FormGroup>
+        )}
+      />
 
-      <div style={{ marginTop: '8px' }}>
-        <H6>Auxiliary Configuration</H6>
-        <AuxInput onChange={UpdateField} config={aux} values={config} />
-      </div>
+      {auxFieldCount > 0 && (
+        <div>
+          <H6>Configuration</H6>
+          <AuxInput
+            onChange={updateField}
+            config={aux}
+            values={config}
+            idPrefix={idPrefix}
+          />
+        </div>
+      )}
 
-      <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-        {!props.processor.is_external &&
-          !props.processor.direct_collect &&
-          props.processor.preview_enabled && (
-            <Button
-              icon="eye-open"
-              onClick={() => setIsPreviewOpen(true)}
-              disabled={name === ''}
-              style={{ flex: 1 }}
-            >
-              Preview
-            </Button>
-          )}
+      <div style={{ display: 'flex', gap: 8 }}>
+        {canPreview && (
+          <Button
+            icon={ARTIFACT_ACTIONS.preview.icon}
+            onClick={() => setIsPreviewOpen(true)}
+            disabled={name.trim() === ''}
+            style={{ flex: 1 }}
+          >
+            {ARTIFACT_ACTIONS.preview.label}
+          </Button>
+        )}
         <Button
-          icon="cube-add"
-          intent="primary"
-          onClick={handleSubmit(OnAdd)}
+          type="submit"
+          icon={ARTIFACT_ACTIONS.add.icon}
+          intent={Intent.PRIMARY}
           loading={mutation.isPending}
-          disabled={name === ''}
+          disabled={name.trim() === '' || hasErrors}
           style={{ flex: 2 }}
         >
-          Add Artifact
+          {processor.requires_approval ? 'Request artifact' : 'Add artifact'}
         </Button>
       </div>
 
-      <PreviewArtifactDialog
-        isOpen={isPreviewOpen}
-        onClose={() => setIsPreviewOpen(false)}
-        artifactId={name}
-        processor={props.processor.id}
-        config={config}
-        filter={filter}
-      />
-    </Div>
+      {canPreview && (
+        <PreviewArtifactDialog
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+          artifactId={name.trim()}
+          processor={processor.id}
+          config={config}
+          filter={filter.trim()}
+          addLabel={
+            processor.requires_approval ? 'Request artifact' : 'Add artifact'
+          }
+          canAdd={!hasErrors}
+          isAdding={mutation.isPending}
+          onAdd={() => {
+            setIsPreviewOpen(false);
+            onAdd();
+          }}
+        />
+      )}
+    </Form>
   );
 });
 
-const Div = styled.div`
+const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 8px;
-`;
-
-const FormRow = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-`;
-
-const HelpIcon = styled(Icon)`
-  margin-left: 8px;
-  color: #abb3bf;
-  cursor: help;
-  flex-shrink: 0;
+  gap: 12px;
 `;

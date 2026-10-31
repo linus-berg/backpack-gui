@@ -1,60 +1,73 @@
 /**
  *
- * Artifact field
+ * Files of one artifact version
  *
  */
-import React, { memo } from 'react';
-import { map } from 'lodash-es';
+import React, { memo, useRef } from 'react';
 import { Classes, Dialog, HTMLTable } from '@blueprintjs/core';
 import { ArtifactVersion } from 'types/ArtifactVersion';
-import { ArtifactFile } from 'types/ArtifactFile';
+import { CopyButton } from 'app/components/common/CopyButton';
 
 interface Props {
+  artifactId: string;
+  processor: string;
   version?: ArtifactVersion | null;
   onClose: () => void;
 }
 
-export const ArtifactFileInspector = memo((props: Props) => {
-  const version = props.version;
-  const files = version?.files;
-  const MapRow = (file: ArtifactFile, key: string) => {
+export const ArtifactFileInspector = memo(
+  ({ artifactId, processor, version, onClose }: Props) => {
+    // Keep content while the dialog animates closed.
+    const last = useRef<ArtifactVersion | null>(null);
+    if (version) {
+      last.current = version;
+    }
+    const shown = version ?? last.current;
+    const files = Object.entries(shown?.files ?? {});
+
     return (
-      <tr>
-        <td>{key}</td>
-        <td>
-          <a href={file.uri} target="_blank" rel="noreferrer">
-            {file.uri}
-          </a>
-        </td>
-        <td>{file.folder === '' ? 'DEFUALT' : file.folder}</td>
-      </tr>
+      <Dialog
+        className="files-dialog"
+        isOpen={!!version}
+        onClose={onClose}
+        icon="folder-open"
+        title={shown ? `${artifactId} ${shown.version}` : ''}
+      >
+        <div className={Classes.DIALOG_BODY}>
+          <HTMLTable className="files-table" condensed striped bordered>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Source URI</th>
+                <th>Storage folder</th>
+              </tr>
+            </thead>
+            <tbody>
+              {files.map(([type, file]) => (
+                <tr key={type}>
+                  <td>{type}</td>
+                  <td style={{ overflowWrap: 'anywhere' }}>
+                    <a href={file.uri} target="_blank" rel="noreferrer">
+                      {file.uri}
+                    </a>{' '}
+                    <CopyButton value={file.uri} label="URI" />
+                  </td>
+                  <td>
+                    {file.folder === '' ? (
+                      <>
+                        {processor}{' '}
+                        <span className={Classes.TEXT_MUTED}>(default)</span>
+                      </>
+                    ) : (
+                      file.folder
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </HTMLTable>
+        </div>
+      </Dialog>
     );
-  };
-  return (
-    <Dialog
-      className="files-dialog"
-      isOpen={version !== null}
-      onClose={props.onClose}
-      title={version?.version}
-    >
-      <div className={Classes.DIALOG_BODY}>
-        <HTMLTable
-          className="files-table"
-          condensed
-          striped
-          bordered
-          interactive
-        >
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>URI</th>
-              <th>Folder</th>
-            </tr>
-          </thead>
-          <tbody>{map(files, MapRow)}</tbody>
-        </HTMLTable>
-      </div>
-    </Dialog>
-  );
-});
+  },
+);

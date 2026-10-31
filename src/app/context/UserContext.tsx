@@ -1,8 +1,11 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Button } from '@blueprintjs/core';
 import { useBackpackApi } from 'api/backpack';
+import { queryKeys } from 'api/queries';
 import { User } from 'types/User';
-import { Spinner } from '@blueprintjs/core';
+import { getErrorMessage } from 'utils/errors';
+import { FullPageMessage, FullPageSpinner } from 'app/components/common/States';
 
 interface IUserContext {
   user: User | null;
@@ -10,13 +13,13 @@ interface IUserContext {
   isLoading: boolean;
 }
 
-const UserContext = createContext<IUserContext>({} as IUserContext);
+const UserContext = createContext<IUserContext | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const backpack = useBackpackApi();
-  
-  const { data, isLoading } = useQuery({
-    queryKey: ['user_info'],
+
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
+    queryKey: queryKeys.user,
     queryFn: backpack.GetUserInfo,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 1,
@@ -29,15 +32,32 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return user.roles.includes(role);
   };
 
+  if (isLoading) {
+    return <FullPageSpinner label="Loading your account…" />;
+  }
+
+  // Without roles the UI would silently hide admin features, so say so.
+  if (isError && !user) {
+    return (
+      <FullPageMessage
+        icon="offline"
+        title="Couldn't load your account"
+        description={getErrorMessage(error)}
+        action={
+          <Button
+            icon="refresh"
+            text="Try again"
+            loading={isFetching}
+            onClick={() => refetch()}
+          />
+        }
+      />
+    );
+  }
+
   return (
     <UserContext.Provider value={{ user, hasRole, isLoading }}>
-      {isLoading ? (
-        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Spinner size={50} />
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </UserContext.Provider>
   );
 };

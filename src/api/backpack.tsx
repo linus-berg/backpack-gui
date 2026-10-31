@@ -1,10 +1,10 @@
 import { useAuth } from 'react-oidc-context';
 import axios, { AxiosResponse } from 'axios';
 import React, { createContext, useContext, useEffect } from 'react';
-import { Artifact } from 'types';
+import { Artifact, ArtifactSummary } from 'types';
 import type { AxiosInstance } from 'axios';
-import { Spinner } from '@blueprintjs/core';
 import { AuthInterceptor } from './AuthInterceptor';
+import { BACKPACK_API } from './config';
 import { Processor } from '../types/Processor';
 import { QueueStatus } from '../types/QueueStatus';
 import { Event } from '../types/Event';
@@ -14,11 +14,11 @@ import { PendingArtifact } from '../types/PendingArtifact';
 import { ApiKey } from '../types/ApiKey';
 import { User } from '../types/User';
 import { NewsPost } from '../types/NewsPost';
+import { FullPageSpinner } from 'app/components/common/States';
 
-export const BACKPACK_API =
-  window.location.protocol + '//' + window.location.hostname + ':8004/api';
+export { BACKPACK_API };
+
 const BACKPACK_ARTIFACTS = '/artifact';
-
 const BACKPACK_PROCESSOR = '/processor';
 
 const axios_ctx = createContext<AxiosInstance>({} as AxiosInstance);
@@ -28,11 +28,32 @@ const axios_instance = axios.create({
 });
 
 const interceptor = new AuthInterceptor();
-const interceptor_hdl = axios_instance.interceptors.request.use(
+axios_instance.interceptors.request.use(
   interceptor.Intercept.bind(interceptor),
 );
 
-export const AxiosProvider = props => {
+/** Identifies an artifact within a processor. */
+export interface ArtifactRef {
+  id: string;
+  processor: string;
+}
+
+/** Payload for adding or previewing an artifact. */
+export interface ArtifactInput extends ArtifactRef {
+  filter: string;
+  config: Record<string, string>;
+}
+
+/**
+ * Response body of `POST /artifact`. The API answers 200 for every outcome;
+ * a `message` is present when the artifact went to the approval queue or was
+ * already tracked.
+ */
+export type AddArtifactResponse = Partial<ArtifactInput> & {
+  message?: string;
+};
+
+export const AxiosProvider = (props: { children: React.ReactNode }) => {
   const auth = useAuth();
 
   useEffect(() => {
@@ -40,12 +61,12 @@ export const AxiosProvider = props => {
   }, [auth.user?.access_token]);
 
   if (auth.isLoading || !auth.isAuthenticated) {
-    return <Spinner />;
+    return <FullPageSpinner label="Signing in…" />;
   }
 
   return (
     <axios_ctx.Provider value={axios_instance}>
-      {auth.isAuthenticated ? props.children : <Spinner />}
+      {props.children}
     </axios_ctx.Provider>
   );
 };
@@ -68,8 +89,8 @@ export const useBackpackApi = () => {
     return backpack.get<User>('/auth/me');
   };
 
-  const GetEvents = (): Promise<AxiosResponse<Event[]>> => {
-    return backpack.get<Event[]>('/event');
+  const GetEvents = (limit = 100): Promise<AxiosResponse<Event[]>> => {
+    return backpack.get<Event[]>('/event', { params: { limit } });
   };
 
   const GetSchedules = (): Promise<AxiosResponse<Schedule[]>> => {
@@ -116,7 +137,9 @@ export const useBackpackApi = () => {
     return backpack.put('/scheduler', schedule);
   };
 
-  const AddSchedule = (schedule: Schedule): Promise<AxiosResponse<void>> => {
+  const AddSchedule = (
+    schedule: Omit<Schedule, 'id'>,
+  ): Promise<AxiosResponse<void>> => {
     return backpack.post('/scheduler', schedule);
   };
 
@@ -125,7 +148,7 @@ export const useBackpackApi = () => {
   };
 
   const ValidateSchedule = (
-    schedule: Schedule,
+    schedule: Partial<Schedule>,
   ): Promise<AxiosResponse<ScheduleValidationResult>> => {
     return backpack.post('/scheduler/validate', schedule);
   };
@@ -134,33 +157,28 @@ export const useBackpackApi = () => {
     return backpack.delete(`/status/queue/${queue_name}`);
   };
 
-  const GetAllProcessorArtifacts = ({
-    queryKey,
-  }: {
-    queryKey: any[];
-  }): Promise<AxiosResponse<Artifact[]>> => {
-    return backpack.get<Artifact[]>(BACKPACK_ARTIFACTS + '/all', {
-      params: { processor: queryKey[1], only_roots: queryKey[2] },
+  const GetAllProcessorArtifacts = (
+    processor: string,
+    only_roots: boolean,
+  ): Promise<AxiosResponse<ArtifactSummary[]>> => {
+    return backpack.get<ArtifactSummary[]>(BACKPACK_ARTIFACTS + '/all', {
+      params: { processor, only_roots },
     });
   };
 
   const GetArtifact = ({
-    queryKey,
-  }: {
-    queryKey: any[];
-  }): Promise<AxiosResponse<Artifact>> => {
+    processor,
+    id,
+  }: ArtifactRef): Promise<AxiosResponse<Artifact>> => {
     return backpack.get<Artifact>(BACKPACK_ARTIFACTS, {
-      params: { processor: queryKey[1], id: queryKey[2] },
+      params: { processor, id },
     });
   };
 
   const DeleteArtifact = ({
     id,
     processor,
-  }: {
-    id: string;
-    processor: string;
-  }): Promise<AxiosResponse<void>> => {
+  }: ArtifactRef): Promise<AxiosResponse<void>> => {
     return backpack.delete(BACKPACK_ARTIFACTS, {
       data: {
         id: id,
@@ -172,10 +190,7 @@ export const useBackpackApi = () => {
   const TrackArtifact = ({
     id,
     processor,
-  }: {
-    id: string;
-    processor: string;
-  }): Promise<AxiosResponse<void>> => {
+  }: ArtifactRef): Promise<AxiosResponse<string>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/track', {
       id: id,
       processor: processor,
@@ -186,11 +201,7 @@ export const useBackpackApi = () => {
     id,
     processor,
     force,
-  }: {
-    id: string;
-    processor: string;
-    force: boolean;
-  }): Promise<AxiosResponse<void>> => {
+  }: ArtifactRef & { force: boolean }): Promise<AxiosResponse<string>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/validate', {
       id: id,
       processor: processor,
@@ -199,7 +210,7 @@ export const useBackpackApi = () => {
   };
 
   const PreviewArtifact = (
-    artifact: Artifact,
+    artifact: ArtifactInput,
   ): Promise<AxiosResponse<Artifact>> => {
     return backpack.post<Artifact>(BACKPACK_ARTIFACTS + '/preview', artifact);
   };
@@ -211,10 +222,7 @@ export const useBackpackApi = () => {
   const ApproveArtifact = ({
     id,
     processor,
-  }: {
-    id: string;
-    processor: string;
-  }): Promise<AxiosResponse<void>> => {
+  }: ArtifactRef): Promise<AxiosResponse<{ message?: string }>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/approve', {
       id: id,
       processor: processor,
@@ -224,18 +232,19 @@ export const useBackpackApi = () => {
   const RejectArtifact = ({
     id,
     processor,
-  }: {
-    id: string;
-    processor: string;
-  }): Promise<AxiosResponse<void>> => {
+    reason,
+  }: ArtifactRef & { reason?: string }): Promise<AxiosResponse<void>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/reject', {
       id: id,
       processor: processor,
+      reason: reason || undefined,
     });
   };
 
   /* Add */
-  const AddArtifact = (artifact: Artifact): Promise<AxiosResponse<void>> => {
+  const AddArtifact = (
+    artifact: ArtifactInput,
+  ): Promise<AxiosResponse<AddArtifactResponse>> => {
     return backpack.post(BACKPACK_ARTIFACTS, {
       id: artifact.id,
       processor: artifact.processor,
@@ -245,11 +254,11 @@ export const useBackpackApi = () => {
       dependencies: {},
     });
   };
-  const TrackAllArtifacts = (): Promise<AxiosResponse<void>> => {
+  const TrackAllArtifacts = (): Promise<AxiosResponse<string>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/track/all');
   };
 
-  const ValidateAllArtifacts = (): Promise<AxiosResponse<void>> => {
+  const ValidateAllArtifacts = (): Promise<AxiosResponse<string>> => {
     return backpack.post(BACKPACK_ARTIFACTS + '/validate/all');
   };
 

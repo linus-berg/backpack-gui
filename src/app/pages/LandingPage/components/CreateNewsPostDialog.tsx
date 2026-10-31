@@ -1,49 +1,37 @@
 import React, { useState } from 'react';
 import {
-  H5,
-  Card,
-  Elevation,
   Button,
-  Intent,
-  Dialog,
+  Card,
   Classes,
+  Dialog,
+  FormGroup,
   InputGroup,
+  Intent,
   TextArea,
 } from '@blueprintjs/core';
 import styled from 'styled-components';
-import ReactMarkdown from 'react-markdown';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
+import { queryKeys } from 'api/queries';
+import { notify } from 'utils/toaster';
+import { MarkdownView } from 'app/components/common/MarkdownView';
 
 const EditorGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  margin-top: 15px;
-  height: 450px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const PreviewPane = styled(Card)`
   background: var(--card-bg);
-  border: 1px solid var(--table-border);
   overflow-y: auto;
   padding: 15px;
-  height: calc(450px - 35px);
-`;
-
-const MarkdownBody = styled.div`
-  font-size: 0.95rem;
-  line-height: 1.6;
-
-  p:last-child {
-    margin-bottom: 0;
-  }
-  code {
-    background: rgba(0, 0, 0, 0.05);
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-family: monospace;
-  }
+  height: 45vh;
+  min-height: 240px;
 `;
 
 interface Props {
@@ -58,78 +46,103 @@ export const CreateNewsPostDialog = ({ isOpen, onClose }: Props) => {
 
   const createMutation = useMutation({
     mutationFn: backpack.CreateNewsPost,
+    meta: { errorTitle: 'Could not publish the announcement' },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['news'] });
+      notify.success('Announcement published.');
+      queryClient.invalidateQueries({ queryKey: queryKeys.news });
       onClose();
       setNewPost({ title: '', content: '' });
     },
   });
 
-  const handleCreatePost = () => {
-    if (!newPost.title || !newPost.content) return;
-    createMutation.mutate(newPost);
-  };
+  const canPublish =
+    newPost.title.trim() !== '' && newPost.content.trim() !== '';
+  const hasDraft = newPost.title !== '' || newPost.content !== '';
 
   return (
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
-      title="Create System Announcement"
+      title="New announcement"
       icon="edit"
-      style={{ width: '80vw' }}
+      style={{ width: 'min(1200px, 95vw)' }}
+      // Keep drafts safe from stray clicks outside the dialog.
+      canOutsideClickClose={!hasDraft}
     >
-      <div
-        className={Classes.DIALOG_BODY}
-        style={{ height: '70vh', overflow: 'hidden' }}
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          if (canPublish) {
+            createMutation.mutate({
+              title: newPost.title.trim(),
+              content: newPost.content,
+            });
+          }
+        }}
       >
-        <H5>Title</H5>
-        <InputGroup
-          placeholder="Post title..."
-          value={newPost.title}
-          onChange={e => setNewPost({ ...newPost, title: e.target.value })}
-        />
-
-        <EditorGrid>
-          <div style={{ height: '100%' }}>
-            <H5>Content (Markdown)</H5>
-            <TextArea
-              fill
-              placeholder="Markdown is supported..."
-              style={{
-                height: 'calc(100% - 35px)',
-                fontFamily: 'monospace',
-                fontSize: '0.9rem',
-                resize: 'none',
-              }}
-              value={newPost.content}
-              onChange={e =>
-                setNewPost({ ...newPost, content: e.target.value })
-              }
+        <div className={Classes.DIALOG_BODY}>
+          <FormGroup label="Title" labelFor="news-title-input">
+            <InputGroup
+              id="news-title-input"
+              placeholder="Post title…"
+              value={newPost.title}
+              autoFocus
+              onChange={e => setNewPost({ ...newPost, title: e.target.value })}
             />
-          </div>
-          <div style={{ height: '100%' }}>
-            <H5>Live Preview</H5>
-            <PreviewPane elevation={Elevation.ZERO}>
-              <MarkdownBody>
-                <ReactMarkdown>{newPost.content}</ReactMarkdown>
-              </MarkdownBody>
-            </PreviewPane>
-          </div>
-        </EditorGrid>
-      </div>
-      <div className={Classes.DIALOG_FOOTER}>
-        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button
-            intent={Intent.PRIMARY}
-            onClick={handleCreatePost}
-            loading={createMutation.isPending}
-            disabled={!newPost.title || !newPost.content}
-          >
-            Publish Announcement
-          </Button>
+          </FormGroup>
+
+          <EditorGrid>
+            <FormGroup
+              label="Content"
+              labelFor="news-content"
+              labelInfo="(Markdown)"
+              style={{ margin: 0 }}
+            >
+              <TextArea
+                id="news-content"
+                fill
+                placeholder="Markdown is supported…"
+                style={{
+                  height: '45vh',
+                  minHeight: 240,
+                  fontFamily: 'monospace',
+                  fontSize: '0.9rem',
+                  resize: 'none',
+                }}
+                value={newPost.content}
+                onChange={e =>
+                  setNewPost({ ...newPost, content: e.target.value })
+                }
+              />
+            </FormGroup>
+            <div>
+              <label className={Classes.LABEL}>Preview</label>
+              <PreviewPane>
+                {newPost.content.trim() ? (
+                  <MarkdownView>{newPost.content}</MarkdownView>
+                ) : (
+                  <span className={Classes.TEXT_MUTED}>
+                    Nothing to preview yet.
+                  </span>
+                )}
+              </PreviewPane>
+            </div>
+          </EditorGrid>
         </div>
-      </div>
+        <div className={Classes.DIALOG_FOOTER}>
+          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button
+              type="submit"
+              intent={Intent.PRIMARY}
+              loading={createMutation.isPending}
+              disabled={!canPublish}
+            >
+              Publish
+            </Button>
+          </div>
+        </div>
+      </form>
     </Dialog>
   );
 };

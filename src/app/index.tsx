@@ -8,90 +8,171 @@
 
 import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
+import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import {
+  MutationCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Button, FocusStyleManager } from '@blueprintjs/core';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 
 import { GlobalStyle } from 'styles/global-styles';
-
-import { NotFoundPage } from './components/NotFoundPage/Loadable';
-import { useTranslation } from 'react-i18next';
-import './app.scss';
-import { ProcessorBrowser } from './pages/ProcessorBrowser/Loadable';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FocusStyleManager } from '@blueprintjs/core';
-import { Layout } from './Layout';
-import { ProcessorConfig } from './pages/ProcessorConfig/Loadable';
-import { useAuth } from 'react-oidc-context';
 import { AxiosProvider } from 'api/backpack';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { getErrorMessage } from 'utils/errors';
+import { notify } from 'utils/toaster';
+import { NotFoundPage } from './components/NotFoundPage/Loadable';
+import { FullPageMessage, FullPageSpinner } from './components/common/States';
+import { RequireAdmin } from './components/common/RequireAdmin';
+import { ProcessorBrowser } from './pages/ProcessorBrowser/Loadable';
+import { ProcessorConfig } from './pages/ProcessorConfig/Loadable';
 import { StatusPage } from './pages/StatusPage/Loadable';
 import { ApprovalsPage } from './pages/ApprovalsPage/Loadable';
 import { ApiKeyPage } from './pages/ApiKeyPage/Loadable';
-import { UserProvider, useUser } from './context/UserContext';
 import { LandingPage } from './pages/LandingPage';
+import { Layout } from './Layout';
+import { UserProvider } from './context/UserContext';
+import { ConfirmProvider } from './context/ConfirmContext';
+import { ThemeProvider } from './context/ThemeContext';
+import './app.scss';
 
-const query_client = new QueryClient();
+declare module '@tanstack/react-query' {
+  interface Register {
+    mutationMeta: {
+      /** Prefix for the error toast, e.g. "Could not save npm". */
+      errorTitle?: string;
+      /** Set when the caller reports errors itself. */
+      skipErrorToast?: boolean;
+    };
+  }
+}
+
+const query_client = new QueryClient({
+  // Every failed mutation is reported, so no action can fail silently.
+  mutationCache: new MutationCache({
+    onError: (error, _variables, _context, mutation) => {
+      if (mutation.meta?.skipErrorToast) {
+        return;
+      }
+      const title = mutation.meta?.errorTitle;
+      const message = getErrorMessage(error);
+      notify.error(title ? `${title}: ${message}` : message);
+    },
+  }),
+});
 FocusStyleManager.onlyShowFocusOnTabs();
 
-const AppRoutes = () => {
-  const { hasRole } = useUser();
-  const isAdmin = hasRole('Administrator');
-
-  return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<LandingPage />} />
-        <Route path="status" element={<StatusPage />}></Route>
-        <Route path="processor">
-          <Route index element={<ProcessorBrowser />} />
-          <Route path=":processor" element={<ProcessorBrowser />} />
-        </Route>
-        <Route path="config">
-          <Route index element={<ProcessorConfig />} />
-          <Route path=":processor" element={<ProcessorConfig />} />
-        </Route>
-        {isAdmin && (
-          <>
-            <Route path="approvals" element={<ApprovalsPage />} />
-            <Route path="apikeys" element={<ApiKeyPage />} />
-          </>
-        )}
-        <Route path="*" element={<NotFoundPage />} />
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={<Layout />}>
+      <Route index element={<LandingPage />} />
+      <Route path="status" element={<StatusPage />} />
+      <Route path="processor">
+        <Route index element={<ProcessorBrowser />} />
+        <Route path=":processor" element={<ProcessorBrowser />} />
       </Route>
-    </Routes>
-  );
-};
+      <Route path="config">
+        <Route
+          index
+          element={
+            <RequireAdmin>
+              <ProcessorConfig />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path=":processor"
+          element={
+            <RequireAdmin>
+              <ProcessorConfig />
+            </RequireAdmin>
+          }
+        />
+      </Route>
+      <Route
+        path="approvals"
+        element={
+          <RequireAdmin>
+            <ApprovalsPage />
+          </RequireAdmin>
+        }
+      />
+      <Route
+        path="apikeys"
+        element={
+          <RequireAdmin>
+            <ApiKeyPage />
+          </RequireAdmin>
+        }
+      />
+      <Route path="*" element={<NotFoundPage />} />
+    </Route>
+  </Routes>
+);
 
 export function App() {
   const { i18n } = useTranslation();
   const auth = useAuth();
 
   React.useEffect(() => {
-    if (!auth.isLoading && !auth.isAuthenticated) {
+    if (!auth.isLoading && !auth.isAuthenticated && !auth.error) {
       auth.signinRedirect();
     }
-  }, [auth.isLoading, auth.isAuthenticated, auth.signinRedirect]);
+  }, [auth.isLoading, auth.isAuthenticated, auth.error, auth.signinRedirect]);
+
+  if (auth.error) {
+    return (
+      <ThemeProvider>
+        <FullPageMessage
+          icon="lock"
+          title="Sign-in failed"
+          description={auth.error.message}
+          action={
+            <Button
+              icon="log-in"
+              intent="primary"
+              text="Try again"
+              onClick={() => auth.signinRedirect()}
+            />
+          }
+        />
+      </ThemeProvider>
+    );
+  }
 
   if (auth.isLoading || !auth.isAuthenticated) {
-    return null;
+    return <FullPageSpinner label="Signing in…" />;
   }
+
   return (
-    <BrowserRouter>
-      <Helmet
-        titleTemplate="%s - Backpack"
-        defaultTitle="Backpack"
-        htmlAttributes={{ lang: i18n.language }}
-      >
-        <meta name="description" content="A artifact application" />
-      </Helmet>
-      <AxiosProvider>
-        <QueryClientProvider client={query_client}>
-          <UserProvider>
-            <AppRoutes />
-          </UserProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </AxiosProvider>
-      <GlobalStyle />
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Helmet
+          titleTemplate="%s - Backpack"
+          defaultTitle="Backpack"
+          htmlAttributes={{ lang: i18n.language }}
+        >
+          <meta
+            name="description"
+            content="Backpack mirrors software packages and their dependencies for offline and air-gapped use."
+          />
+        </Helmet>
+        <AxiosProvider>
+          <QueryClientProvider client={query_client}>
+            <ConfirmProvider>
+              <UserProvider>
+                <AppRoutes />
+              </UserProvider>
+            </ConfirmProvider>
+            {import.meta.env.DEV && (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
+          </QueryClientProvider>
+        </AxiosProvider>
+        <GlobalStyle />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }

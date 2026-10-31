@@ -3,5 +3,6 @@ export interface AuxField {
   type: string;
   name: string;
   placeholder: string;
-  default?: string;
+  /** Value pre-filled when adding an artifact. */
+  default?: string | null;
 }
