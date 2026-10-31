@@ -68,7 +68,7 @@ export const SchedulerPanel = memo(({ titleId }: Props) => {
       actions={
         isAdmin && (
           <Button
-            small
+            size="small"
             icon="add"
             text="Add schedule"
             onClick={() => {
@@ -137,7 +137,7 @@ export const SchedulerPanel = memo(({ titleId }: Props) => {
         />
       ) : (
         <ScrollTableContainer>
-          <HTMLTable striped condensed style={{ width: '100%' }}>
+          <HTMLTable striped compact style={{ width: '100%' }}>
             <thead>
               <tr>
                 <th>Processor</th>
@@ -185,9 +185,9 @@ export const SchedulerPanel = memo(({ titleId }: Props) => {
                   </td>
                   {isAdmin && (
                     <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                      <ButtonGroup minimal>
+                      <ButtonGroup variant="minimal">
                         <Button
-                          small
+                          size="small"
                           icon="refresh"
                           text="Sync now"
                           loading={
@@ -200,7 +200,7 @@ export const SchedulerPanel = memo(({ titleId }: Props) => {
                         />
                         <Tooltip content="Edit schedule">
                           <Button
-                            small
+                            size="small"
                             icon="edit"
                             aria-label={`Edit ${schedule.processor} schedule`}
                             onClick={() => {
@@ -211,7 +211,7 @@ export const SchedulerPanel = memo(({ titleId }: Props) => {
                         </Tooltip>
                         <Tooltip content="Delete schedule">
                           <Button
-                            small
+                            size="small"
                             icon="trash"
                             intent={Intent.DANGER}
                             aria-label={`Delete ${schedule.processor} schedule`}

@@ -15,7 +15,11 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Button, FocusStyleManager } from '@blueprintjs/core';
+import {
+  BlueprintProvider,
+  Button,
+  FocusStyleManager,
+} from '@blueprintjs/core';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 
@@ -147,32 +151,38 @@ export function App() {
   }
 
   return (
-    <ThemeProvider>
-      <BrowserRouter>
-        <Helmet
-          titleTemplate="%s - Backpack"
-          defaultTitle="Backpack"
-          htmlAttributes={{ lang: i18n.language }}
+    // BlueprintProvider supplies hotkeys (used by the artifact table),
+    // overlay stacking and portal context.
+    <BlueprintProvider>
+      <ThemeProvider>
+        <BrowserRouter
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
         >
-          <meta
-            name="description"
-            content="Backpack mirrors software packages and their dependencies for offline and air-gapped use."
-          />
-        </Helmet>
-        <AxiosProvider>
-          <QueryClientProvider client={query_client}>
-            <ConfirmProvider>
-              <UserProvider>
-                <AppRoutes />
-              </UserProvider>
-            </ConfirmProvider>
-            {import.meta.env.DEV && (
-              <ReactQueryDevtools initialIsOpen={false} />
-            )}
-          </QueryClientProvider>
-        </AxiosProvider>
-        <GlobalStyle />
-      </BrowserRouter>
-    </ThemeProvider>
+          <Helmet
+            titleTemplate="%s - Backpack"
+            defaultTitle="Backpack"
+            htmlAttributes={{ lang: i18n.language }}
+          >
+            <meta
+              name="description"
+              content="Backpack mirrors software packages and their dependencies for offline and air-gapped use."
+            />
+          </Helmet>
+          <AxiosProvider>
+            <QueryClientProvider client={query_client}>
+              <ConfirmProvider>
+                <UserProvider>
+                  <AppRoutes />
+                </UserProvider>
+              </ConfirmProvider>
+              {import.meta.env.DEV && (
+                <ReactQueryDevtools initialIsOpen={false} />
+              )}
+            </QueryClientProvider>
+          </AxiosProvider>
+          <GlobalStyle />
+        </BrowserRouter>
+      </ThemeProvider>
+    </BlueprintProvider>
   );
 }

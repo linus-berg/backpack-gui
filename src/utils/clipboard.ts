@@ -1,3 +1,5 @@
+import { Classes } from '@blueprintjs/core';
+
 /**
  * Copies text to the clipboard. Falls back to a hidden textarea and
  * `execCommand('copy')` when the async Clipboard API is unavailable, which is
@@ -18,8 +20,9 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
   // Mount inside the open overlay (if any) so dialog focus traps don't
   // pull focus away before the copy runs.
   const host =
-    (document.activeElement?.closest('.bp4-overlay') as HTMLElement | null) ??
-    document.body;
+    (document.activeElement?.closest(
+      `.${Classes.OVERLAY}`,
+    ) as HTMLElement | null) ?? document.body;
   const textarea = document.createElement('textarea');
   textarea.value = text;
   textarea.setAttribute('readonly', '');

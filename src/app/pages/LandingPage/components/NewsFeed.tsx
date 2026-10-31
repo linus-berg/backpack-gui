@@ -45,7 +45,7 @@ export const NewsFeed = () => {
         {isAdmin && (
           <Button
             icon="add"
-            small
+            size="small"
             intent={Intent.PRIMARY}
             text="New announcement"
             onClick={() => setIsPostDialogOpen(true)}

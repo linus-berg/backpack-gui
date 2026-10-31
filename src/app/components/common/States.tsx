@@ -38,8 +38,8 @@ export const FullPageSpinner = ({ label }: { label?: string }) => (
 interface FullPageMessageProps {
   icon?: IconName;
   title: string;
-  description?: string | JSX.Element;
-  action?: JSX.Element;
+  description?: string | React.JSX.Element;
+  action?: React.JSX.Element;
 }
 
 /** Full-viewport message for failures that happen before routing exists. */
@@ -88,8 +88,8 @@ export const QueryErrorState = ({
 interface EmptyStateProps {
   icon?: IconName;
   title: string;
-  description?: string | JSX.Element;
-  action?: JSX.Element;
+  description?: string | React.JSX.Element;
+  action?: React.JSX.Element;
 }
 
 /** Shown when a list has nothing in it. */

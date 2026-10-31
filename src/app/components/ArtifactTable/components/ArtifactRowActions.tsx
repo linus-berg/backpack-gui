@@ -5,8 +5,7 @@ import {
   Menu,
   MenuDivider,
   MenuItem,
-  Popover,
-  Position,
+  PopoverNext,
   Tooltip,
 } from '@blueprintjs/core';
 import { ArtifactSummary } from 'types';
@@ -64,10 +63,10 @@ export const ArtifactRowActions = ({
   );
 
   return (
-    <ButtonGroup minimal>
+    <ButtonGroup variant="minimal">
       <Tooltip content={`Inspect ${artifact.id}`} lazy>
         <Button
-          small
+          size="small"
           icon={ARTIFACT_ACTIONS.inspect.icon}
           intent={ARTIFACT_ACTIONS.inspect.intent}
           aria-label={`Inspect ${artifact.id}`}
@@ -75,13 +74,13 @@ export const ArtifactRowActions = ({
         />
       </Tooltip>
       {hasMenu && (
-        <Popover content={menu} position={Position.BOTTOM_RIGHT} lazy>
+        <PopoverNext content={menu} placement="bottom-end">
           <Button
-            small
+            size="small"
             icon="more"
             aria-label={`More actions for ${artifact.id}`}
           />
-        </Popover>
+        </PopoverNext>
       )}
     </ButtonGroup>
   );

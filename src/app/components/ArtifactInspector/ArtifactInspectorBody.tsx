@@ -158,7 +158,7 @@ export const ArtifactInspectorBody = memo(
               <Button
                 icon={ARTIFACT_ACTIONS.delete.icon}
                 intent={Intent.DANGER}
-                minimal
+                variant="minimal"
                 text={`${ARTIFACT_ACTIONS.delete.label}…`}
                 onClick={async () => {
                   if (await run('delete', [artifact.id])) {
@@ -235,7 +235,7 @@ export const ArtifactInspectorBody = memo(
           id="artifact-inspector-tabs"
           onChange={id => setActiveTab(id as string)}
           selectedTabId={activeTab}
-          large
+          size="large"
         >
           <Tab
             id="versions"

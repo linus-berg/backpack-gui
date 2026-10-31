@@ -228,7 +228,7 @@ export const ApiKeyPage = memo(() => {
   };
 
   const keys = query.data ?? [];
-  let body: JSX.Element;
+  let body: React.JSX.Element;
   if (query.isLoading) {
     body = <LoadingState />;
   } else if (query.isError && !query.data) {
@@ -250,7 +250,7 @@ export const ApiKeyPage = memo(() => {
   } else {
     body = (
       <ScrollTableContainer>
-        <HTMLTable striped condensed style={{ width: '100%' }}>
+        <HTMLTable striped compact style={{ width: '100%' }}>
           <thead>
             <tr>
               <th>Name</th>
@@ -283,8 +283,8 @@ export const ApiKeyPage = memo(() => {
                 <td style={{ textAlign: 'right' }}>
                   <Tooltip content="Revoke key">
                     <Button
-                      small
-                      minimal
+                      size="small"
+                      variant="minimal"
                       intent={Intent.DANGER}
                       icon="trash"
                       aria-label={`Revoke ${key.name}`}

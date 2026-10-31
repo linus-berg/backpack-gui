@@ -78,13 +78,13 @@ export const ProcessorEditorFields = ({
           </H4>
           <ButtonGroup>
             <Button
-              small
+              size="small"
               text="Edit"
               active={!showPreview}
               onClick={() => setShowPreview(false)}
             />
             <Button
-              small
+              size="small"
               text="Preview"
               active={showPreview}
               onClick={() => setShowPreview(true)}

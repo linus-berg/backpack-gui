@@ -9,7 +9,7 @@ export const ThemeToggle = () => {
   return (
     <Tooltip content={label} position={Position.BOTTOM}>
       <Button
-        minimal
+        variant="minimal"
         icon={isDark ? 'flash' : 'moon'}
         aria-label={label}
         onClick={toggleTheme}

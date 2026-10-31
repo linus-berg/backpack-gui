@@ -231,7 +231,7 @@ export const BulkAddDialog = memo(({ processor, isOpen, onClose }: Props) => {
               <TextArea
                 id="bulk-add-text"
                 fill
-                large
+                size="large"
                 placeholder={`react\nlodash;^4\\.\nmy-pkg;;${exampleKey}=value`}
                 value={text}
                 onChange={e => setText(e.target.value)}
@@ -239,7 +239,7 @@ export const BulkAddDialog = memo(({ processor, isOpen, onClose }: Props) => {
               />
               {lines.length > 0 && (
                 <ScrollTableContainer style={{ maxHeight: 260, marginTop: 12 }}>
-                  <HTMLTable condensed striped style={{ width: '100%' }}>
+                  <HTMLTable compact striped style={{ width: '100%' }}>
                     <thead>
                       <tr>
                         <th>Line</th>
@@ -370,7 +370,7 @@ export const BulkAddDialog = memo(({ processor, isOpen, onClose }: Props) => {
                   }.`}
             </p>
             <ScrollTableContainer style={{ maxHeight: '50vh' }}>
-              <HTMLTable condensed striped style={{ width: '100%' }}>
+              <HTMLTable compact striped style={{ width: '100%' }}>
                 <thead>
                   <tr>
                     <th>Line</th>

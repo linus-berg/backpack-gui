@@ -27,7 +27,8 @@
             dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           }
         } catch (e) {}
-        if (dark) document.body.classList.add('bp4-dark');
+        // Must match Blueprint's Classes.DARK.
+        if (dark) document.body.classList.add('bp6-dark');
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
       })();
     </script>

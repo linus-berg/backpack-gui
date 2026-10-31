@@ -2,6 +2,7 @@
 @import 'normalize.css';
 @import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 @import '@blueprintjs/core/lib/scss/variables';
+@import '@blueprintjs/colors/lib/scss/colors';
 @import '@blueprintjs/table/lib/css/table.css';
 @import '@blueprintjs/core/lib/css/blueprint.css';
 
@@ -13,6 +14,8 @@ body {
   background-color: var(--page-bg);
 }
 
+// Blueprint 6 classes use the `bp6-` prefix; keep the literals below in sync
+// with `Classes.*` in TypeScript.
 // Theme tokens. Components use these instead of hard-coded colors so both
 // themes stay readable. Portals (dialogs, toasts) inherit them from <body>.
 :root {
@@ -28,7 +31,7 @@ body {
   --table-border: #{$light-gray2};
 }
 
-.bp4-dark {
+.bp6-dark {
   // Native scrollbars otherwise stay light in some browsers.
   scrollbar-color: $dark-gray5 $dark-gray2;
   --page-bg: #{$pt-dark-app-background-color};
@@ -43,9 +46,9 @@ body {
   --table-border: #{$dark-gray1};
 }
 
-// Blueprint renders popover wrappers inside <label> as blocks (for selects);
+// Blueprint renders popover targets inside <label> as blocks (for selects);
 // keep inline help icons on the same line as their label text.
-label.bp4-label .help-tip.bp4-popover-wrapper {
+label.bp6-label .help-tip.bp6-popover-target {
   display: inline-block;
   margin-top: 0;
 }

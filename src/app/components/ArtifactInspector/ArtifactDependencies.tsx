@@ -68,7 +68,7 @@ export const ArtifactDependencies = memo(({ artifact }: Props) => {
         style={{ width: 240, marginTop: 10 }}
       />
       <ScrollTableContainer style={{ maxHeight: '50vh', marginTop: 10 }}>
-        <HTMLTable condensed striped style={{ width: '100%' }}>
+        <HTMLTable compact striped style={{ width: '100%' }}>
           <thead>
             <tr>
               <th>Processor</th>

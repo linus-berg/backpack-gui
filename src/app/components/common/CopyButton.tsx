@@ -45,8 +45,8 @@ export const CopyButton = ({
 
   const button = (
     <Button
-      minimal={!text}
-      small={!text}
+      variant={!text ? 'minimal' : undefined}
+      size={!text ? 'small' : undefined}
       icon={copied ? 'tick' : 'duplicate'}
       intent={copied ? 'success' : undefined}
       aria-label={`Copy ${label}`}

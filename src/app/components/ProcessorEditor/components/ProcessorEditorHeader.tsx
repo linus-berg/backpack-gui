@@ -55,7 +55,7 @@ export const ProcessorEditorHeader = ({
       icon="trash"
       text="Delete processor…"
       intent={Intent.DANGER}
-      minimal
+      variant="minimal"
       onClick={onDelete}
       loading={isDeleting}
     />

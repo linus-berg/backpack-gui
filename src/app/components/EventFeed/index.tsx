@@ -113,7 +113,7 @@ export const EventFeed = memo(() => {
         {query.isFetching && <Spinner size={16} aria-label="Refreshing" />}
       </Toolbar>
       <ScrollTableContainer>
-        <HTMLTable striped condensed style={{ width: '100%' }}>
+        <HTMLTable striped compact style={{ width: '100%' }}>
           <thead>
             <tr>
               <th style={{ width: 140 }}>When</th>

@@ -10,8 +10,7 @@ import {
   Intent,
   Menu,
   MenuItem,
-  Popover,
-  Position,
+  PopoverNext,
 } from '@blueprintjs/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
@@ -131,7 +130,7 @@ export const ScheduleEditorDialog = ({
   const hint = cronFieldHint(cron);
   const description = describeCron(trimmed);
 
-  const save = (e: React.FormEvent) => {
+  const save = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!canSave) return;
     if (schedule) {
@@ -203,8 +202,8 @@ export const ScheduleEditorDialog = ({
                 validation.status === 'invalid' ? Intent.DANGER : Intent.NONE
               }
               rightElement={
-                <Popover
-                  position={Position.BOTTOM_RIGHT}
+                <PopoverNext
+                  placement="bottom-end"
                   content={
                     <Menu>
                       {CRON_PRESETS.map(p => (
@@ -218,8 +217,12 @@ export const ScheduleEditorDialog = ({
                     </Menu>
                   }
                 >
-                  <Button minimal rightIcon="caret-down" text="Presets" />
-                </Popover>
+                  <Button
+                    variant="minimal"
+                    endIcon="caret-down"
+                    text="Presets"
+                  />
+                </PopoverNext>
               }
             />
           </FormGroup>

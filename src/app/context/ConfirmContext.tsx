@@ -29,7 +29,7 @@ const ConfirmContext = createContext<ConfirmFn>(() => Promise.resolve(false));
 export const ConfirmProvider = ({ children }: { children: ReactNode }) => {
   const [options, setOptions] = useState<ConfirmOptions | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const resolver = useRef<(value: boolean) => void>();
+  const resolver = useRef<((value: boolean) => void) | undefined>(undefined);
 
   const confirm = useCallback<ConfirmFn>(opts => {
     resolver.current?.(false);

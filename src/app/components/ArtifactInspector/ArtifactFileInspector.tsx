@@ -34,7 +34,7 @@ export const ArtifactFileInspector = memo(
         title={shown ? `${artifactId} ${shown.version}` : ''}
       >
         <div className={Classes.DIALOG_BODY}>
-          <HTMLTable className="files-table" condensed striped bordered>
+          <HTMLTable className="files-table" compact striped bordered>
             <thead>
               <tr>
                 <th>Type</th>

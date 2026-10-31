@@ -138,7 +138,7 @@ export const ApprovalsPage = memo(() => {
   const allSelected =
     pending.length > 0 && selectedItems.length === pending.length;
 
-  let body: JSX.Element;
+  let body: React.JSX.Element;
   if (query.isLoading) {
     body = <LoadingState label="Loading requests…" />;
   } else if (query.isError && !query.data) {
@@ -160,7 +160,7 @@ export const ApprovalsPage = memo(() => {
   } else {
     body = (
       <ScrollTableContainer>
-        <HTMLTable striped condensed style={{ width: '100%' }}>
+        <HTMLTable striped compact style={{ width: '100%' }}>
           <thead>
             <tr>
               <th style={{ width: 32 }}>
@@ -233,7 +233,7 @@ export const ApprovalsPage = memo(() => {
                   <td style={{ whiteSpace: 'nowrap', textAlign: 'right' }}>
                     <ButtonGroup>
                       <Button
-                        small
+                        size="small"
                         intent={Intent.SUCCESS}
                         icon="tick"
                         disabled={isBusy || invalidFilter}
@@ -247,7 +247,7 @@ export const ApprovalsPage = memo(() => {
                         Approve
                       </Button>
                       <Button
-                        small
+                        size="small"
                         intent={Intent.DANGER}
                         icon="cross"
                         disabled={isBusy}

@@ -84,7 +84,7 @@ export const QueueStatusTable = memo(() => {
 
   return (
     <ScrollTableContainer>
-      <HTMLTable striped condensed style={{ width: '100%' }}>
+      <HTMLTable striped compact style={{ width: '100%' }}>
         <thead>
           <tr>
             <th>Queue</th>
@@ -128,8 +128,8 @@ export const QueueStatusTable = memo(() => {
               {isAdmin && (
                 <td style={{ textAlign: 'right' }}>
                   <Button
-                    minimal
-                    small
+                    variant="minimal"
+                    size="small"
                     intent={Intent.DANGER}
                     icon="trash"
                     text="Purge…"

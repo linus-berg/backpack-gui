@@ -77,8 +77,8 @@ export const NewsPostCard = ({ post, isAdmin }: Props) => {
             <Tooltip content="Delete announcement">
               <Button
                 icon="trash"
-                minimal
-                small
+                variant="minimal"
+                size="small"
                 intent={Intent.DANGER}
                 aria-label={`Delete announcement “${post.title}”`}
                 onClick={handleDelete}

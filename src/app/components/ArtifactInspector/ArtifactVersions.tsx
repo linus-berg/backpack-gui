@@ -124,7 +124,7 @@ export const ArtifactVersions = memo(({ artifact, compiled }: Props) => {
         </span>
       </Toolbar>
       <ScrollTableContainer style={{ maxHeight: '50vh', marginTop: 10 }}>
-        <HTMLTable condensed striped style={{ width: '100%' }}>
+        <HTMLTable compact striped style={{ width: '100%' }}>
           <thead>
             <tr>
               <th style={{ width: 40 }}>
@@ -145,8 +145,8 @@ export const ArtifactVersions = memo(({ artifact, compiled }: Props) => {
                   <td style={{ fontWeight: 600 }}>{version.version}</td>
                   <td style={{ textAlign: 'right' }}>
                     <Button
-                      small
-                      minimal
+                      size="small"
+                      variant="minimal"
                       icon="folder-open"
                       intent={Intent.PRIMARY}
                       disabled={fileCount === 0}

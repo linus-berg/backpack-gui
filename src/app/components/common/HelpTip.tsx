@@ -2,7 +2,7 @@ import React from 'react';
 import { Classes, Icon, Position, Tooltip } from '@blueprintjs/core';
 
 interface Props {
-  content: string | JSX.Element;
+  content: string | React.JSX.Element;
   /** Accessible label; defaults to "More information". */
   label?: string;
   position?: Position;
@@ -21,6 +21,7 @@ export const HelpTip = ({
       className={Classes.TEXT_MUTED}
       tabIndex={0}
       aria-label={label}
+      title={label}
       style={{ cursor: 'help', marginLeft: 6, verticalAlign: 'text-bottom' }}
     />
   </Tooltip>

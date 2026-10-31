@@ -81,7 +81,7 @@ const AddProcessorDialog = ({
     },
   });
 
-  const submit = (e: React.FormEvent) => {
+  const submit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!trimmed || error) {
       return;

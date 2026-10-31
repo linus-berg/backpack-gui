@@ -10,7 +10,6 @@ import 'react-app-polyfill/stable';
 
 import * as React from 'react';
 import * as ReactDOMClient from 'react-dom/client';
-import { Provider } from 'react-redux';
 
 // Use consistent styling
 import 'sanitize.css/sanitize.css';
@@ -22,27 +21,22 @@ import { App } from 'app';
 
 import { HelmetProvider } from 'react-helmet-async';
 
-import { configureAppStore } from 'store/configureStore';
-
 import reportWebVitals from 'reportWebVitals';
 
 // Initialize languages
 import './locales/i18n';
 import { OidcWrapper } from './app/components/OidcWrapper';
 
-const store = configureAppStore();
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 
 ReactDOMClient.createRoot(MOUNT_NODE!).render(
-  <Provider store={store}>
-    <HelmetProvider>
-      <React.StrictMode>
-        <OidcWrapper>
-          <App />
-        </OidcWrapper>
-      </React.StrictMode>
-    </HelmetProvider>
-  </Provider>,
+  <HelmetProvider>
+    <React.StrictMode>
+      <OidcWrapper>
+        <App />
+      </OidcWrapper>
+    </React.StrictMode>
+  </HelmetProvider>,
 );
 
 // Hot reloadable translation json files

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkbox } from '@blueprintjs/core';
+import { Checkbox, Classes } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { HelpTip } from 'app/components/common/HelpTip';
 import {
@@ -23,7 +23,7 @@ const Flags = styled.div<{ $column: boolean }>`
   gap: ${p => (p.$column ? '4px' : '8px 24px')};
   margin-top: 1rem;
 
-  .bp4-control {
+  .${Classes.CONTROL} {
     margin-bottom: 0;
   }
 `;

@@ -6,10 +6,11 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import { Classes } from '@blueprintjs/core';
 
 /** Same key the previous toggle used, so existing preferences carry over. */
 export const THEME_STORAGE_KEY = 'blueprintjs-dark-mode';
-const DARK_CLASS = 'bp4-dark';
+const DARK_CLASS = Classes.DARK;
 
 const readSavedPreference = (): boolean | null => {
   try {

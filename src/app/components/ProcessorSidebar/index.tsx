@@ -59,7 +59,7 @@ const Item = styled(NavLink)`
   border-radius: 3px;
   white-space: nowrap;
 
-  /* && outranks Blueprint's '.bp4-dark a' link color. */
+  /* && outranks Blueprint's '.bp6-dark a' link color. */
   &&,
   &&:hover {
     color: inherit;
@@ -134,7 +134,7 @@ export const ProcessorSidebar = ({
       {processors.length > 6 && (
         <InputGroup
           type="search"
-          small
+          size="small"
           leftIcon="search"
           placeholder="Find processor…"
           aria-label="Find processor"

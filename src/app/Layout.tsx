@@ -11,7 +11,7 @@ import {
   MenuDivider,
   MenuItem,
   Navbar,
-  Popover,
+  PopoverNext,
   Position,
   Tag,
   Tooltip,
@@ -205,7 +205,7 @@ export function Layout() {
   return (
     <>
       <NavBar>
-        <Navbar.Group align={Alignment.LEFT}>
+        <Navbar.Group align={Alignment.START}>
           <Navbar.Heading>
             <LogoBox to="/" aria-label="Backpack home">
               <Logo src={LogoImage} alt="" />
@@ -236,39 +236,36 @@ export function Layout() {
                   }
                 />
                 <Navbar.Divider />
-                <Popover
-                  content={<ToolsMenu />}
-                  position={Position.BOTTOM_LEFT}
-                >
-                  <Button icon="wrench" minimal rightIcon="caret-down">
+                <PopoverNext content={<ToolsMenu />} placement="bottom-start">
+                  <Button icon="wrench" variant="minimal" endIcon="caret-down">
                     <span className="nav-text">Tools</span>
                   </Button>
-                </Popover>
+                </PopoverNext>
               </>
             )}
           </NavContainer>
         </Navbar.Group>
-        <Navbar.Group align={Alignment.RIGHT}>
+        <Navbar.Group align={Alignment.END}>
           <Tooltip content="Documentation & help" position={Position.BOTTOM}>
             <Button
               icon="help"
-              minimal
+              variant="minimal"
               aria-label="Documentation and help"
               onClick={() => setIsHelpOpen(true)}
             />
           </Tooltip>
           <ThemeToggle />
           <Navbar.Divider />
-          <Popover content={userMenu} position={Position.BOTTOM_RIGHT}>
+          <PopoverNext content={userMenu} placement="bottom-end">
             <Button
               icon="user"
-              minimal
-              rightIcon="caret-down"
+              variant="minimal"
+              endIcon="caret-down"
               aria-label="Account"
             >
               <span className="nav-text">{user?.name ?? 'Account'}</span>
             </Button>
-          </Popover>
+          </PopoverNext>
         </Navbar.Group>
       </NavBar>
       <Main>

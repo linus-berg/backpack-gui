@@ -4,9 +4,10 @@ Web interface for [Backpack](../backpack-backend/README.md): browse mirrored
 artifacts, add new ones, watch queues and events, and administer processors,
 approvals, schedules and API keys.
 
-Built with React 18, [Blueprint 4](https://blueprintjs.com/docs/v4/),
-TanStack Query and Vite. Every asset (Monaco editor, Inter font, icons) is
-bundled, so the UI works on networks without internet access.
+Built with React 19, [Blueprint 6](https://blueprintjs.com/docs/),
+TanStack Query, styled-components 6 and Vite. Every asset (Monaco editor,
+Inter font, icons) is bundled, so the UI works on networks without internet
+access.
 
 ## Development
 
@@ -51,4 +52,13 @@ advertises at `/api/auth/oidc`. Run the backend stack from
 - **Shareable state:** browser state (search, filters, open artifact) lives in
   the URL; see `src/app/pages/ProcessorBrowser/useBrowserParams.ts`.
 
-`yarn generate` scaffolds components and Redux slices (`internals/generators`).
+### Blueprint 6 notes
+
+- Class names use the `bp6-` prefix. In TypeScript use `Classes.*` (e.g.
+  `Classes.DARK`); SCSS and the theme script in `index.html` use the literal.
+- Use `variant="minimal"`, `size="small"` and `endIcon` instead of the
+  deprecated `minimal`, `small` and `rightIcon` props, and `PopoverNext`
+  instead of `Popover`.
+- The app is wrapped in `BlueprintProvider` (hotkeys, overlays, portals).
+- Toasts go through `notify` in `src/utils/toaster.ts`; Blueprint 6 creates
+  toasters asynchronously.

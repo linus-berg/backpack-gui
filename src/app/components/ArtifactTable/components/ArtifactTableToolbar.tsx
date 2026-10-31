@@ -119,7 +119,7 @@ export const ArtifactTableToolbar = (props: Props) => {
             rightElement={
               searchFilter ? (
                 <Button
-                  minimal
+                  variant="minimal"
                   icon="cross"
                   aria-label="Clear search"
                   onClick={() => onSearchFilterChange('')}
@@ -136,7 +136,7 @@ export const ArtifactTableToolbar = (props: Props) => {
             {props.canCollect && (
               <>
                 <Button
-                  small
+                  size="small"
                   icon={
                     props.updateLabel === ARTIFACT_ACTIONS.track.label
                       ? ARTIFACT_ACTIONS.track.icon
@@ -146,7 +146,7 @@ export const ArtifactTableToolbar = (props: Props) => {
                   onClick={() => props.onBulkAction('update')}
                 />
                 <Button
-                  small
+                  size="small"
                   icon={ARTIFACT_ACTIONS.validate.icon}
                   text={ARTIFACT_ACTIONS.validate.label}
                   onClick={() => props.onBulkAction('validate')}
@@ -155,7 +155,7 @@ export const ArtifactTableToolbar = (props: Props) => {
             )}
             {props.canDelete && (
               <Button
-                small
+                size="small"
                 intent={Intent.DANGER}
                 icon={ARTIFACT_ACTIONS.delete.icon}
                 text={`${ARTIFACT_ACTIONS.delete.label}…`}
@@ -164,8 +164,8 @@ export const ArtifactTableToolbar = (props: Props) => {
             )}
           </Group>
           <Button
-            small
-            minimal
+            size="small"
+            variant="minimal"
             text="Clear selection"
             onClick={() => props.onSelectAll(false)}
           />

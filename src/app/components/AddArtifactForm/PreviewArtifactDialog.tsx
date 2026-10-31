@@ -140,8 +140,8 @@ export const PreviewArtifactDialog = ({
                 ) : null}
               </div>
               <Button
-                small
-                minimal
+                size="small"
+                variant="minimal"
                 icon="refresh"
                 text="Refresh"
                 loading={query.isFetching}
@@ -161,7 +161,7 @@ export const PreviewArtifactDialog = ({
                   Discovered versions ({versions.length})
                 </SectionTitle>
                 <ScrollTableContainer style={{ maxHeight: '50vh' }}>
-                  <HTMLTable striped condensed style={{ width: '100%' }}>
+                  <HTMLTable striped compact style={{ width: '100%' }}>
                     <thead>
                       <tr>
                         <th style={{ width: 40 }} />
@@ -220,7 +220,7 @@ export const PreviewArtifactDialog = ({
                   Direct dependencies ({dependencies.length})
                 </SectionTitle>
                 <ScrollTableContainer style={{ maxHeight: '50vh' }}>
-                  <HTMLTable striped condensed style={{ width: '100%' }}>
+                  <HTMLTable striped compact style={{ width: '100%' }}>
                     <thead>
                       <tr>
                         <th>Processor</th>
