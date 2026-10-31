@@ -5,6 +5,11 @@
   </picture>
 </p>
 
+<p align="center">
+  <a href="https://github.com/linus-berg/backpack-gui/actions/workflows/build-and-publish.yml"><img src="https://github.com/linus-berg/backpack-gui/actions/workflows/build-and-publish.yml/badge.svg?branch=master" alt="Build and Publish"></a>
+  <a href="https://github.com/linus-berg/backpack-gui/actions/workflows/codeql.yml"><img src="https://github.com/linus-berg/backpack-gui/actions/workflows/codeql.yml/badge.svg?branch=master" alt="CodeQL"></a>
+</p>
+
 # Backpack UI
 
 Web interface for [Backpack](../backpack-backend/README.md): browse mirrored
