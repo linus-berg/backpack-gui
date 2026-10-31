@@ -114,7 +114,15 @@ export const BulkAddDialog = memo(({ processor, isOpen, onClose }: Props) => {
   const [statuses, setStatuses] = useState<Record<number, RowStatus>>({});
   const stopRequested = useRef(false);
 
-  const lines = useMemo(() => parseBulkLines(text, aux), [text, aux]);
+  const lines = useMemo(
+    () =>
+      parseBulkLines(
+        text,
+        aux,
+        processor.direct_collect ? processor.id : undefined,
+      ),
+    [text, aux, processor],
+  );
   const valid = lines.filter(l => l.errors.length === 0);
   const invalidCount = lines.length - valid.length;
 

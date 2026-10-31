@@ -1,6 +1,7 @@
 import { AuxDict } from 'types/AuxDict';
 import { auxDefaults, auxFieldList } from 'utils/processorConfig';
 import { validateFilterInput } from 'utils/versionFilter';
+import { validateCollectLocation } from 'utils/collectLocation';
 
 export interface BulkLine {
   /** 1-based line number in the textarea. */
@@ -21,8 +22,14 @@ export interface BulkLine {
  * lines starting with `#` are ignored.
  * @param text The textarea contents.
  * @param aux Field definitions, used for defaults and to flag unknown keys.
+ * @param directProcessorId For direct-collect processors, whose IDs are
+ * locations: checks that each ID includes its protocol.
  */
-export const parseBulkLines = (text: string, aux: AuxDict): BulkLine[] => {
+export const parseBulkLines = (
+  text: string,
+  aux: AuxDict,
+  directProcessorId?: string,
+): BulkLine[] => {
   const knownKeys = new Set(auxFieldList(aux).map(f => f.key));
   const defaults = auxDefaults(aux);
   const seen = new Map<string, number>();
@@ -41,8 +48,14 @@ export const parseBulkLines = (text: string, aux: AuxDict): BulkLine[] => {
     const errors: string[] = [];
     const warnings: string[] = [];
 
+    const locationError =
+      id && directProcessorId
+        ? validateCollectLocation(id, directProcessorId)
+        : null;
     if (!id) {
       errors.push('Missing artifact ID.');
+    } else if (locationError) {
+      errors.push(locationError);
     } else if (seen.has(id)) {
       errors.push(`Duplicate of line ${seen.get(id)}.`);
     } else {

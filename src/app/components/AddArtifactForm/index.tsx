@@ -20,6 +20,10 @@ import { classifyAddResponse } from 'utils/addArtifact';
 import { auxDefaults, parseAuxConfig } from 'utils/processorConfig';
 import { notify } from 'utils/toaster';
 import { validateFilterInput } from 'utils/versionFilter';
+import {
+  exampleLocation,
+  validateCollectLocation,
+} from 'utils/collectLocation';
 import { HelpTip } from 'app/components/common/HelpTip';
 import { RichMarkdownView } from 'app/components/common/RichMarkdownView';
 import { ARTIFACT_ACTIONS } from 'app/components/ArtifactActions/actions';
@@ -43,6 +47,8 @@ export const AddArtifactForm = memo(({ processor }: Props) => {
   const { inspect } = useBrowserParams();
   const aux = useMemo(() => parseAuxConfig(processor.config), [processor]);
   const defaults = useMemo(() => auxDefaults(aux), [aux]);
+  /** Direct-collect artifacts are added by their URL, see utils/collectLocation. */
+  const isDirect = processor.direct_collect;
   const idPrefix = `add-${processor.id}`;
 
   const {
@@ -147,43 +153,56 @@ export const AddArtifactForm = memo(({ processor }: Props) => {
         name="name"
         control={control}
         rules={{
-          validate: value => value.trim() !== '' || 'Enter an artifact name.',
+          validate: value => {
+            if (value.trim() === '') {
+              return isDirect ? 'Enter a location.' : 'Enter an artifact name.';
+            }
+            return (
+              (isDirect && validateCollectLocation(value, processor.id)) || true
+            );
+          },
         }}
-        render={({ field, fieldState }) => (
-          <FormGroup
-            label={
-              <>
-                Artifact name
-                <HelpTip content="The package's identifier in its registry, e.g. 'lodash' or 'ubuntu'." />
-              </>
-            }
-            labelFor={`${idPrefix}-name`}
-            labelInfo="(required)"
-            intent={
-              fieldState.error && fieldState.isTouched
-                ? Intent.DANGER
-                : Intent.NONE
-            }
-            helperText={
-              fieldState.isTouched ? fieldState.error?.message : undefined
-            }
-            style={{ marginBottom: 0 }}
-          >
-            <InputGroup
-              {...field}
-              id={`${idPrefix}-name`}
-              fill
-              placeholder="e.g. react"
-              leftIcon="cube"
-              autoComplete="off"
-              intent={
-                fieldState.error && fieldState.isTouched
-                  ? Intent.DANGER
-                  : Intent.NONE
+        render={({ field, fieldState }) => {
+          // Show problems as soon as something is typed, not only on blur,
+          // so a missing protocol is caught before submitting.
+          const showError =
+            !!fieldState.error && (fieldState.isTouched || fieldState.isDirty);
+          return (
+            <FormGroup
+              label={
+                <>
+                  {isDirect ? 'Location' : 'Artifact name'}
+                  <HelpTip
+                    content={
+                      isDirect
+                        ? 'The URL to collect from, including the protocol. The protocol picks the collector, e.g. git:// for the Git collector.'
+                        : "The package's identifier in its registry, e.g. 'lodash' or 'ubuntu'."
+                    }
+                  />
+                </>
               }
-            />
-          </FormGroup>
-        )}
+              labelFor={`${idPrefix}-name`}
+              labelInfo="(required)"
+              intent={showError ? Intent.DANGER : Intent.NONE}
+              helperText={showError ? fieldState.error?.message : undefined}
+              style={{ marginBottom: 0 }}
+            >
+              <InputGroup
+                {...field}
+                id={`${idPrefix}-name`}
+                fill
+                placeholder={
+                  isDirect
+                    ? `e.g. ${exampleLocation(processor.id)}`
+                    : 'e.g. react'
+                }
+                leftIcon={isDirect ? 'link' : 'cube'}
+                autoComplete="off"
+                intent={showError ? Intent.DANGER : Intent.NONE}
+              />
+            </FormGroup>
+          );
+        }}
       />
 
       <Controller
