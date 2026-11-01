@@ -9,6 +9,7 @@ import { Processor } from '../types/Processor';
 import { ArtifactCount } from 'types/ArtifactCount';
 import { QueueStatus } from '../types/QueueStatus';
 import { InfrastructureHealth } from '../types/InfrastructureHealth';
+import { Job, JobKind } from '../types/Job';
 import { Event } from '../types/Event';
 import { Schedule } from '../types/Schedule';
 import { ScheduleValidationResult } from '../types/ScheduleValidationResult';
@@ -136,8 +137,18 @@ export const useBackpackApi = () => {
     return backpack.delete(`/news/${id}`);
   };
 
-  const TriggerSync = (processor: string): Promise<AxiosResponse<void>> => {
-    return backpack.post(`/scheduler/trigger/${processor}`);
+  /* Background jobs: one runs at a time; starting another answers 409. */
+  const GetJobs = (limit = 50): Promise<AxiosResponse<Job[]>> => {
+    return backpack.get<Job[]>('/jobs', { params: { limit } });
+  };
+  const StartJob = (input: {
+    kind: JobKind;
+    processor?: string | null;
+  }): Promise<AxiosResponse<Job>> => {
+    return backpack.post<Job>('/jobs', input);
+  };
+  const CancelJob = (id: string): Promise<AxiosResponse<Job>> => {
+    return backpack.post<Job>(`/jobs/${encodeURIComponent(id)}/cancel`);
   };
 
   const UpdateSchedule = (schedule: Schedule): Promise<AxiosResponse<void>> => {
@@ -266,14 +277,6 @@ export const useBackpackApi = () => {
       dependencies: {},
     });
   };
-  const TrackAllArtifacts = (): Promise<AxiosResponse<string>> => {
-    return backpack.post(BACKPACK_ARTIFACTS + '/track/all');
-  };
-
-  const ValidateAllArtifacts = (): Promise<AxiosResponse<string>> => {
-    return backpack.post(BACKPACK_ARTIFACTS + '/validate/all');
-  };
-
   /* Add Processor */
   const AddProcessor = ({
     processor_id,
@@ -334,21 +337,21 @@ export const useBackpackApi = () => {
     GetNewsPosts,
     CreateNewsPost,
     DeleteNewsPost,
-    TriggerSync,
+    GetJobs,
+    StartJob,
+    CancelJob,
     PurgeQueue,
     AddProcessor,
     UpdateProcessor,
     DeleteProcessor,
     AddArtifact,
     GetArtifact,
-    TrackAllArtifacts,
     TrackArtifact,
     PreviewArtifact,
     DeleteArtifact,
     GetAllProcessors,
     GetAllProcessorArtifacts,
     GetArtifactCounts,
-    ValidateAllArtifacts,
     ValidateArtifact,
     GetPendingArtifacts,
     ApproveArtifact,

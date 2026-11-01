@@ -143,8 +143,8 @@ export const HelpDialog = ({ isOpen, onClose }: Props) => (
           <Item icon="calendar" title="Schedules" admin>
             <p>
               Check processors for new versions automatically on a cron
-              schedule, or trigger a sync now. The Status page shows the next
-              scheduled run to everyone.
+              schedule, or sync one now as a background job. The Status page
+              shows the next scheduled run to everyone.
             </p>
           </Item>
           <Item icon="key" title="API keys" admin>
@@ -160,7 +160,14 @@ export const HelpDialog = ({ isOpen, onClose }: Props) => (
           <Item icon="build" title="System tasks" admin>
             <p>
               Check every artifact for updates, or validate every artifact to
-              collect files missing from storage.
+              collect files missing from storage. Both run as background jobs.
+            </p>
+          </Item>
+          <Item icon="history" title="Jobs" admin>
+            <p>
+              Follow re-tracks and validations as they run, cancel one, or start
+              one for a single processor. One job runs at a time; scheduled
+              re-tracks wait their turn.
             </p>
           </Item>
           <Item

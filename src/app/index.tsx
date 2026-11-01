@@ -46,6 +46,7 @@ import {
   AnnouncementsPage,
   SchedulesPage,
   SystemTasksPage,
+  JobsPage,
 } from './pages/Admin/Loadable';
 import { LandingPage } from './pages/LandingPage';
 import { Layout } from './Layout';
@@ -123,6 +124,7 @@ const AppRoutes = () => (
         <Route path="api-keys" element={<ApiKeyPage />} />
         <Route path="announcements" element={<AnnouncementsPage />} />
         <Route path="tasks" element={<SystemTasksPage />} />
+        <Route path="jobs" element={<JobsPage />} />
       </Route>
       {/* Locations before the Admin section, kept for bookmarks. */}
       <Route

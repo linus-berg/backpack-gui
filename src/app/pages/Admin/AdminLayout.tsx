@@ -1,8 +1,10 @@
 import React from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Classes, Icon, IconName } from '@blueprintjs/core';
+import { Classes, Icon, IconName, Spinner, Tooltip } from '@blueprintjs/core';
 import styled from 'styled-components';
+import { useActiveJobs } from 'api/queries';
 import { ErrorBoundary } from 'app/components/common/ErrorBoundary';
+import { jobProgress, jobTitle } from 'utils/jobs';
 
 interface Section {
   to: string;
@@ -17,6 +19,7 @@ export const ADMIN_SECTIONS: Section[] = [
   { to: '/admin/api-keys', icon: 'key', label: 'API keys' },
   { to: '/admin/announcements', icon: 'feed', label: 'Announcements' },
   { to: '/admin/tasks', icon: 'build', label: 'System tasks' },
+  { to: '/admin/jobs', icon: 'history', label: 'Jobs' },
 ];
 
 const Shell = styled.div`
@@ -107,6 +110,9 @@ const Content = styled.div`
  */
 export const AdminLayout = () => {
   const location = useLocation();
+  /* A running job is shown next to "Jobs" on every admin page. */
+  const { running } = useActiveJobs();
+  const progress = running ? jobProgress(running) : undefined;
   return (
     <Shell>
       <Nav aria-label="Administration">
@@ -115,6 +121,22 @@ export const AdminLayout = () => {
           <Item key={section.to} to={section.to}>
             <Icon icon={section.icon} className={Classes.TEXT_MUTED} />
             {section.label}
+            {section.to === '/admin/jobs' && running && (
+              <Tooltip
+                content={`${jobTitle(running)}${
+                  progress !== undefined
+                    ? ` · ${Math.floor(progress * 100)}%`
+                    : ''
+                }`}
+              >
+                <Spinner
+                  size={14}
+                  value={progress}
+                  aria-label={`${jobTitle(running)} is running`}
+                  style={{ marginLeft: 'auto' }}
+                />
+              </Tooltip>
+            )}
           </Item>
         ))}
       </Nav>

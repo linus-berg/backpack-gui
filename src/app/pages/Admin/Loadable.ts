@@ -20,6 +20,11 @@ export const AnnouncementsPage = lazyLoad(
   module => module.AnnouncementsPage,
 );
 
+export const JobsPage = lazyLoad(
+  () => import('./JobsPage'),
+  module => module.JobsPage,
+);
+
 export const SystemTasksPage = lazyLoad(
   () => import('./SystemTasksPage'),
   module => module.SystemTasksPage,

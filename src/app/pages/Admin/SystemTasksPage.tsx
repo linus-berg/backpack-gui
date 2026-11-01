@@ -1,21 +1,41 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 import {
   Button,
+  Callout,
   Card,
   Classes,
   H5,
   Icon,
   IconName,
   Intent,
+  Tooltip,
 } from '@blueprintjs/core';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { useBackpackApi } from 'api/backpack';
+import { queryKeys, useActiveJobs } from 'api/queries';
 import { useConfirm } from 'app/context/ConfirmContext';
 import { Page, PageHeader } from 'app/components/common/PageHeader';
 import { LinkButton } from 'app/components/common/LinkButton';
+import { JobKind } from 'types/Job';
+import { jobProgress, jobTitle } from 'utils/jobs';
 import { notify } from 'utils/toaster';
+
+const Running = styled(Callout)`
+  max-width: 1100px;
+  margin-bottom: 16px;
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .row > :last-child {
+    margin-left: auto;
+  }
+`;
 
 const Tasks = styled.div`
   display: grid;
@@ -39,6 +59,8 @@ const TaskCard = styled(Card)`
     margin: 0;
   }
   .task-action {
+    display: flex;
+    gap: 8px;
     margin-top: auto;
     padding-top: 4px;
   }
@@ -62,39 +84,47 @@ const Task = ({ icon, title, children, action }: TaskProps) => (
   </TaskCard>
 );
 
-/** Admin → System tasks: maintenance actions that cover every processor. */
+/**
+ * Admin → System tasks: maintenance actions that cover every processor. They
+ * run as background jobs, one at a time (see the Jobs page).
+ */
 export const SystemTasksPage = () => {
   const api = useBackpackApi();
   const confirm = useConfirm();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { running } = useActiveJobs();
+  const progress = running ? jobProgress(running) : undefined;
 
-  const trackAll = useMutation({
-    mutationFn: api.TrackAllArtifacts,
-    meta: { errorTitle: 'Could not start tracking' },
-    onSuccess: () =>
-      notify.success(
-        'Checking every artifact for updates. Progress is shown in System Events.',
-      ),
+  const start = useMutation({
+    mutationFn: api.StartJob,
+    meta: { errorTitle: 'Could not start the job' },
+    onSuccess: res => {
+      notify.success(`${jobTitle(res.data)} started in the background.`, {
+        action: { text: 'View job', onClick: () => navigate('/admin/jobs') },
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs });
+    },
   });
-  const validateAll = useMutation({
-    mutationFn: api.ValidateAllArtifacts,
-    meta: { errorTitle: 'Could not start validation' },
-    onSuccess: () =>
-      notify.success(
-        'Validating every artifact. Problems are reported in System Events.',
-      ),
-  });
+  const isStarting = (kind: JobKind) =>
+    start.isPending && start.variables?.kind === kind;
+  const busy = running
+    ? `${jobTitle(
+        running,
+      )} is running. Wait for it to finish, or cancel it on the Jobs page.`
+    : '';
 
   const runTrackAll = async () => {
     const ok = await confirm({
       title: 'Check all artifacts for updates?',
       message:
-        'Every root artifact in every processor is checked upstream for new versions and dependencies. On large mirrors this queues a lot of work and can take hours.',
+        'Every root artifact in every processor is checked upstream for new versions and dependencies. On large mirrors this queues a lot of work. It runs in the background, so you can leave this page and follow it on the Jobs page.',
       confirmText: 'Check all',
       intent: Intent.WARNING,
       icon: 'refresh',
     });
     if (ok) {
-      trackAll.mutate();
+      start.mutate({ kind: 'track' });
     }
   };
 
@@ -102,13 +132,13 @@ export const SystemTasksPage = () => {
     const ok = await confirm({
       title: 'Validate all artifacts?',
       message:
-        'The files of every known version in every processor are sent to the collectors again, and any that are missing from storage are downloaded. On large mirrors this can take hours.',
+        'The files of every known version in every processor are sent to the collectors again, and any that are missing from storage are downloaded. It runs in the background, so you can leave this page and follow it on the Jobs page.',
       confirmText: 'Validate all',
       intent: Intent.WARNING,
       icon: 'archive',
     });
     if (ok) {
-      validateAll.mutate();
+      start.mutate({ kind: 'validate' });
     }
   };
 
@@ -121,20 +151,38 @@ export const SystemTasksPage = () => {
         <PageHeader
           icon="build"
           title="System tasks"
-          description="Maintenance that covers every processor at once. To run it for a single processor or artifact, use its schedule or the artifact's actions."
+          description="Maintenance that covers every processor at once. Each runs as a background job; only one job runs at a time."
         />
+        {running && (
+          <Running intent={Intent.PRIMARY} icon="refresh">
+            <div className="row">
+              <span>
+                <b>{jobTitle(running)}</b> is running
+                {progress !== undefined &&
+                  ` · ${running.done.toLocaleString()} of ${running.total.toLocaleString()} artifacts (${Math.floor(
+                    progress * 100,
+                  )}%)`}
+                . The tasks below can start once it has finished.
+              </span>
+              <LinkButton to="/admin/jobs" icon="arrow-right" text="View job" />
+            </div>
+          </Running>
+        )}
         <Tasks>
           <Task
             icon="refresh"
             title="Check all artifacts for updates"
             action={
-              <Button
-                icon="refresh"
-                loading={trackAll.isPending}
-                onClick={runTrackAll}
-              >
-                Check all…
-              </Button>
+              <Tooltip content={busy} disabled={!running}>
+                <Button
+                  icon="refresh"
+                  loading={isStarting('track')}
+                  disabled={!!running}
+                  onClick={runTrackAll}
+                >
+                  Check all…
+                </Button>
+              </Tooltip>
             }
           >
             <p>
@@ -151,13 +199,16 @@ export const SystemTasksPage = () => {
             icon="archive"
             title="Validate all artifacts"
             action={
-              <Button
-                icon="archive"
-                loading={validateAll.isPending}
-                onClick={runValidateAll}
-              >
-                Validate all…
-              </Button>
+              <Tooltip content={busy} disabled={!running}>
+                <Button
+                  icon="archive"
+                  loading={isStarting('validate')}
+                  disabled={!!running}
+                  onClick={runValidateAll}
+                >
+                  Validate all…
+                </Button>
+              </Tooltip>
             }
           >
             <p>
@@ -170,15 +221,22 @@ export const SystemTasksPage = () => {
             </p>
           </Task>
           <Task
-            icon="pulse"
-            title="Queues and events"
+            icon="history"
+            title="Jobs and queues"
             action={
-              <LinkButton to="/status" icon="arrow-right" text="Open Status" />
+              <>
+                <LinkButton to="/admin/jobs" icon="history" text="Open Jobs" />
+                <LinkButton to="/status" icon="pulse" text="Open Status" />
+              </>
             }
           >
             <p>
-              Watch these tasks progress, purge a queue, and read the system
-              events on the Status page.
+              Follow a running job, cancel it, or start one for a single
+              processor on the Jobs page.
+            </p>
+            <p className={Classes.TEXT_MUTED}>
+              A job ends once every artifact has been sent on; the queues it
+              fills, and the system events, are on the Status page.
             </p>
           </Task>
         </Tasks>

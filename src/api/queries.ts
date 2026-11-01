@@ -6,6 +6,7 @@ import {
 import { useCallback } from 'react';
 import { Processor } from 'types/Processor';
 import { isNotFound } from 'utils/errors';
+import { isActiveJob } from 'utils/jobs';
 import { ArtifactRef, useBackpackApi } from './backpack';
 
 /**
@@ -31,6 +32,7 @@ export const queryKeys = {
   schedules: ['schedules'] as const,
   queues: ['queue_status'] as const,
   infrastructure: ['infrastructure_health'] as const,
+  jobs: ['jobs'] as const,
   news: ['news'] as const,
   apiKeys: ['api_keys'] as const,
 };
@@ -132,6 +134,32 @@ export const useInfrastructureHealth = (refetchInterval = 10_000) => {
     // APIs from before the endpoint answer 404; don't retry those.
     retry: (count, error) => !isNotFound(error) && count < 2,
   });
+};
+
+/**
+ * Background jobs, newest first: every 2 s while one is waiting or running,
+ * every 15 s otherwise. Administrators only.
+ */
+export const useJobs = (enabled = true) => {
+  const api = useBackpackApi();
+  return useQuery({
+    queryKey: queryKeys.jobs,
+    queryFn: () => api.GetJobs().then(r => r.data),
+    enabled,
+    refetchInterval: query =>
+      (query.state.data ?? []).some(isActiveJob) ? 2_000 : 15_000,
+  });
+};
+
+/** The running job, if any, and the jobs waiting for it. */
+export const useActiveJobs = (enabled = true) => {
+  const query = useJobs(enabled);
+  const jobs = query.data ?? [];
+  return {
+    running: jobs.find(j => j.state === 'running'),
+    waiting: jobs.filter(j => j.state === 'waiting'),
+    query,
+  };
 };
 
 export const useSchedules = () => {

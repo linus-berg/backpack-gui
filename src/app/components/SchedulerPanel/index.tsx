@@ -10,10 +10,12 @@ import {
 } from '@blueprintjs/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackpackApi } from 'api/backpack';
-import { queryKeys, useSchedules } from 'api/queries';
+import { useNavigate } from 'react-router-dom';
+import { queryKeys, useActiveJobs, useSchedules } from 'api/queries';
 import { useConfirm } from 'app/context/ConfirmContext';
 import { useUser } from 'app/context/UserContext';
 import { Schedule } from 'types/Schedule';
+import { jobTitle } from 'utils/jobs';
 import { notify } from 'utils/toaster';
 import { DateTime } from 'app/components/common/DateTime';
 import { PageHeader, SectionHeader } from 'app/components/common/PageHeader';
@@ -47,6 +49,7 @@ export const SchedulerPanel = memo(
     const backpack = useBackpackApi();
     const queryClient = useQueryClient();
     const confirm = useConfirm();
+    const navigate = useNavigate();
     const { hasRole } = useUser();
     const isAdministrator = hasRole('Administrator');
     /* Editing controls (add, edit, delete, sync now). */
@@ -55,13 +58,18 @@ export const SchedulerPanel = memo(
     const [editing, setEditing] = useState<Schedule | null>(null);
     const [isEditorOpen, setIsEditorOpen] = useState(false);
 
+    /* "Sync now" starts a background re-track job; only one job runs at a
+       time, so it is disabled while one does. */
+    const { running } = useActiveJobs(isAdmin);
     const syncMutation = useMutation({
-      mutationFn: backpack.TriggerSync,
+      mutationFn: (processor: string) =>
+        backpack.StartJob({ kind: 'track', processor }),
       meta: { errorTitle: 'Could not start the sync' },
-      onSuccess: (_res, processor) => {
-        notify.success(
-          `Sync started for ${processor}. Progress is shown in System Events.`,
-        );
+      onSuccess: res => {
+        notify.success(`${jobTitle(res.data)} started in the background.`, {
+          action: { text: 'View job', onClick: () => navigate('/admin/jobs') },
+        });
+        queryClient.invalidateQueries({ queryKey: queryKeys.jobs });
         queryClient.invalidateQueries({ queryKey: queryKeys.allEvents });
       },
     });
@@ -227,18 +235,29 @@ export const SchedulerPanel = memo(
                     {isAdmin && (
                       <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                         <ButtonGroup variant="minimal">
-                          <Button
-                            size="small"
-                            icon="refresh"
-                            text="Sync now"
-                            loading={
-                              syncMutation.isPending &&
-                              syncMutation.variables === schedule.processor
+                          <Tooltip
+                            content={
+                              running
+                                ? `${jobTitle(
+                                    running,
+                                  )} is running. Wait for it to finish, or cancel it on the Jobs page.`
+                                : `Re-track ${schedule.processor} now, in the background`
                             }
-                            onClick={() =>
-                              syncMutation.mutate(schedule.processor)
-                            }
-                          />
+                          >
+                            <Button
+                              size="small"
+                              icon="refresh"
+                              text="Sync now"
+                              disabled={!!running}
+                              loading={
+                                syncMutation.isPending &&
+                                syncMutation.variables === schedule.processor
+                              }
+                              onClick={() =>
+                                syncMutation.mutate(schedule.processor)
+                              }
+                            />
+                          </Tooltip>
                           <Tooltip content="Edit schedule">
                             <Button
                               size="small"
