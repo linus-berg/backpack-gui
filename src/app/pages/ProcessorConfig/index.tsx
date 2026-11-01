@@ -1,6 +1,6 @@
 /**
  *
- * Processor configuration (administrators only)
+ * Admin → Processors: processor definitions (administrators only)
  *
  */
 import React, { memo, useCallback, useRef, useState } from 'react';
@@ -35,6 +35,9 @@ import { ProcessorEditor } from 'app/components/ProcessorEditor/Loadable';
 import { ProcessorEditorSettings } from 'app/components/ProcessorEditor/components/ProcessorEditorSettings';
 import { ProcessorFlags } from 'app/components/ProcessorEditor/processorFlags';
 import { notify } from 'utils/toaster';
+
+/** Admin → Processors; each processor at `${BASE_PATH}/<id>`. */
+const BASE_PATH = '/admin/processors';
 
 const NEW_FLAGS: ProcessorFlags = {
   requires_approval: false,
@@ -77,7 +80,7 @@ const AddProcessorDialog = ({
       onClose();
       setId('');
       setFlags(NEW_FLAGS);
-      navigate(`/config/${encodeURIComponent(trimmed)}`);
+      navigate(`${BASE_PATH}/${encodeURIComponent(trimmed)}`);
     },
   });
 
@@ -183,7 +186,7 @@ export const ProcessorConfig = memo(() => {
   const list = processors.data ?? [];
   if (list.length > 0 && !selectedId) {
     return (
-      <Navigate to={`/config/${encodeURIComponent(list[0].id)}`} replace />
+      <Navigate to={`${BASE_PATH}/${encodeURIComponent(list[0].id)}`} replace />
     );
   }
   const selected = list.find(p => p.id === selectedId);
@@ -191,15 +194,14 @@ export const ProcessorConfig = memo(() => {
   return (
     <>
       <Helmet>
-        <title>
-          {selected ? `Configure ${selected.id}` : 'Processor configuration'}
-        </title>
+        <title>{selected ? `Configure ${selected.id}` : 'Processors'}</title>
         <meta name="description" content="Configure Backpack processors" />
       </Helmet>
       <FillPage>
         <PageHeader
           icon="cog"
-          title="Processor configuration"
+          title="Processors"
+          description="The ecosystems Backpack mirrors. Each processor service needs a definition here with the same ID."
           actions={
             <Button
               icon="plus"
@@ -220,7 +222,7 @@ export const ProcessorConfig = memo(() => {
           <SplitLayout>
             <ProcessorSidebar
               processors={list}
-              basePath="/config"
+              basePath={BASE_PATH}
               onBeforeNavigate={confirmLeave}
               label="Processors"
             />
@@ -238,7 +240,7 @@ export const ProcessorConfig = memo(() => {
                   description={`There's no processor called “${selectedId}”. It may have been deleted.`}
                   action={
                     <LinkButton
-                      to={`/config/${encodeURIComponent(list[0].id)}`}
+                      to={`${BASE_PATH}/${encodeURIComponent(list[0].id)}`}
                       text={`Go to ${list[0].id}`}
                     />
                   }

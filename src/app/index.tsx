@@ -8,7 +8,13 @@
 
 import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import {
+  Navigate,
+  Route,
+  BrowserRouter,
+  Routes,
+  useParams,
+} from 'react-router-dom';
 import {
   MutationCache,
   QueryClient,
@@ -35,6 +41,12 @@ import { ProcessorConfig } from './pages/ProcessorConfig/Loadable';
 import { StatusPage } from './pages/StatusPage/Loadable';
 import { ApprovalsPage } from './pages/ApprovalsPage/Loadable';
 import { ApiKeyPage } from './pages/ApiKeyPage/Loadable';
+import {
+  AdminLayout,
+  AnnouncementsPage,
+  SchedulesPage,
+  SystemTasksPage,
+} from './pages/Admin/Loadable';
 import { LandingPage } from './pages/LandingPage';
 import { Layout } from './Layout';
 import { UserProvider } from './context/UserContext';
@@ -68,6 +80,17 @@ const query_client = new QueryClient({
 });
 FocusStyleManager.onlyShowFocusOnTabs();
 
+/** Old /config/:processor links open the processor under Admin. */
+const LegacyConfigRedirect = () => {
+  const { processor } = useParams();
+  return (
+    <Navigate
+      to={`/admin/processors/${encodeURIComponent(processor ?? '')}`}
+      replace
+    />
+  );
+};
+
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Layout />}>
@@ -76,24 +99,6 @@ const AppRoutes = () => (
       <Route path="processor">
         <Route index element={<ProcessorBrowser />} />
         <Route path=":processor" element={<ProcessorBrowser />} />
-      </Route>
-      <Route path="config">
-        <Route
-          index
-          element={
-            <RequireAdmin>
-              <ProcessorConfig />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path=":processor"
-          element={
-            <RequireAdmin>
-              <ProcessorConfig />
-            </RequireAdmin>
-          }
-        />
       </Route>
       <Route
         path="approvals"
@@ -104,12 +109,30 @@ const AppRoutes = () => (
         }
       />
       <Route
-        path="apikeys"
+        path="admin"
         element={
           <RequireAdmin>
-            <ApiKeyPage />
+            <AdminLayout />
           </RequireAdmin>
         }
+      >
+        <Route index element={<Navigate to="processors" replace />} />
+        <Route path="processors" element={<ProcessorConfig />} />
+        <Route path="processors/:processor" element={<ProcessorConfig />} />
+        <Route path="schedules" element={<SchedulesPage />} />
+        <Route path="api-keys" element={<ApiKeyPage />} />
+        <Route path="announcements" element={<AnnouncementsPage />} />
+        <Route path="tasks" element={<SystemTasksPage />} />
+      </Route>
+      {/* Locations before the Admin section, kept for bookmarks. */}
+      <Route
+        path="config"
+        element={<Navigate to="/admin/processors" replace />}
+      />
+      <Route path="config/:processor" element={<LegacyConfigRedirect />} />
+      <Route
+        path="apikeys"
+        element={<Navigate to="/admin/api-keys" replace />}
       />
       <Route path="*" element={<NotFoundPage />} />
     </Route>

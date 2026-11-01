@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   Alignment,
   Button,
@@ -16,17 +16,13 @@ import {
   Tag,
   Tooltip,
 } from '@blueprintjs/core';
-import { useMutation } from '@tanstack/react-query';
 import { useAuth } from 'react-oidc-context';
 import styled from 'styled-components';
-import { useBackpackApi } from 'api/backpack';
 import { usePendingApprovals } from 'api/queries';
-import { notify } from 'utils/toaster';
 import LogoMark from './logo.svg?react';
 import { ThemeToggle } from './components/ThemeToggle';
 import { HelpDialog } from './components/HelpDialog';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
-import { useConfirm } from './context/ConfirmContext';
 import { useUser } from './context/UserContext';
 import './app.scss';
 
@@ -110,76 +106,6 @@ const NavItem = ({ to, icon, text, end, badge }: NavItemProps) => (
   </NavLink>
 );
 
-const ToolsMenu = () => {
-  const navigate = useNavigate();
-  const confirm = useConfirm();
-  const api = useBackpackApi();
-
-  const trackAll = useMutation({
-    mutationFn: api.TrackAllArtifacts,
-    meta: { errorTitle: 'Could not start tracking' },
-    onSuccess: () =>
-      notify.success(
-        'Checking every artifact for updates. Progress is shown in System Events.',
-      ),
-  });
-  const validateAll = useMutation({
-    mutationFn: api.ValidateAllArtifacts,
-    meta: { errorTitle: 'Could not start validation' },
-    onSuccess: () =>
-      notify.success(
-        'Validating every artifact. Problems are reported in System Events.',
-      ),
-  });
-
-  const runGlobal = async (kind: 'track' | 'validate') => {
-    const ok = await confirm({
-      title:
-        kind === 'track'
-          ? 'Check all artifacts for updates?'
-          : 'Validate all artifacts?',
-      message:
-        kind === 'track'
-          ? 'Every artifact in every processor is re-scanned upstream. On large mirrors this queues a lot of work and can take hours.'
-          : 'Every recorded file in every processor is checked against storage. On large mirrors this can take hours.',
-      confirmText: kind === 'track' ? 'Check all' : 'Validate all',
-      intent: Intent.WARNING,
-      icon: kind === 'track' ? 'refresh' : 'archive',
-    });
-    if (ok) {
-      (kind === 'track' ? trackAll : validateAll).mutate();
-    }
-  };
-
-  return (
-    <Menu>
-      <MenuDivider title="Security" />
-      <MenuItem
-        icon="key"
-        text="API keys"
-        onClick={() => navigate('/apikeys')}
-      />
-      <MenuDivider title="System tasks" />
-      <MenuItem
-        icon="refresh"
-        text="Check all artifacts for updates…"
-        onClick={() => runGlobal('track')}
-      />
-      <MenuItem
-        icon="archive"
-        text="Validate all artifacts…"
-        onClick={() => runGlobal('validate')}
-      />
-      <MenuDivider title="Settings" />
-      <MenuItem
-        icon="cog"
-        text="Processor configuration"
-        onClick={() => navigate('/config')}
-      />
-    </Menu>
-  );
-};
-
 export function Layout() {
   const auth = useAuth();
   const location = useLocation();
@@ -241,12 +167,7 @@ export function Layout() {
                     )
                   }
                 />
-                <Navbar.Divider />
-                <PopoverNext content={<ToolsMenu />} placement="bottom-start">
-                  <Button icon="wrench" variant="minimal" endIcon="caret-down">
-                    <span className="nav-text">Tools</span>
-                  </Button>
-                </PopoverNext>
+                <NavItem to="/admin" icon="cog" text="Admin" />
               </>
             )}
           </NavContainer>

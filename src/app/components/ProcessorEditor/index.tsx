@@ -109,7 +109,7 @@ export const ProcessorEditor = memo(({ processor, onDirtyChange }: Props) => {
       notify.success(`Deleted processor ${processor.id}.`);
       onDirtyChange?.(false);
       queryClient.invalidateQueries({ queryKey: queryKeys.processors });
-      navigate('/config', { replace: true });
+      navigate('/admin/processors', { replace: true });
     },
   });
 

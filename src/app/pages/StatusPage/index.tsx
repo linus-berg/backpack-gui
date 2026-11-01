@@ -42,7 +42,8 @@ export function StatusPage() {
           </Section>
           <Section $height="42vh" aria-labelledby="schedules-title">
             <ErrorBoundary>
-              <SchedulerPanel titleId="schedules-title" />
+              {/* Edited under Admin → Schedules. */}
+              <SchedulerPanel titleId="schedules-title" readOnly />
             </ErrorBoundary>
           </Section>
         </Grid>

@@ -55,9 +55,9 @@ export const ProcessorBrowser = memo(() => {
         action={
           hasRole('Administrator') ? (
             <LinkButton
-              to="/config"
+              to="/admin/processors"
               icon="cog"
-              text="Processor configuration"
+              text="Set up processors"
             />
           ) : undefined
         }

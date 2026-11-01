@@ -128,6 +128,25 @@ export const HelpDialog = ({ isOpen, onClose }: Props) => (
               bar shows how many are waiting.
             </p>
           </Item>
+          <Item icon="cog" title="Admin" admin>
+            <p>
+              Everything below is under <b>Admin</b> in the navigation bar.
+            </p>
+          </Item>
+          <Item icon="cog" title="Processors" admin>
+            <p>
+              Define the ecosystems Backpack mirrors and change their behaviour
+              (approval, preview, bulk add, external or direct collection),
+              description and configuration fields.
+            </p>
+          </Item>
+          <Item icon="calendar" title="Schedules" admin>
+            <p>
+              Check processors for new versions automatically on a cron
+              schedule, or trigger a sync now. The Status page lists the
+              schedules for everyone.
+            </p>
+          </Item>
           <Item icon="key" title="API keys" admin>
             <p>
               Generate and revoke keys for automation. <b>User</b> keys can read
@@ -135,17 +154,13 @@ export const HelpDialog = ({ isOpen, onClose }: Props) => (
               reconfigure.
             </p>
           </Item>
-          <Item icon="cog" title="Processor configuration" admin>
-            <p>
-              Change processor behaviour (approval, preview, bulk add, external
-              or direct collection), its description and its configuration
-              fields.
-            </p>
+          <Item icon="feed" title="Announcements" admin>
+            <p>Publish and delete the posts shown on the home page.</p>
           </Item>
-          <Item icon="calendar" title="Tracking schedules" admin>
+          <Item icon="build" title="System tasks" admin>
             <p>
-              Check processors for new versions automatically on a cron
-              schedule, or trigger a sync now. Find them on the Status page.
+              Check every artifact for updates, or validate every artifact to
+              collect files missing from storage.
             </p>
           </Item>
           <Item
