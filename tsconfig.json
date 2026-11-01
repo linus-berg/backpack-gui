@@ -19,14 +19,5 @@
     "baseUrl": "./src",
     "types": ["node", "vite/client"]
   },
-  "include": ["src"],
-  "ts-node": {
-    "compilerOptions": {
-      "esModuleInterop": true,
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "noEmit": true,
-      "allowSyntheticDefaultImports": true
-    }
-  }
+  "include": ["src"]
 }
