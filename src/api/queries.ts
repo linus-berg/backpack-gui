@@ -1,6 +1,5 @@
 import {
   keepPreviousData,
-  useQueries,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
@@ -21,6 +20,7 @@ export const queryKeys = {
     ['artifact_table', processor] as const,
   artifacts: (processor: string, onlyRoots: boolean) =>
     ['artifact_table', processor, onlyRoots] as const,
+  artifactCounts: ['artifact_counts'] as const,
   artifact: (processor: string, id: string) =>
     ['artifact', processor, id] as const,
   preview: (processor: string, id: string, config: Record<string, string>) =>
@@ -66,22 +66,28 @@ export const useArtifact = (ref: ArtifactRef | null) => {
 };
 
 /**
- * Root artifact count per processor. Shares the cache with the artifact
- * table, so visiting a processor afterwards is instant.
+ * Artifact counts of every processor in one request; the API counts them in
+ * MongoDB, so no artifact lists are downloaded just to be counted.
+ */
+export const useArtifactCounts = () => {
+  const api = useBackpackApi();
+  return useQuery({
+    queryKey: queryKeys.artifactCounts,
+    queryFn: () => api.GetArtifactCounts().then(r => r.data),
+    staleTime: 60_000,
+  });
+};
+
+/**
+ * Root artifact count per processor, undefined until the counts have loaded.
+ * A processor the API didn't report (e.g. added a moment ago) counts as 0.
  */
 export const useRootArtifactCounts = (processors: Processor[] | undefined) => {
-  const api = useBackpackApi();
-  const results = useQueries({
-    queries: (processors ?? []).map(p => ({
-      queryKey: queryKeys.artifacts(p.id, true),
-      queryFn: () => api.GetAllProcessorArtifacts(p.id, true).then(r => r.data),
-      staleTime: 60_000,
-    })),
-  });
+  const query = useArtifactCounts();
+  const roots = new Map((query.data ?? []).map(c => [c.processor, c.roots]));
   const counts: Record<string, number | undefined> = {};
-  (processors ?? []).forEach((p, idx) => {
-    const data = results[idx]?.data;
-    counts[p.id] = data ? data.filter(a => a.root).length : undefined;
+  (processors ?? []).forEach(p => {
+    counts[p.id] = query.data ? roots.get(p.id) ?? 0 : undefined;
   });
   return counts;
 };
@@ -134,6 +140,7 @@ export const useInvalidateArtifacts = () => {
           ? queryKeys.artifactsForProcessor(processor)
           : queryKeys.allArtifacts,
       });
+      client.invalidateQueries({ queryKey: queryKeys.artifactCounts });
       client.invalidateQueries({ queryKey: queryKeys.pendingApprovals });
       client.invalidateQueries({ queryKey: queryKeys.allEvents });
     },

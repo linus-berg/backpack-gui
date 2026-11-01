@@ -6,6 +6,7 @@ import type { AxiosInstance } from 'axios';
 import { AuthInterceptor } from './AuthInterceptor';
 import { BACKPACK_API } from './config';
 import { Processor } from '../types/Processor';
+import { ArtifactCount } from 'types/ArtifactCount';
 import { QueueStatus } from '../types/QueueStatus';
 import { Event } from '../types/Event';
 import { Schedule } from '../types/Schedule';
@@ -155,6 +156,11 @@ export const useBackpackApi = () => {
 
   const PurgeQueue = (queue_name: string): Promise<AxiosResponse<void>> => {
     return backpack.delete(`/status/queue/${queue_name}`);
+  };
+
+  /** Artifact counts of every processor, counted by the API in one request. */
+  const GetArtifactCounts = (): Promise<AxiosResponse<ArtifactCount[]>> => {
+    return backpack.get<ArtifactCount[]>(BACKPACK_ARTIFACTS + '/counts');
   };
 
   const GetAllProcessorArtifacts = (
@@ -334,6 +340,7 @@ export const useBackpackApi = () => {
     DeleteArtifact,
     GetAllProcessors,
     GetAllProcessorArtifacts,
+    GetArtifactCounts,
     ValidateAllArtifacts,
     ValidateArtifact,
     GetPendingArtifacts,
