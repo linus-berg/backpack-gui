@@ -73,7 +73,7 @@
     "prettier": "2.5.1",
     "sass": "1.98.0",
     "serve": "14.2.6",
-    "typescript": "^5.0.0",
+    "typescript": "^7.0.2",
     "vite": "8.3.5",
     "vite-plugin-svgr": "4.5.0"
   },
