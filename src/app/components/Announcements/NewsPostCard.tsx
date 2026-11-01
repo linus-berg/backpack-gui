@@ -19,10 +19,11 @@ import { MarkdownView } from 'app/components/common/MarkdownView';
 
 interface Props {
   post: NewsPost;
-  isAdmin: boolean;
+  /** Shows the delete button (the Admin announcements page). */
+  canDelete?: boolean;
 }
 
-export const NewsPostCard = ({ post, isAdmin }: Props) => {
+export const NewsPostCard = ({ post, canDelete = false }: Props) => {
   const backpack = useBackpackApi();
   const queryClient = useQueryClient();
   const confirm = useConfirm();
@@ -73,7 +74,7 @@ export const NewsPostCard = ({ post, isAdmin }: Props) => {
               <DateTime value={post.timestamp} />
             </div>
           </div>
-          {isAdmin && (
+          {canDelete && (
             <Tooltip content="Delete announcement">
               <Button
                 icon="trash"

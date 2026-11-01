@@ -1,27 +1,23 @@
-import React, { useState } from 'react';
-import { Button, Classes, H5, Icon, Intent } from '@blueprintjs/core';
-import { useQuery } from '@tanstack/react-query';
-import { useBackpackApi } from 'api/backpack';
-import { queryKeys } from 'api/queries';
+import React from 'react';
+import { Classes, H5, Icon } from '@blueprintjs/core';
 import { useUser } from 'app/context/UserContext';
+import { LinkButton } from 'app/components/common/LinkButton';
 import {
   EmptyState,
   LoadingState,
   QueryErrorState,
 } from 'app/components/common/States';
-import { NewsPostCard } from './NewsPostCard';
-import { CreateNewsPostDialog } from './CreateNewsPostDialog';
+import { NewsPostCard } from 'app/components/Announcements/NewsPostCard';
+import { useNewsPosts } from 'app/components/Announcements/useNewsPosts';
 
+/**
+ * Announcements on the home page, read-only. Administrators publish and
+ * delete them under Admin → Announcements.
+ */
 export const NewsFeed = () => {
-  const backpack = useBackpackApi();
   const { hasRole } = useUser();
   const isAdmin = hasRole('Administrator');
-  const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
-
-  const query = useQuery({
-    queryKey: queryKeys.news,
-    queryFn: () => backpack.GetNewsPosts().then(r => r.data),
-  });
+  const query = useNewsPosts();
   const posts = query.data ?? [];
 
   return (
@@ -43,12 +39,12 @@ export const NewsFeed = () => {
           Announcements
         </H5>
         {isAdmin && (
-          <Button
-            icon="add"
-            size="small"
-            intent={Intent.PRIMARY}
-            text="New announcement"
-            onClick={() => setIsPostDialogOpen(true)}
+          <LinkButton
+            to="/admin/announcements"
+            icon="cog"
+            text="Manage"
+            minimal
+            small
           />
         )}
       </div>
@@ -68,16 +64,7 @@ export const NewsFeed = () => {
           description="System updates and news will appear here."
         />
       ) : (
-        posts.map(post => (
-          <NewsPostCard key={post.id} post={post} isAdmin={isAdmin} />
-        ))
-      )}
-
-      {isAdmin && (
-        <CreateNewsPostDialog
-          isOpen={isPostDialogOpen}
-          onClose={() => setIsPostDialogOpen(false)}
-        />
+        posts.map(post => <NewsPostCard key={post.id} post={post} />)
       )}
     </section>
   );
