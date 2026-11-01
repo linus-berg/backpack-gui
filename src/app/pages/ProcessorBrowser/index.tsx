@@ -4,15 +4,12 @@
  *
  */
 import React, { memo } from 'react';
+import styled from 'styled-components';
 import { Helmet } from 'react-helmet-async';
 import { Navigate, useParams } from 'react-router-dom';
 import { useProcessors, useRootArtifactCounts } from 'api/queries';
 import { useUser } from 'app/context/UserContext';
-import {
-  FillPage,
-  SplitContent,
-  SplitLayout,
-} from 'app/components/common/PageHeader';
+import { FillPage } from 'app/components/common/PageHeader';
 import {
   EmptyState,
   LoadingState,
@@ -21,6 +18,12 @@ import {
 import { LinkButton } from 'app/components/common/LinkButton';
 import { ProcessorSidebar } from 'app/components/ProcessorSidebar';
 import { ProcessorPanel } from './ProcessorPanel';
+
+const Shell = styled.div`
+  display: flex;
+  height: 100%;
+  min-height: 0;
+`;
 
 export const ProcessorBrowser = memo(() => {
   const processors = useProcessors();
@@ -79,33 +82,34 @@ export const ProcessorBrowser = memo(() => {
         <title>{selected ? `${selected.id} artifacts` : 'Artifacts'}</title>
         <meta name="description" content="Browse and add mirrored artifacts" />
       </Helmet>
-      <FillPage>
-        <SplitLayout>
-          <ProcessorSidebar
-            processors={list}
-            basePath="/processor"
-            counts={counts}
-            label="Processors"
-          />
-          <SplitContent>
-            {selected ? (
-              <ProcessorPanel key={selected.id} processor={selected} />
-            ) : (
-              <EmptyState
-                icon="search"
-                title="Unknown processor"
-                description={`There's no processor called “${selectedId}”. It may have been removed.`}
-                action={
-                  <LinkButton
-                    to={`/processor/${encodeURIComponent(list[0].id)}`}
-                    text={`Go to ${list[0].id}`}
-                  />
-                }
-              />
-            )}
-          </SplitContent>
-        </SplitLayout>
-      </FillPage>
+      {/* The processor list is a full-height side panel, like the Admin
+          section's navigation; the selected processor fills the rest. */}
+      <Shell>
+        <ProcessorSidebar
+          processors={list}
+          basePath="/processor"
+          counts={counts}
+          label="Processors"
+          variant="panel"
+        />
+        <FillPage style={{ flex: 1, minWidth: 0 }}>
+          {selected ? (
+            <ProcessorPanel key={selected.id} processor={selected} />
+          ) : (
+            <EmptyState
+              icon="search"
+              title="Unknown processor"
+              description={`There's no processor called “${selectedId}”. It may have been removed.`}
+              action={
+                <LinkButton
+                  to={`/processor/${encodeURIComponent(list[0].id)}`}
+                  text={`Go to ${list[0].id}`}
+                />
+              }
+            />
+          )}
+        </FillPage>
+      </Shell>
     </>
   );
 });

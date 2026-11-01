@@ -16,17 +16,33 @@ interface Props {
    */
   onBeforeNavigate?: () => boolean | Promise<boolean>;
   label: string;
+  /**
+   * `panel`: a full-height side panel with a heading, for pages where the
+   * list is the main navigation (Artifacts). `inline` (default): a column
+   * inside a page (Admin → Processors).
+   */
+  variant?: 'panel' | 'inline';
 }
 
-const Aside = styled.nav`
-  width: 230px;
+const Aside = styled.nav<{ $panel: boolean }>`
+  width: ${p => (p.$panel ? '240px' : '230px')};
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-right: 12px;
-  border-right: 1px solid var(--table-border);
+  border-right: 1px solid var(--divider);
   overflow-y: auto;
+  ${p =>
+    p.$panel
+      ? `
+    height: 100%;
+    box-sizing: border-box;
+    padding: 1rem 12px 1rem 1.25rem;
+    background: var(--card-bg);
+  `
+      : `
+    padding-right: 12px;
+  `}
 
   @media (max-width: 900px) {
     width: auto;
@@ -35,6 +51,15 @@ const Aside = styled.nav`
     padding: 0 0 8px;
     overflow: visible;
   }
+`;
+
+/* Same heading style as the Admin section's navigation. */
+const PanelTitle = styled.div`
+  margin: 4px 8px 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 `;
 
 const List = styled.ul`
@@ -102,6 +127,7 @@ export const ProcessorSidebar = ({
   counts,
   onBeforeNavigate,
   label,
+  variant = 'inline',
 }: Props) => {
   const [filter, setFilter] = useState('');
   const navigate = useNavigate();
@@ -130,7 +156,10 @@ export const ProcessorSidebar = ({
   };
 
   return (
-    <Aside aria-label={label}>
+    <Aside aria-label={label} $panel={variant === 'panel'}>
+      {variant === 'panel' && (
+        <PanelTitle className={Classes.TEXT_MUTED}>{label}</PanelTitle>
+      )}
       {processors.length > 6 && (
         <InputGroup
           type="search"

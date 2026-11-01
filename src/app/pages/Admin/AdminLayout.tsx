@@ -37,7 +37,8 @@ const Nav = styled.nav`
   flex-direction: column;
   gap: 2px;
   padding: 1rem 12px 1rem 1.25rem;
-  border-right: 1px solid var(--table-border);
+  background: var(--card-bg);
+  border-right: 1px solid var(--divider);
   overflow-y: auto;
 
   @media (max-width: 900px) {

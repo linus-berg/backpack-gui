@@ -31,6 +31,8 @@ body {
   --table-header-bg: #{$light-gray5};
   --table-header-shadow: #{$light-gray3};
   --table-border: #{$light-gray2};
+  /* Lines between page regions (side panels), visible on both themes. */
+  --divider: #{$pt-divider-black};
 }
 
 .bp6-dark {
@@ -48,6 +50,7 @@ body {
   --table-header-bg: #{$dark-gray3};
   --table-header-shadow: #{$dark-gray2};
   --table-border: #{$dark-gray1};
+  --divider: #{$pt-dark-divider-white-muted};
 }
 
 // Blueprint renders popover targets inside <label> as blocks (for selects);
