@@ -1,53 +1,85 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Button, Tag } from '@blueprintjs/core';
 import styled from 'styled-components';
-import { QueueStatusTable } from '../../components/QueueStatusTable/Loadable';
+import {
+  QueueFilter,
+  QueueStatusTable,
+} from '../../components/QueueStatusTable';
 import { EventFeed } from '../../components/EventFeed/Loadable';
-import { SchedulerPanel } from '../../components/SchedulerPanel/Loadable';
-import { Page, SectionHeader } from 'app/components/common/PageHeader';
+import { FillPage, SectionHeader } from 'app/components/common/PageHeader';
 import { ErrorBoundary } from 'app/components/common/ErrorBoundary';
+import { NextRun, StatusSummary } from './StatusSummary';
 
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(520px, 100%), 1fr));
-  gap: 1rem;
+/* The page fits the window: the summary at its natural height, the queues
+   at theirs (up to half of what's left, scrolling inside beyond that), and
+   the event log takes the rest. */
+const Layout = styled(FillPage)`
+  gap: 16px;
+
+  > * {
+    flex-shrink: 0;
+  }
 `;
 
-/** A titled panel whose table scrolls inside a bounded height. */
-const Section = styled.section<{ $height: string }>`
+const Section = styled.section<{ $fill?: boolean }>`
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: ${p => p.$height};
-  min-height: 280px;
+  min-height: ${p => (p.$fill ? '220px' : '160px')};
+  ${p =>
+    p.$fill
+      ? 'flex: 1 1 0; && { flex-shrink: 1; }'
+      : 'flex: 0 1 auto; max-height: 50%; && { flex-shrink: 1; }'}
 `;
 
+const FILTER_LABELS: Record<Exclude<QueueFilter, 'all'>, string> = {
+  attention: 'Needing attention',
+  busy: 'With messages',
+};
+
 export function StatusPage() {
+  const [filter, setFilter] = useState<QueueFilter>('all');
+
   return (
     <>
       <Helmet>
         <title>Status</title>
         <meta name="description" content="Backpack system status and events" />
       </Helmet>
-      <Page style={{ gap: '1rem' }}>
-        <Grid>
-          <Section $height="42vh" aria-labelledby="queues-title">
-            <SectionHeader
-              icon="pulse"
-              title={<span id="queues-title">Queues</span>}
-            />
-            <ErrorBoundary>
-              <QueueStatusTable />
-            </ErrorBoundary>
-          </Section>
-          <Section $height="42vh" aria-labelledby="schedules-title">
-            <ErrorBoundary>
-              {/* Edited under Admin → Schedules. */}
-              <SchedulerPanel titleId="schedules-title" readOnly />
-            </ErrorBoundary>
-          </Section>
-        </Grid>
-        <Section $height="60vh" aria-labelledby="events-title">
+      <Layout>
+        <ErrorBoundary>
+          <StatusSummary filter={filter} onFilterChange={setFilter} />
+        </ErrorBoundary>
+        <Section aria-labelledby="queues-title">
+          <SectionHeader
+            icon="layers"
+            title={<span id="queues-title">Queues</span>}
+            actions={
+              <>
+                {filter !== 'all' && (
+                  <>
+                    <Tag minimal round icon="filter">
+                      {FILTER_LABELS[filter]}
+                    </Tag>
+                    <Button
+                      variant="minimal"
+                      size="small"
+                      text="Show all"
+                      onClick={() => setFilter('all')}
+                    />
+                  </>
+                )}
+                <NextRun />
+              </>
+            }
+          />
+          <ErrorBoundary>
+            <QueueStatusTable filter={filter} />
+          </ErrorBoundary>
+        </Section>
+        <Section $fill aria-labelledby="events-title">
           <SectionHeader
             icon="history"
             title={<span id="events-title">System events</span>}
@@ -56,7 +88,7 @@ export function StatusPage() {
             <EventFeed />
           </ErrorBoundary>
         </Section>
-      </Page>
+      </Layout>
     </>
   );
 }

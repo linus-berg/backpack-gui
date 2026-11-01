@@ -143,8 +143,8 @@ export const HelpDialog = ({ isOpen, onClose }: Props) => (
           <Item icon="calendar" title="Schedules" admin>
             <p>
               Check processors for new versions automatically on a cron
-              schedule, or trigger a sync now. The Status page lists the
-              schedules for everyone.
+              schedule, or trigger a sync now. The Status page shows the next
+              scheduled run to everyone.
             </p>
           </Item>
           <Item icon="key" title="API keys" admin>

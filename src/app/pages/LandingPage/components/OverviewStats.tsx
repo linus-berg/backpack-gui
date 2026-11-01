@@ -1,7 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Classes, Icon, IconName, Intent } from '@blueprintjs/core';
-import styled from 'styled-components';
+import { Icon } from '@blueprintjs/core';
 import {
   usePendingApprovals,
   useProcessors,
@@ -10,130 +8,7 @@ import {
 } from 'api/queries';
 import { useUser } from 'app/context/UserContext';
 import { getQueueHealth } from 'utils/queueHealth';
-
-/* All tiles on one row. */
-const Grid = styled.div<{ $columns: number }>`
-  display: grid;
-  grid-template-columns: repeat(${p => p.$columns}, minmax(0, 1fr));
-  gap: 16px;
-`;
-
-const Tile = styled(Link)<{ $tone: Tone }>`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px 18px;
-
-  &&,
-  &&:hover {
-    color: inherit;
-    text-decoration: none;
-  }
-  .top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .label {
-    font-weight: 600;
-  }
-  .icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
-    background: ${p => TONE_BACKGROUND[p.$tone]};
-  }
-  .value {
-    font-size: 1.85rem;
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-    font-variant-numeric: tabular-nums;
-  }
-  .detail {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.9rem;
-    /* Neutral captions keep Blueprint's muted text colour. */
-    ${p => (p.$tone === 'neutral' ? '' : `color: ${TONE_TEXT[p.$tone]};`)}
-  }
-`;
-
-/** Colour is reserved for numbers that need someone to act. */
-type Tone = 'neutral' | 'good' | 'attention' | 'bad';
-
-const TONE_BACKGROUND: Record<Tone, string> = {
-  neutral: 'var(--hover-bg)',
-  good: 'var(--hover-bg)',
-  attention: 'rgba(255, 194, 71, 0.22)',
-  bad: 'rgba(205, 66, 70, 0.18)',
-};
-
-const TONE_TEXT: Record<Tone, string> = {
-  neutral: '',
-  good: 'var(--success-text)',
-  attention: 'var(--warning-text)',
-  bad: 'var(--danger-text)',
-};
-
-const TONE_INTENT: Record<Tone, Intent> = {
-  neutral: Intent.NONE,
-  good: Intent.SUCCESS,
-  attention: Intent.WARNING,
-  bad: Intent.DANGER,
-};
-
-interface TileProps {
-  to: string;
-  icon: IconName;
-  label: string;
-  value: React.ReactNode;
-  detail: React.ReactNode;
-  tone?: Tone;
-}
-
-const StatTile = ({
-  to,
-  icon,
-  label,
-  value,
-  detail,
-  tone = 'neutral',
-}: TileProps) => (
-  <Tile
-    to={to}
-    $tone={tone}
-    className={`${Classes.CARD} ${Classes.INTERACTIVE}`}
-  >
-    <div className="top">
-      <span className="label">{label}</span>
-      <span className="icon" aria-hidden="true">
-        <Icon
-          icon={icon}
-          intent={
-            tone === 'neutral' || tone === 'good'
-              ? undefined
-              : TONE_INTENT[tone]
-          }
-          className={
-            tone === 'neutral' || tone === 'good'
-              ? Classes.TEXT_MUTED
-              : undefined
-          }
-        />
-      </span>
-    </div>
-    <div className="value">{value}</div>
-    <div className={`detail ${tone === 'neutral' ? Classes.TEXT_MUTED : ''}`}>
-      {detail}
-    </div>
-  </Tile>
-);
+import { StatGrid, StatTile } from 'app/components/common/StatTile';
 
 const DASH = '—';
 
@@ -161,7 +36,7 @@ export const OverviewStats = () => {
   const pending = approvals.data?.length ?? 0;
 
   return (
-    <Grid $columns={isAdmin ? 4 : 3}>
+    <StatGrid $columns={isAdmin ? 4 : 3}>
       <StatTile
         to="/processor"
         icon="cube"
@@ -226,6 +101,6 @@ export const OverviewStats = () => {
           )
         }
       />
-    </Grid>
+    </StatGrid>
   );
 };
