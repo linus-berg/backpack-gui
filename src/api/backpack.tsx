@@ -8,6 +8,7 @@ import { BACKPACK_API } from './config';
 import { Processor } from '../types/Processor';
 import { ArtifactCount } from 'types/ArtifactCount';
 import { QueueStatus } from '../types/QueueStatus';
+import { InfrastructureHealth } from '../types/InfrastructureHealth';
 import { Event } from '../types/Event';
 import { Schedule } from '../types/Schedule';
 import { ScheduleValidationResult } from '../types/ScheduleValidationResult';
@@ -84,6 +85,11 @@ export const useBackpackApi = () => {
   };
   const GetQueueStatus = (): Promise<AxiosResponse<QueueStatus[]>> => {
     return backpack.get<QueueStatus[]>('/status/queue');
+  };
+  const GetInfrastructureHealth = (): Promise<
+    AxiosResponse<InfrastructureHealth>
+  > => {
+    return backpack.get<InfrastructureHealth>('/status/health');
   };
 
   const GetUserInfo = (): Promise<AxiosResponse<User>> => {
@@ -314,6 +320,7 @@ export const useBackpackApi = () => {
 
   return {
     GetQueueStatus,
+    GetInfrastructureHealth,
     GetUserInfo,
     GetEvents,
     GetSchedules,

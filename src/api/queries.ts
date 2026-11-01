@@ -30,6 +30,7 @@ export const queryKeys = {
   events: (limit: number) => ['events', limit] as const,
   schedules: ['schedules'] as const,
   queues: ['queue_status'] as const,
+  infrastructure: ['infrastructure_health'] as const,
   news: ['news'] as const,
   apiKeys: ['api_keys'] as const,
 };
@@ -118,6 +119,18 @@ export const useQueueStatus = (refetchInterval = 5_000) => {
     queryKey: queryKeys.queues,
     queryFn: () => api.GetQueueStatus().then(r => r.data),
     refetchInterval,
+  });
+};
+
+/** Health of RabbitMQ, MongoDB, Redis, S3 and the OIDC provider. */
+export const useInfrastructureHealth = (refetchInterval = 10_000) => {
+  const api = useBackpackApi();
+  return useQuery({
+    queryKey: queryKeys.infrastructure,
+    queryFn: () => api.GetInfrastructureHealth().then(r => r.data),
+    refetchInterval,
+    // APIs from before the endpoint answer 404; don't retry those.
+    retry: (count, error) => !isNotFound(error) && count < 2,
   });
 };
 

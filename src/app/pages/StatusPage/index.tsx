@@ -11,10 +11,11 @@ import { EventFeed } from '../../components/EventFeed/Loadable';
 import { FillPage, SectionHeader } from 'app/components/common/PageHeader';
 import { ErrorBoundary } from 'app/components/common/ErrorBoundary';
 import { NextRun, StatusSummary } from './StatusSummary';
+import { InfrastructureStatus } from './InfrastructureStatus';
 
-/* The page fits the window: the summary at its natural height, the queues
-   at theirs (up to half of what's left, scrolling inside beyond that), and
-   the event log takes the rest. */
+/* The page fits the window: the infrastructure strip and the summary at
+   their natural height, the queues at theirs (up to half of what's left,
+   scrolling inside beyond that), and the event log takes the rest. */
 const Layout = styled(FillPage)`
   gap: 16px;
 
@@ -49,6 +50,9 @@ export function StatusPage() {
         <meta name="description" content="Backpack system status and events" />
       </Helmet>
       <Layout>
+        <ErrorBoundary>
+          <InfrastructureStatus />
+        </ErrorBoundary>
         <ErrorBoundary>
           <StatusSummary filter={filter} onFilterChange={setFilter} />
         </ErrorBoundary>
