@@ -3,7 +3,7 @@
  * ProcessorEditor
  *
  */
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Intent } from '@blueprintjs/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { PathValue, useForm } from 'react-hook-form';
@@ -75,7 +75,10 @@ export const ProcessorEditor = memo(({ processor, onDirtyChange }: Props) => {
     formState: { isDirty },
   } = useForm<FormData>({ defaultValues: toForm(processor) });
   const values = watch();
-  const configError = validateAuxConfigJson(values.config);
+  /* Problems in the field builder (empty or duplicate keys, missing labels). */
+  const [builderError, setBuilderError] = useState<string | null>(null);
+  const jsonError = validateAuxConfigJson(values.config);
+  const configError = builderError ?? jsonError;
 
   useEffect(() => onDirtyChange?.(isDirty), [isDirty, onDirtyChange]);
 
@@ -114,7 +117,7 @@ export const ProcessorEditor = memo(({ processor, onDirtyChange }: Props) => {
   });
 
   const save = handleSubmit(data => {
-    if (validateAuxConfigJson(data.config)) {
+    if (builderError || validateAuxConfigJson(data.config)) {
       return;
     }
     mutation.mutate({ id: processor.id, ...data });
@@ -149,6 +152,7 @@ export const ProcessorEditor = memo(({ processor, onDirtyChange }: Props) => {
         processorId={processor.id}
         isDirty={isDirty}
         canSave={!configError}
+        saveBlockedReason={configError}
         onSave={save}
         onDiscard={() => reset()}
         onDelete={onDelete}
@@ -166,7 +170,8 @@ export const ProcessorEditor = memo(({ processor, onDirtyChange }: Props) => {
         onDescriptionChange={val => setField('description', val)}
         config={values.config}
         onConfigChange={val => setField('config', val)}
-        configError={configError}
+        configError={jsonError}
+        onBuilderErrorChange={setBuilderError}
       />
     </Div>
   );

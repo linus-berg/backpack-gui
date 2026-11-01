@@ -6,6 +6,8 @@ interface Props {
   processorId: string;
   isDirty: boolean;
   canSave: boolean;
+  /** Why the changes can't be saved yet, shown next to the title. */
+  saveBlockedReason?: string | null;
   onSave: () => void;
   onDiscard: () => void;
   onDelete: () => void;
@@ -24,6 +26,7 @@ export const ProcessorEditorHeader = ({
   processorId,
   isDirty,
   canSave,
+  saveBlockedReason,
   onSave,
   onDiscard,
   onDelete,
@@ -35,6 +38,11 @@ export const ProcessorEditorHeader = ({
     {isDirty && (
       <Tag minimal intent={Intent.WARNING} icon="edit">
         Unsaved changes
+      </Tag>
+    )}
+    {isDirty && saveBlockedReason && (
+      <Tag minimal intent={Intent.DANGER} icon="error">
+        {saveBlockedReason}
       </Tag>
     )}
     <div style={{ flex: 1 }} />
