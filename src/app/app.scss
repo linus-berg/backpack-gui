@@ -26,6 +26,8 @@ body {
   --active-bg: #{rgba($blue3, 0.15)};
   --brand-text: #{$blue3};
   --danger-text: #{$red2};
+  --warning-text: #{$orange2};
+  --success-text: #{$green2};
   --table-header-bg: #{$light-gray5};
   --table-header-shadow: #{$light-gray3};
   --table-border: #{$light-gray2};
@@ -41,6 +43,8 @@ body {
   --active-bg: #{rgba($blue4, 0.25)};
   --brand-text: #{$blue5};
   --danger-text: #{$red5};
+  --warning-text: #{$orange5};
+  --success-text: #{$green5};
   --table-header-bg: #{$dark-gray3};
   --table-header-shadow: #{$dark-gray2};
   --table-border: #{$dark-gray1};
