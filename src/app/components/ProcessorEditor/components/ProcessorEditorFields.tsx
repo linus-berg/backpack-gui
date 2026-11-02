@@ -193,7 +193,7 @@ export const ProcessorEditorFields = ({
         <PanelHeader>
           <H4>
             Description
-            <HelpTip content="Markdown shown to users above the add-artifact form. Basic HTML is allowed; scripts and styles are removed." />
+            <HelpTip content="Markdown shown to users above the add-artifact form. HTML is allowed, including Blueprint classes (e.g. bp6-callout) and inline styles; scripts, event handlers, <style> blocks and url() in styles are removed." />
           </H4>
           <ButtonGroup>
             <Button
